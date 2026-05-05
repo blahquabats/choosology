@@ -1,0 +1,87 @@
+<?php
+   class commentArea 
+   {
+      var $which="",
+      $ispublic=true,
+      $readonly=false,
+      $html="",
+      $script="";
+      /*
+      which = adv123, 
+      
+      */
+      
+      function commentArea($which, $public=true,$readonly=false, $screenid=0, $style="", $commentstext="Comments")
+      {
+          $this->commentstext = $commentstext;
+          $this->which=$which;
+          $this->ispublic=$public;
+          $this->readonly=$readonly;
+          $this->screenid=$screenid;
+          $this->style=$style;
+          if (!$_SESSION['user'] && !$public) return false;
+          if($_SESSION['user'] && !$readonly) $this->buildCommenter();
+          if($public) $this->buildComments();
+          
+      }
+   
+   
+      function buildCommenter()  // textarea, ajax submit stuff
+      {
+          $html="<div class='CAentercomment'>
+          <div class='CAentercommentloader' id='CAloader".$this->which."'>
+          </div>
+          <span id='CAmessage".$this->which."'></span>
+          <textarea id='CAtext".$this->which."' class='CAtextarea empty' onfocus=\"checkCATextArea(this, 'f')\" onblur=\"checkCATextArea(this, 'b')\" maxlength='500'>Enter your comment here...</textarea>
+          <div style='font-size:8pt;color:#666666;float:right;overflow:visible;height:5px;'>(500 characters max)</div>
+          ".makeFakeButton("subcombutton", "submitCAComment('".$this->which."', '".$this->screenid."')",false, "say", "<span id='CAsubmit".$this->which."'>Submit</span>", "green")."
+          <br />
+          </div>";                                    
+          $this->html.=$html;
+      }
+      
+
+      
+      function buildComments()
+      {
+          
+           $html="<br><div class='CAcomments' ";
+           if($this->style) $html .= "style='{$this->style}'";
+           $html.=">
+           <h4>
+           <div class='CAcommentslastpage' id='CAcommentslastpage{$this->which}'></div>
+           <div class='CAcommentsheaderholder'>
+           {$this->commentstext} <br>
+           <span id='CAcommentscountbegin{$this->which}'></span>
+           <span id='CAcommentscountend{$this->which}'></span>
+           <span id='CAcommentscountfull{$this->which}'></span>
+           </div>
+           <div class='CAcommentsnextpage' id='CAcommentsnextpage{$this->which}'></div>
+           </h4>
+           <br><br>
+           <div class='CAcommentsholder' id='CAcommentsholder{$this->which}'>Loading comments...</div>
+           </div>
+           ";
+           $this->html.=$html;
+           $this->script.="window.onload=loadComments('{$this->which}',1);
+           ";
+      }
+      
+      function display($return=false)
+      {
+      if(!$return)
+       {
+       echo $this->html;
+       echo "<script>".$this->script."</script>";
+       }
+       else 
+       {
+       return $this->html;
+      }
+      }
+      function displayScript()
+      {
+         echo "<script>".$this->script."</script>";
+      }
+   }
+?>
