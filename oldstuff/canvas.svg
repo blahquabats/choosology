@@ -1,0 +1,1766 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg 
+     version="1.1" 
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="3600" height="1800"
+     viewBox="0 0 3600 1800"
+     preserveAspectRatio="xMinYMin"
+     style="background-color: #efefff;"
+     onload="loaded()"
+     id="SVGguy">
+     
+<style type='text/css'>                                                                 
+<![CDATA[
+  text {
+  font-family: "Arial", "Helvetica"; 
+  font-weight: normal; 
+  font-size: 11px;
+  font-style: normal;
+  }
+]]>
+</style>
+
+     <script type="text/javascript"><![CDATA[
+                             
+       var cyoXML=top.cyoXML;
+      var num=0;
+      var origtop=0;
+      var targetmoved=0;
+function stripHTML(oldString) {
+
+   var newString = "";
+   var inTag = false;
+   for(var i = 0; i < oldString.length; i++) {
+        if(oldString.charAt(i) == '<') inTag = true;
+        if(oldString.charAt(i) == '>') {
+              if(oldString.charAt(i+1)!="<")
+	{
+		inTag = false;
+		i++;
+	}
+        }
+        if(!inTag) newString += oldString.charAt(i);
+   }
+   return newString;
+}
+
+function addCommas(nStr)
+{
+	nStr += '';
+	x = nStr.split('.');
+	x1 = x[0];
+	x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
+}
+
+    function strip_tags (input, allowed) {
+        allowed = (((allowed || "") + "").toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join(''); // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+        var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi,
+            commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
+        return input.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
+            return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+        });
+    }
+
+
+	
+	function updateDB(screenarray, startnum)
+	{
+	//alert(screenarray.length);
+
+	  if(top.advavail=="public") 
+	  {
+      //alert("You cannot edit this adventure until it is made unavailable to the public.");
+      return false;
+      }
+      if (!startnum) startnum = 0;
+    //else alert(top.advavail);
+    
+		//document.getElementById("loadingoverlay").style.display="block";
+		//document.getElementById("loadingoverlaytext").style.display="block";
+		//document.getElementById("throbgroup").style.display="block";
+		document.getElementById("savingtext").style.visibility="visible";
+		if(screenarray)
+		{
+		if(cyoXML.readyState==4 || cyoXML.readyState==0)
+		{
+		 var post="";
+		 var orsc = 0;
+		 var screencount = 0;
+		  for (var x in screenarray)
+		  {
+		    if (screencount < startnum)
+		    {
+		      screencount++;
+		      continue;
+		    }
+		    if (screencount >= (startnum + 50))
+		    {
+                cyoXML.onreadystatechange=function()
+                {
+                   updateDB(screenarray, startnum+50);
+                };
+                orsc = 1;
+                break;
+		    }
+
+		    for (var y in screenarray[x])
+            {
+               if(y.substr(0,6)=="choice" || y=="id" || y=="xpos" || y=="ypos" || y=="deleted" || y=="name" )
+               {
+                  post+=x+"_"+y+"="+encodeURIComponent(screenarray[x][y])+"&";
+
+               }
+            }
+            screencount++;
+          }
+      if(!post) return false; // nothin to do
+      post+="origtop="+origtop;
+      post+="&advid="+top.advid;
+      //     top.document.getElementById("blehblah").innerHTML=post;
+      //alert(startnum);
+      //alert(post);
+      //return false;
+			cyoXML.open("POST","updateadv.php",true);
+			cyoXML.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			cyoXML.setRequestHeader("Content-length",post.length);
+			if(!orsc) cyoXML.onreadystatechange=advResponse;
+			//alert("send with orsc "+orsc+" and startnum "+startnum);
+			cyoXML.send(post);
+			return true;
+		}
+		else 
+		{
+			//setTimeout('updateDB('+top.advid+')',500);
+		}
+		}
+		else return false;
+		return true;
+	}
+
+	function sendAdventureRequest(id)
+	{
+		  /*document.getElementById("loadingoverlay").style.display="block";
+		  document.getElementById("loadingoverlaytext").style.display="block";
+		  document.getElementById("throbgroup").style.display="block";*/
+		  
+		if(id>0)
+		{
+		if(cyoXML.readyState==4 || cyoXML.readyState==0)
+		{
+			cyoXML.open("GET","updateadv.php?id="+id,true);
+			cyoXML.onreadystatechange=advResponse;
+			cyoXML.send(null);
+			var curfirst=document.getElementById("firstGroup"); 
+      for(var i=(curfirst.childNodes.length-1);i>=0;i--)
+        {
+          curfirst.removeChild(curfirst.childNodes[i]);
+        }
+		}
+		else 
+		{
+			setTimeout('sendAdventureRequest('+id+')',1000);
+		}
+		}
+		else return false;
+	}
+	var allscreens=new Array();
+	var advinfo=new Array();
+	var highlightedfriends = new Array();
+	
+	function advResponse()
+	{
+	  		if(cyoXML.readyState==4)
+		{
+			if(cyoXML.status==200)
+			{
+
+			//alert("responsing");
+
+						var curfirst=document.getElementById("firstGroup"); 
+      for(var i=(curfirst.childNodes.length-1);i>=0;i--)
+        {
+          curfirst.removeChild(curfirst.childNodes[i]);
+        }
+      connx=[];
+      dconnx=[];
+      getx=[];
+      lines=[];
+      allscreens=[];
+      advinfo=[];
+      origtop=0;
+
+			xmlResponse=cyoXML.responseXML;
+			xmlDocEl=xmlResponse.documentElement;
+			var adv=xmlDocEl.getElementsByTagName("adv");
+			var options=xmlDocEl.getElementsByTagName("options");
+			var usedscreens=xmlDocEl.getElementsByTagName("usedscreens");
+			top.document.getElementById('beginid').innerHTML = options[0].firstChild.data;
+			top.document.usedscreens = usedscreens[0].firstChild.data;
+			var nodes=adv[0].childNodes;
+			 
+      
+     for(var i=1;i<nodes.length;i++)
+	 {
+       if(nodes[i].nodeName!="#text") 
+       {
+          if(nodes[i].firstChild)
+          {
+              eval ("advinfo['"+nodes[i].nodeName+"']= \""+nodes[i].firstChild.data+"\";");
+          }
+          else eval ("advinfo['"+nodes[i].nodeName+"']= ''");
+       } 
+     }
+       if(advinfo['avail']=='public') document.getElementById("avail").setAttribute("fill","#ff0000");
+       else document.getElementById("avail").setAttribute("fill","#ccccff");
+			var screens= xmlDocEl.getElementsByTagName("screen");
+			if (browser!="Microsoft Internet Explorer") var index=1;
+            else var index=0;
+			for(var i=0;i<screens.length;i++)
+			{
+         
+                var nodes=screens[i].childNodes;
+         
+                var currid=nodes[index].firstChild.data;
+                allscreens[currid]=new Array();
+                for (var j=0; j<nodes.length;j++)
+                {
+                    if(nodes[j].nodeName=="#text")
+                    {}
+                    else
+                    {
+                        if(nodes[j].firstChild)
+                        {
+                            var thetext=nodes[j].firstChild.data.replace(/^\s\s*/, '').replace(/\s\s*$/, '').replace(/<br \/><br \/><br \/>/gm, "<br /><br />").replace(/(\r\n|\n|\r)/gm,"<br />");
+                            eval ("allscreens["+currid+"]['"+nodes[j].nodeName+"']= '"+thetext+"';");
+                        }
+                        else eval ("allscreens["+currid+"]['"+nodes[j].nodeName+"']= ''");
+                    }
+                }
+      
+            }
+      origtop=parseInt(currid);
+        
+      var bs=new Array();
+      bs[0]=null;
+      bs[1]=advinfo['begin'];
+      buildScreen(bs, false, 0,'begin');
+
+      var yoffset=75;
+      var strayid=new Array();
+      var scrcount = 0;
+      var minuscount = 0;
+      for(var id in allscreens)
+	   {
+	          scrcount++;
+
+			  if(document.getElementById("box"+id)) continue;
+			  else 
+              {
+                yoffset+=75;
+                strayid[0]=null;
+                strayid[1]=id;
+                buildScreen(strayid, false, yoffset,null);
+                minuscount++;
+              }
+	   }
+	   document.getElementById("nodestext").textContent = "Nodes: "+scrcount;
+	   document.getElementById("totalcounttext").textContent = "Total Word Count: "+addCommas(advinfo['space3']);
+			       num=parseInt(origtop)+1;
+		  document.getElementById("savingtext").style.visibility="hidden";
+		  top.document.getElementById("advoptload").style.display="none";
+      return false;
+			}
+			else {
+			document.getElementById("nodestext").textContent = "Nodes: N/A";
+				alert("There was a problem accessing the server: "+cyoXML.statusText);
+				document.getElementById("savingtext").style.visibility="hidden";
+				top.document.getElementById("advoptload").style.display="none";
+			}
+		}	
+	}
+	var totalcount = 0;
+      function buildScreen(sid, fromid, yoffset, marker)
+      {
+
+      var targetscreen;
+       var screeninfo=allscreens[sid[1]];
+       if(!screeninfo)
+       {
+       return false;
+       }
+
+       if(parseInt(sid[1])>parseInt(origtop)) origtop=parseInt(sid[1]);
+       if(screeninfo['xpos']>0) var xoff=screeninfo['xpos'];
+       else var xoff=50;
+       if(screeninfo['ypos']>0) var yoff=screeninfo['ypos'];
+       else var yoff=65+yoffset;
+
+        var screenfull = screeninfo['wordcount'];
+      if(fromid===false) makeRect(xoff,yoff,45,150,5,5,sid[1],screeninfo['name'],marker, screenfull);
+      else if(connx[fromid])
+       {
+        if(!inArray(sid[1],connx[fromid])) makeChild(fromid,sid[1]);
+        else return false;
+       }
+      else if(!connx[fromid]) makeChild(fromid,sid[1]);
+      else return false;
+      for (var num=1;num<=8;num++)
+      {
+        if(screeninfo['choice'+num]!="")
+        {
+          targetscreen=screeninfo['choice'+num].split("|Q-D-|");
+          buildScreen(targetscreen,sid[1], yoffset,null);
+        }
+      }                         
+      }                           
+      
+      function loaded()
+      {
+       var onloadFunc = doload;
+        var O=top.document.getElementById("canvas");     
+    try{
+    top.svgDoc=O.contentDocument;
+    }
+
+catch(err){
+   top.svgDoc=O.getSVGDocument();
+      }  
+      
+        if (top.svgweb) {
+          top.svgweb.addOnLoad(onloadFunc, true, window);
+        } else {
+          onloadFunc();
+        }
+        
+        sendAdventureRequest(top.advid);
+        getEditScreen();
+        
+       } 
+      function doload() 
+      {
+        // SVG on the page should only be manipulated after the page is 
+        // finished loading
+        
+ document.getElementById("SVGguy").addEventListener('mousedown', dragHandler, false);
+ 
+      }
+      
+      function checkOffScreen()
+{
+   overdiv=top.document.getElementById("overdiv");
+   var screenarray=allscreens;
+   var left=parseInt(overdiv.scrollLeft);
+   var right=left+parseInt(overdiv.offsetWidth);
+   var topb=parseInt(overdiv.scrollTop);
+   var bottom=topb+parseInt(overdiv.offsetHeight);
+   var topcount=0;
+   var bottomcount=0;
+   var leftcount=0;
+   var rightcount=0;
+   var maxc=5;
+   var bc="#aaaaff";
+   for (var x in screenarray)
+		  { 
+           if((parseInt(screenarray[x]['xpos'])+140)<left && leftcount<maxc)
+           {
+              leftcount++;
+              continue;
+           }
+           if((parseInt(screenarray[x]['xpos']))>right && rightcount<maxc)
+           {
+              rightcount++;
+              continue;
+           }
+           if((parseInt(screenarray[x]['ypos'])+45)<topb && topcount<maxc)
+           {
+              topcount++;
+              continue;
+           } 
+           if((parseInt(screenarray[x]['ypos']))>bottom && bottomcount<maxc)
+           {
+              bottomcount++;
+              continue;
+           }
+      }
+      //topind=bottom-offsetheight
+      if(leftcount>0)
+      {
+         top.document.getElementById("overdiv").style.borderLeft=leftcount+"px dashed "+bc;
+      }
+      else
+      {
+         top.document.getElementById("overdiv").style.borderLeft="2px solid black";
+      }
+            if(topcount>0)
+      {
+         top.document.getElementById("overdiv").style.borderTop=topcount+"px dashed "+bc;
+      }
+      else
+      {
+         top.document.getElementById("overdiv").style.borderTop="2px solid black";
+      }
+            if(rightcount>0)
+      {
+         top.document.getElementById("overdiv").style.borderRight=rightcount+"px dashed "+bc;
+      }
+      else
+      {
+         top.document.getElementById("overdiv").style.borderRight="2px solid black";
+      }
+            if(bottomcount>0)
+      {
+         top.document.getElementById("overdiv").style.borderBottom=bottomcount+"px dashed "+bc;
+      }
+      else
+      {
+         top.document.getElementById("overdiv").style.borderBottom="2px solid black";
+      }
+      
+      //alert(topcount+ " is top and bottom:"+bottomcount+ " and right: "+rightcount+ " and left:"+leftcount);   
+}
+      
+      
+function inArray(needle, haystack) {
+    var length = haystack.length;
+    for(var i = 0; i < length; i++) {
+        if(haystack[i] == needle) return true;
+    }
+    return false;
+}
+  var browser="";
+if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){ //test for MSIE x.x;
+ var ieversion=new Number(RegExp.$1) // capture x.x portion and store as a number
+ }
+ if(ieversion) browser="Microsoft Internet Explorer";
+ else browser="okay";
+var tempX = 0;
+var tempY = 0;
+var tox = 0;
+var toy = 0;
+
+function getMouseXY(e) {
+  if (browser=="Microsoft Internet Explorer") { // grab the x-y pos.s if browser is IE
+   tempX = e.clientX + document.getElementById("SVGguy").scrollLeft;
+    tempY = e.clientY + document.getElementById("SVGguy").scrollTop;
+  } else {  // grab the x-y pos.s if it isn't 
+    tempX = e.pageX;
+    tempY = e.pageY;
+  }  
+  if (tempX < 0)tempX = 0;
+  if (tempY < 0)tempY = 0;  
+  return true;
+}
+var savedTarget=null; 
+var savedTitle=null;
+var savedId=null;
+
+var attachLock=false;
+var attach1=0;
+var attach2=0;
+
+var orgCursor=null;                             
+   var dragOK=false;                              
+   var dragXoffset=0;                              
+   var dragYoffset=0;
+   var dragXoffsett=0;                              
+   var dragYoffsett=0;   
+   var perfcount=0; 
+   var perfneed=1;
+   var justmoved=0;
+   var menuopen=0;
+   var mid=0;
+   if (browser=="Microsoft Internet Explorer") perfneed=3;
+                                   // global stuff
+                                   
+ function startAttach() 
+ {
+ if(attach1.substr(0,3)!="box") attach1="box"+attach1;
+ if(attach2.substr(0,3)!="box") attach2="box"+attach2;
+ // on first click: [is there more than one box?]
+ if(attachLock) 
+ {
+ document.getElementById("attach").setAttribute("fill","#ccccff");
+ document.getElementById("detach").setAttribute("fill","#ccccff");
+ //document.getElementById("SVGguy").removeEventListener("click",attachProc,false);
+ document.getElementById("SVGguy").removeEventListener("click",attachFinish,false);
+ document.getElementById("SVGguy").removeEventListener("click",detachFinish,false);
+ document.getElementById("SVGguy").addEventListener("mousedown",dragHandler,false);
+ if(attach1!=0)
+ {
+  olditem=document.getElementById(attach1);
+  if(!olditem) alert(attach1);
+  olditem.setAttributeNS(null,"stroke","rgb(0,0,0)");
+  //olditem.setAttributeNS(null,"fill","rgb(204,204,255)");
+  olditem.setAttribute("style","cursor:move");
+  attach1=0;
+ }
+ attach2=0;
+ attachLock=false;
+ return false;
+ }
+ else return false;
+                                      
+ //attachLock=true;
+ //document.getElementById("attach").setAttribute("fill","red");
+ 
+ // then the next click on a box means "start here"
+ //document.getElementById("SVGguy").removeEventListener("mousedown",dragHandler,false);
+ //document.getElementById("SVGguy").addEventListener("click",attachProc,false);
+ // then the next click on different box NOT connected to already means "go here""
+ 
+ } 
+ 
+ function attachProc(e)
+ {
+  if(attach1==0)
+  {
+   attachStart(e);
+  }
+  else 
+  {
+   attachFinish(e);
+  }
+ }                                
+ 
+ function attachStart(id)
+ {
+   if(id.substr(0,3)!="box") id="box"+id;
+   var idnum=parseInt(id.substr(3));
+   if(connx[idnum])
+   {
+      if(connx[idnum].length>=8)
+      {
+        return false;
+      }
+   
+   }
+   
+   var target=document.getElementById(id);
+   //var target = e.target != null ? e.target : e.srcElement;
+   //if(target.getAttribute("id").substring(0,3)=="box")
+   if(id)
+   {
+   closeMenu();
+      attachLock=1;
+      document.getElementById("attach").setAttribute("fill","purple");
+      // get the box even if clicking on x or >> or something
+      attach1=id;
+      rtarget=document.getElementById(attach1);
+      rtarget.setAttribute("style","cursor:not-allowed");
+      //rtarget.setAttribute("fill","#ffddff");
+      rtarget.setAttribute("stroke","#ee88ee");
+      
+       document.getElementById("SVGguy").removeEventListener("mousedown",dragHandler,false);
+ document.getElementById("SVGguy").addEventListener("click",attachFinish,false);
+      
+      return false;
+   }
+   else
+   { 
+   return false;
+   }
+ }
+ 
+ function attachFinish(e)
+ {
+      
+   var target = e.target != null ? e.target : e.srcElement;
+   if(target.getAttribute("id").substring(0,3)=="box") // is it a box?
+   {
+      // get the box even if clicking on x or >> or something
+      // is it a box we're not already connected to?
+      if(attach2!=0 && attach1!=0)
+      {
+       olditem=document.getElementById(attach1);
+       olditem.setAttributeNS(null,"stroke","rgb(0,0,0)");
+      // olditem.setAttributeNS(null,"fill","rgb(204,204,255)");
+      }
+      attach2=target.getAttribute("id");
+      if(attach2.substring(attach2.length-4)=="text") attach2=attach2.substring(0,attach2.length-4);
+      // is it the same box? then cancel
+      if(attach1==attach2)   // if you're clicking on the same thing twice, cancel
+      {
+       olditem=document.getElementById(attach1);
+       olditem.setAttributeNS(null,"stroke","rgb(0,0,0)");
+       //olditem.setAttributeNS(null,"fill","rgb(204,204,255)");
+       startAttach();
+       return false;
+      }
+      if(attach1.substring(0,3)=="box")attach1=attach1.substring(3);
+      if(attach2.substring(0,3)=="box")attach2=attach2.substring(3);
+        if(getx[attach2])
+        {
+             for(var i=0; i<getx[attach2].length; i++)
+             {
+              if(getx[attach2][i]==attach1) 
+              {
+              startAttach();
+              return false;
+              }
+             }
+        }
+        // if the two aren't already connected to each other, then [prompt and] go for it
+
+      makeConnector(attach1,attach2,false);
+      connect(attach1,attach2);
+      updateConnectors(attach2);
+      updateDB(allscreens);
+      startAttach(); 
+      return false;
+   }
+   else
+   { 
+   return false;
+   }
+ }
+ 
+ function detachStart(id)
+ {
+    if(id.substr(0,3)!="box") id="box"+id;
+   var target=document.getElementById(id);
+   if(id)
+   {
+   closeMenu();
+      attachLock=1;
+      document.getElementById("detach").setAttribute("fill","red");
+      // get the box even if clicking on x or >> or something
+      attach1=id;
+      rtarget=document.getElementById(attach1);
+      rtarget.setAttribute("style","cursor:not-allowed");
+      //rtarget.setAttribute("fill","#ffddff");
+      rtarget.setAttribute("stroke","#eeaaee");
+      
+      document.getElementById("SVGguy").removeEventListener("mousedown",dragHandler,false);
+      document.getElementById("SVGguy").addEventListener("click",detachFinish,false);
+      
+      return false;
+   }
+   else
+   { 
+   return false;
+   }
+ }
+ 
+ function detachFinish(e)
+ {
+    var target = e.target != null ? e.target : e.srcElement;
+   if(target.getAttribute("id").substring(0,3)=="box") // is it a box?
+   {
+
+      // get the box even if clicking on text or something
+      // is it a box we're not already connected to?
+      if(attach2!=0 && attach1!=0)
+      {
+       olditem=document.getElementById(attach1);
+       olditem.setAttributeNS(null,"stroke","rgb(0,0,0)");
+      // olditem.setAttributeNS(null,"fill","rgb(204,204,255)");
+      }
+      attach2=target.getAttribute("id");  
+      if(attach2.substring(attach2.length-4)=="text") attach2=attach2.substring(0,attach2.length-4);
+      // is it the same box? then cancel
+      if(attach1==attach2)   // if you're clicking on the same thing twice, cancel
+      {
+       olditem=document.getElementById(attach1);
+       olditem.setAttributeNS(null,"stroke","rgb(0,0,0)");
+      // olditem.setAttributeNS(null,"fill","rgb(204,204,255)");
+       startAttach();
+       return false;
+      }
+      if(attach1.substring(0,3)=="box")attach1=attach1.substring(3);
+      if(attach2.substring(0,3)=="box")attach2=attach2.substring(3);
+      
+        if(getx[attach2])
+        {
+             for(var i=0; i<getx[attach2].length; i++)
+             {
+              if(getx[attach2][i]==attach1) 
+              {
+                 removeConnector(attach1,attach2);
+                 getx[attach2].splice(getx[attach2].indexOf(parseInt(attach1)),1);
+                 connx[attach1].splice(connx[attach1].indexOf(parseInt(attach2)),1);
+                 
+                 if(dconnx[attach1]) if(inArray(attach2,dconnx[attach1])) dconnx[attach1].splice(dconnx[attach1].indexOf(attach2),1);
+                 updateDB(allscreens);
+                 startAttach();
+              return false;
+              }
+             }
+        }
+        // if the two aren't already connected to each other, then give up
+
+      startAttach(); 
+      return false;
+   }
+   else
+   { 
+   return false;
+   }
+ }
+ 
+ 
+ 
+ function divMoveHandler(e)
+ {
+ 
+   if (e == null) { e = window.event }
+   var target = e.target != null ? e.target : e.srcElement; 
+      //if (perfcount>=perfneed){
+      
+      var newx=e.clientX-tempX;
+      var newy=e.clientY-tempY;
+      divScrollX-=newx;
+      divScrollY-=newy;
+
+      var overdiv=top.document.getElementById("overdiv");
+      overdiv.scrollLeft=divScrollX;
+      overdiv.scrollTop=divScrollY;
+      if(overdiv.scrollLeft!=divScrollX) divScrollX=overdiv.scrollLeft;
+      if(overdiv.scrollTop!=divScrollY) divScrollY=overdiv.scrollTop;
+     // checkOffScreen();
+      perfcount=0;
+      
+      //else if(target.getAttribute("id")!="SVGguy") cleanup();
+     /* else {
+           perfcount++;
+           return false;
+      }*/
+ }
+ 
+
+ 
+                                                     
+ function moveHandler(e){
+	 if (e == null) { e = window.event } 
+      if (dragOK && perfcount>=perfneed){
+      var newx=e.clientX-dragXoffset;
+      var newy=e.clientY-dragYoffset;
+      var newxt=e.clientX-dragXoffsett;
+      var newyt=e.clientY-dragYoffsett;
+         if (newx+125>3600)
+         {
+         newx=3600-125;
+         newxt=newx+30;
+         }
+         if (newx<=0) 
+         {
+         newx=0;
+         newxt=newx+30;
+         }
+         if (newy+55>1800)
+         {
+         newy=1800-55;
+         newyt=newy+20;
+         }     
+         if (newy<=0) 
+         {
+         newy=0;
+         newyt=newy+20;
+         }
+         savedTarget.setAttributeNS(null,"x",newx+'px');
+         savedTarget.setAttributeNS(null,"y",newy+'px');
+         
+         savedTitle.setAttributeNS(null,"x",newxt+'px');
+         savedTitle.setAttributeNS(null,"y",newyt+'px');
+         if (!(ieversion && ieversion<9)) updateConnectors(savedTarget.getAttributeNS(null,"id"));
+         perfcount=0;
+         justmoved=savedTarget.getAttribute("id");
+         var jmnum=justmoved.substr(3);
+         allscreens[jmnum]['xpos']=newx;
+         allscreens[jmnum]['ypos']=newy;
+         targetmoved=1;
+         return false;
+      }
+      else if(dragOK) 
+      {
+       perfcount++;
+       return false;
+      }
+   }
+
+   function cleanup(e) {  // just back to business as usual after dragging
+       dragOK=false;
+       var overdiv=top.document.getElementById("overdiv");
+       checkOffScreen();
+    document.getElementById("SVGguy").removeEventListener("mousemove",moveHandler,false);
+    document.getElementById("SVGguy").removeEventListener("mousemove",divMoveHandler,false);
+     //document.getElementById("SVGguy").addEventListener("mousemove",getMouseXY,false);
+     if(savedTarget)
+     {
+        savedTarget.style.cursor="move";
+     }   
+      if(savedTarget && !menuopen && targetmoved) 
+      {
+        updateDB(allscreens);
+      }
+     
+      document.getElementById("SVGguy").removeEventListener("mouseup",cleanup,false);
+      if (browser=="Microsoft Internet Explorer" && savedTarget) updateConnectors(savedTarget.getAttributeNS(null,"id"));
+      savedTarget=null;
+      return true;
+   }
+   
+   function returnAllScreens()
+   {
+       return "hello";
+   }
+
+   function dragHandler(e){ // on mousedown, check to see if it's time to start dragging
+      var htype='-moz-grabbing';
+	    //  e = window.event; 
+	       if (browser=="Microsoft Internet Explorer") var htype='move';
+       
+      var target = e.target != null ? e.target : e.srcElement;
+      if (target.getAttribute("class")=="draggable") 
+      {
+      targetmoved=0;
+      var id=parseInt(target.getAttribute("id").substr(3));
+      if(!id) return false;
+      id=String(id);
+      target=document.getElementById("box"+id);
+      var targett="box"+id+"text";
+      var targettext=document.getElementById(targett);
+	    savedTarget=target; 
+	    savedTitle=targettext;
+
+         target.style.cursor=htype;
+         dragOK=true;
+         dragXoffset=e.clientX-parseInt(savedTarget.getAttributeNS(null,"x"));
+         dragYoffset=e.clientY-parseInt(savedTarget.getAttributeNS(null,"y"));
+          
+         dragXoffsett=e.clientX-parseInt(savedTitle.getAttributeNS(null,"x"));
+         dragYoffsett=e.clientY-parseInt(savedTitle.getAttributeNS(null,"y"));
+          
+         document.getElementById("SVGguy").addEventListener("mousemove",moveHandler,false);
+         document.getElementById("SVGguy").addEventListener("mouseup",cleanup,false);
+         e.preventDefault();
+         return false;
+      }
+      else if (target.getAttribute("id")=="SVGguy") 
+      {
+       //alert(e.clientX+" and "+e.clientY);
+       //return false;
+       divScrollX=top.document.getElementById("overdiv").scrollLeft;
+       divScrollY=top.document.getElementById("overdiv").scrollTop;   
+       tempX=e.clientX;
+       tempY=e.clientY;
+       document.getElementById("SVGguy").addEventListener("mousemove",divMoveHandler,false);
+       document.getElementById("SVGguy").addEventListener("mouseup",cleanup,false);
+       closeMenu();
+      }
+   }
+var first=0;   
+      
+      var svgNS = "http://www.w3.org/2000/svg";
+      var xlinkNS = "http://www.w3.org/1999/xlink";
+      
+         
+      var connx=new Array();
+      var dconnx=new Array();
+      var getx=new Array();
+      var lines=new Array();
+ 
+      function makeRect(x,y,h,w,rx,ry,number,label,marker, screenfull)
+      {
+      var newGroup = document.createElementNS(svgNS,"g");
+      var gid="box"+number+"group";
+      newGroup.setAttributeNS(null,"id",gid);
+      document.getElementById("firstGroup").appendChild(newGroup);
+      var newRect = document.createElementNS(svgNS,"rect");
+      newRect.setAttributeNS(null,"width",w);	
+      newRect.setAttributeNS(null,"height",h);		
+      newRect.setAttributeNS(null,"x",x);		
+      newRect.setAttributeNS(null,"y",y);
+      newRect.setAttributeNS(null,"rx",5);
+      newRect.setAttributeNS(null,"ry",5);
+      newRect.setAttributeNS(null,"class","draggable");
+      newRect.setAttributeNS(null,"style","cursor:move");
+      newRect.setAttributeNS(null,"id","box"+number);
+      newRect.setAttributeNS(null,"stroke-width","3");
+      newRect.setAttributeNS(null,"stroke","rgb(0,0,0)");
+      if(screenfull > 0)
+      {
+      //   newRect.setAttributeNS(null,"stroke","rgb(17,68,17)");
+         newRect.setAttributeNS(null,"fill","rgb(204,255,204)");
+      }
+      else
+      {
+      //   newRect.setAttributeNS(null,"stroke","rgb(17,17,68)");
+         newRect.setAttributeNS(null,"fill","rgb(204,204,255)");
+      }
+      newRect.addEventListener('mouseover',highlightFriends,true);
+      newRect.addEventListener('mouseout',dimFriends,true);
+      newRect.addEventListener('click',openMenu,true);
+      newRect.addEventListener('dblclick',editScreen,true);
+      w=parseInt(w);
+      h=parseInt(h);
+      var Text = document.createElementNS(svgNS,"text");
+      var Line1 = document.createElementNS(svgNS,"tspan");
+      var Line2 = document.createElementNS(svgNS,"tspan");
+
+      Line2.setAttributeNS(null, "dy", "1em");
+      Text.setAttributeNS(null,"x",parseInt(x)+10);
+      Text.setAttributeNS(null,"y",parseInt(y)+20);
+      Text.setAttributeNS(null,"id","box"+number+"text");
+      Line1.setAttributeNS(null,"id","box"+number+"text");
+      Line2.setAttributeNS(null,"id","box"+number+"text");
+      Text.addEventListener('mouseover',highlightFriends,true);
+      Text.addEventListener('mouseout',dimFriends,true);
+      Text.addEventListener('click',openMenu,true);
+      Text.setAttributeNS(null,"class","draggable");
+      Text.setAttributeNS(null,"style","cursor:move");
+      document.getElementById(gid).appendChild(newRect);
+      if(label==undefined) label="[Untitled]";
+      if(marker=='begin') label+=" [B]";
+      // figure out line breaks
+      if(label.length>15)
+      {
+      
+      
+      }
+      
+      var textNode = document.createTextNode(label);
+      if(screenfull == 1) var counttext = "1 word";
+       else var counttext = screenfull+" words";
+      var textNode2 = document.createTextNode(counttext);
+      
+      
+      Line1.appendChild(textNode);
+          Text.appendChild(Line1);
+          document.getElementById(gid).appendChild(Text);
+      var line1length = Line1.getComputedTextLength();
+      //alert(line1length);
+      Line2.setAttributeNS(null, "dx", -line1length);
+      Line2.appendChild(textNode2);
+
+      Text.appendChild(Line2);
+
+                                  
+      }
+      
+      function makeChild(id1,newid)
+      {
+       if(typeof(id1)=="string" && id1.substr(0,3)=="box")
+       {
+         id1=id1.substr(3);
+       }
+       var label;
+       if(newid===false) 
+       {
+       closeMenu();  
+       newid=num++;
+       var label=prompt("Enter a name for the new screen:");
+       if(label==null) return false;
+       if(label=="") label="NEW SCREEN";
+       allscreens[newid]=new Array();
+       allscreens[newid]["id"]=newid;
+       allscreens[newid]["name"]=label;
+       allscreens[newid]["screenname"]="";
+       allscreens[newid]["choice1"]="";
+       allscreens[newid]["choice2"]="";
+       allscreens[newid]["choice3"]="";
+       allscreens[newid]["choice4"]="";
+       allscreens[newid]["choice5"]="";
+       allscreens[newid]["choice6"]="";
+       allscreens[newid]["choice7"]="";
+       allscreens[newid]["choice8"]="";
+       }
+       else 
+       {
+       var newscreen=allscreens[newid];
+       label=newscreen['name'];
+       }
+       if(!document.getElementById("box"+newid))
+       {
+       var box=document.getElementById("box"+id1);
+       var x=parseInt(box.getAttributeNS(null,"x"));
+       var y=parseInt(box.getAttributeNS(null,"y"));
+       var h=box.getAttributeNS(null,"height");
+       var w=box.getAttributeNS(null,"width");
+       var c;
+       if(dconnx[id1])
+       {
+         var parlength=dconnx[id1].length;
+         //alert(connx[id1].length);
+
+        if(parlength>0)
+        {
+                 parlength--;
+         var sibid=dconnx[id1][parlength];
+         if(dconnx[sibid]) var siblength=dconnx[sibid].length;
+         else siblength=0;
+         if(siblength) y=parseInt(document.getElementById("box"+dconnx[sibid][siblength-1]).getAttributeNS(null,"y"));
+         
+         /*for(c=1;c<siblength; c++)
+        {
+         y=y+70;
+        }  */
+        if(y+55>1800) y=1800-75;
+         }
+       }
+       if(dconnx[id1])
+       {
+        for(c=0;c<dconnx[id1].length; c++)
+        {
+         y=y+70;
+        }
+        if(y+55>1800) y=1800-75;
+       } 
+              
+        x=x+250;
+        if(x+125>3600) x=3600-150;
+        if(newscreen && newscreen['xpos'] && newscreen['xpos']!='0') x=newscreen['xpos'];
+        else allscreens[newid]['xpos']=x;
+        if(newscreen && newscreen['ypos'] && newscreen['ypos']!='0') y=newscreen['ypos'];
+        else allscreens[newid]['ypos']=y;
+        
+        /*if(allscreens[newid]['text'])
+        {
+               var screenfull = allscreens[newid]['text'];
+               screenfull = strip_tags(top.Encoder.htmlDecode(screenfull));
+               screenfull = screenfull.trim();
+               screenfull = screenfull.split(" ");
+               screenfull = screenfull.length;
+        }
+        else screenfull=0;*/
+        var screenfull = 0;
+        if(allscreens[newid]['wordcount']) screenfull = allscreens[newid]['wordcount'];
+        makeRect(x,y,h,w,5,5,newid,label,null, screenfull);
+
+
+        if(!dconnx[id1]) 
+      {
+         dconnx[id1]=new Array();
+         dconnx[id1][0]=newid;
+      }
+      else if(inArray(newid,dconnx[id1]))
+           {
+            return false;
+           }
+           else dconnx[id1][dconnx[id1].length]=newid;
+       }
+      if((connx[id1] && !inArray(newid,connx[id1])) || !connx[id1])
+      {
+      makeConnector(id1,newid, true); 
+      connect(id1,newid);
+      updateConnectors(id1);
+       }
+      }
+            
+      function showinfo(id)
+      {
+        //return false;
+        var dump="";
+        for (var i in allscreens[id])
+        {
+           dump+=" "+i+"="+allscreens[id][i]+" ";
+        }
+        alert(dump+" origtop:"+origtop+" num:"+num);
+      }
+        
+      function deleteScreen(boxid)
+      {
+        if(advinfo['begin']==boxid) 
+        {
+           alert("This screen is set as the beginning of your adventure! You cannot remove it.");
+           return false;
+        }
+        if(confirm("Are you sure you want to delete this screen? This will remove it and all its connections from the adventure.")) 
+        {
+          removeBox(boxid);
+          top.closeDivUp();
+          updateDB(allscreens);
+        }     
+      }
+      
+      function removeBox(boxid)
+      {    
+       
+        if(attachLock) return false;
+        var box=document.getElementById("box"+boxid);
+        var group=document.getElementById("box"+boxid+"group");
+        closeMenu();
+        // need to remove from field, from arrays, remove any connectors.
+        //1: from field (take all members of the node's group out)
+        for(var i=(group.childNodes.length-1);i>=0;i--)
+        {
+          group.removeChild(group.childNodes[i]);
+        }
+        
+        //2: connectors and arrays. for each entry in the connector arrays, remove the connector, remove the entry in the partner array for the deleted 
+        if(connx[boxid])
+         {                                      
+              for(var i=0;i<connx[boxid].length; i++)
+              {              
+              removeConnector(boxid,connx[boxid][i]);
+              getx[connx[boxid][i]].splice(getx[connx[boxid][i]].indexOf(boxid),1);
+              }
+              connx[boxid]=new Array();
+              dconnx[boxid]=new Array();
+         }
+         if(getx[boxid])
+         {
+              for(var i=0;i<getx[boxid].length; i++)
+              {                   
+              removeConnector(getx[boxid][i],boxid);
+              connx[getx[boxid][i]].splice(connx[getx[boxid][i]].indexOf(boxid),1);
+              if(dconnx[getx[boxid][i]])dconnx[getx[boxid][i]].splice(dconnx[getx[boxid][i]].indexOf(boxid),1);
+              }
+              getx[boxid]=new Array();    
+         }
+         allscreens[boxid]["deleted"]=1;
+
+      }
+      
+      function removeConnector(id1,id2)
+      {
+      var conn=document.getElementById(id1+"to"+id2);
+      conn.parentNode.removeChild(conn);
+      var si=allscreens[id1];
+      var ttext= new Array();
+        for (var i=1; i<=8; i++)
+        {
+            if(si["choice"+i]=="") continue;
+            ttext[1]="";
+            ttext=si["choice"+i].split("|Q-D-|");
+              if(ttext[1]==allscreens[id2]["id"])
+              {
+                allscreens[id1]["choice"+i]="";
+              }
+          
+          
+        }
+      }
+      
+      function connect(id1,id2)
+      {
+            if(!connx[id1]) 
+      {
+         connx[id1]=new Array();
+         connx[id1][0]=id2;
+      }
+      else if(inArray(id2,connx[id1]))
+           {
+            return false;
+           }
+      else connx[id1][connx[id1].length]=id2;
+
+
+      if(!getx[id2]) 
+      {
+         getx[id2]=new Array();
+         getx[id2][0]=id1;
+      }
+      else getx[id2][getx[id2].length]=id1; 
+      
+       
+    // now we save the information... make sure we're not adding another one for pre-made stuff
+      var firstfree=0;
+      for(var num=1; num<=8;num++)
+      {
+         if((!allscreens[id1]["choice"+num] || allscreens[id1]["choice"+num]=="") && firstfree==0)
+         {
+            firstfree=num;
+         }
+         else
+         {
+           var we=allscreens[id1]["choice"+num].split("|Q-D-|");
+           if(we[1]==allscreens[id2]["id"]) return true;
+         }
+         
+      }
+      allscreens[id1]["choice"+firstfree]=allscreens[id2]["name"]+"|Q-D-|"+allscreens[id2]["id"];
+      
+            return true;
+      
+      }
+      
+      function updateConnectors(boxid)
+      {
+        if(boxid.substr(0,3)=="box") boxid=boxid.substr(3);
+         if(connx[boxid])
+         {
+              for(var i=0;i<connx[boxid].length; i++)
+              {
+              var apath=document.getElementById(boxid+"to"+connx[boxid][i]);        
+              lineOrPath(boxid,connx[boxid][i],apath);     
+              }
+         }
+         if(getx[boxid])
+         {
+              for(var i=0;i<getx[boxid].length; i++)
+              {
+              var apath=document.getElementById(getx[boxid][i]+"to"+boxid);
+              lineOrPath(getx[boxid][i],boxid,apath);     
+              }
+         }
+      }
+      
+      function replace(which,sort,atts)
+      {
+        if(sort=="line")
+        { // it is currently a path, needs to be a line.
+           var newPath = document.createElementNS(svgNS,"line");
+             
+             newPath.setAttributeNS(null,"x1",atts[0]);
+             newPath.setAttributeNS(null,"y1",atts[1]);
+             newPath.setAttributeNS(null,"x2",atts[2]);
+             newPath.setAttributeNS(null,"y2",atts[3]);
+             newPath.setAttributeNS(null,"stroke",which.getAttribute("stroke"));
+             newPath.setAttributeNS(null,"stroke-width","3");
+             newPath.setAttributeNS(null,"fill","none");
+             newPath.setAttributeNS(null,"id",atts[4]);
+             newPath.setAttributeNS(null,"class","itsaline");
+             which.parentNode.replaceChild(newPath,which);
+
+        }
+          if(sort=="path")
+        { // it is currently a line, needs to be a path.
+           var newPath = document.createElementNS(svgNS,"path");
+             
+             newPath.setAttributeNS(null,"d",atts[0]);
+             newPath.setAttributeNS(null,"stroke",which.getAttribute("stroke"));
+             newPath.setAttributeNS(null,"fill","none");
+             newPath.setAttributeNS(null,"stroke-width","3");
+             newPath.setAttributeNS(null,"id",atts[1]);
+             newPath.setAttributeNS(null,"class","itsapath");
+             which.parentNode.replaceChild(newPath,which);
+
+        }
+      }
+      
+      function lineOrPath(id1,id2,which)
+      {
+        var box1=document.getElementById("box"+id1);
+        var box2=document.getElementById("box"+id2);
+        var b1x=parseInt(box1.getAttributeNS(null,"x"));
+        var b2x=parseInt(box2.getAttributeNS(null,"x"));
+        var b1w=parseInt(box1.getAttributeNS(null,"width"));
+        if(b1x+b1w>=b2x+3) 
+        {
+        var newd=figurePath(box1,box2);
+        if (which.getAttributeNS(null,"class")=="itsapath")
+        {
+        which.setAttributeNS(null,"d",newd);
+        }
+        else
+        {
+        var attribs=new Array();
+        attribs[0]=newd
+        attribs[1]=id1+"to"+id2;
+        replace(which,"path",attribs);
+        }
+        }
+        else
+        {
+        var linear=figureLine(box1,box2);
+        if (which.getAttribute("class")=="itsaline")
+        {
+        which.setAttribute("x1",linear[0]);
+        which.setAttribute("y1",linear[1]);
+        which.setAttribute("x2",linear[2]);
+        which.setAttribute("y2",linear[3]);
+         }
+         else
+         {
+           linear[4]=id1+"to"+id2;
+           replace(which,"line",linear);
+         }
+         
+        }
+      }
+      
+      function figureLine(box1,box2)
+      {
+        //var box1=document.getElementById(id1);
+        //var box2=document.getElementById(id2);
+        var b1x=parseInt(box1.getAttributeNS(null,"x"));
+        var b1y=parseInt(box1.getAttributeNS(null,"y"));
+        var b1h=parseInt(box1.getAttributeNS(null,"height"));
+        var b1w=parseInt(box1.getAttributeNS(null,"width"));
+           
+        var b2x=parseInt(box2.getAttributeNS(null,"x"));
+        var b2y=parseInt(box2.getAttributeNS(null,"y"));
+        var b2h=parseInt(box2.getAttributeNS(null,"height"));
+        var b2w=parseInt(box2.getAttributeNS(null,"width"));
+        
+        var r=new Array();
+        r[0]=b1x+b1w; // x1
+        r[1]=b1y+(b1h*.5); //y1
+        r[2]=b2x;          // x2
+        r[3]=b2y+(b1h*.5); // y2
+        return r;
+      }
+      
+      function figurePath(box1,box2)
+      {
+        //var box1=document.getElementById(id1);
+        //var box2=document.getElementById(id2);
+                  
+        var b1x=parseInt(box1.getAttributeNS(null,"x"));
+        var b1y=parseInt(box1.getAttributeNS(null,"y"));
+        var b1h=parseInt(box1.getAttributeNS(null,"height"));
+        var b1w=parseInt(box1.getAttributeNS(null,"width"));
+           
+        var b2x=parseInt(box2.getAttributeNS(null,"x"));
+        var b2y=parseInt(box2.getAttributeNS(null,"y"));
+        var b2h=parseInt(box2.getAttributeNS(null,"height"));
+        var b2w=parseInt(box2.getAttributeNS(null,"width"));
+        var newxs=b1x+b1w;
+        var newys=b1y+(b1h*.5);
+        var newxe=b2x;
+        var newye=b2y+(b1h*.5);
+        // control points
+      
+        var diff=(b1x+b1w)-(b2x+3);
+        var hdiff=diff*.5;
+        if(hdiff>50) hdiff=50;
+        var newxc1=b1x+b1w+(hdiff);
+        var newxc2=b2x-(hdiff);
+         if(b1y<b2y)
+         {
+          var newyc1=b1y+b1h+(hdiff);
+          var newyc2=b2y-(hdiff);
+         }
+         else
+         {
+          var newyc1=b1y-(hdiff);
+          var newyc2=b2y+b2h+(hdiff);
+         }
+        var newd="M"+newxs+","+newys+" C"+newxc1+","+newyc1+" "+newxc2+","+newyc2+" "+newxe+","+newye;
+        return newd;
+      }
+      
+      function makeConnector(id1,id2,isline)
+      {
+        if(connx[id1])
+        {
+           if(inArray(id2,connx[id1]))
+           {
+            return false;
+           }
+           }
+            if(isline==true) {
+            var xy=figureLine(document.getElementById("box"+id1),document.getElementById("box"+id2));
+            var newPath = document.createElementNS(svgNS,"line");
+             
+             newPath.setAttributeNS(null,"x1",xy[0]);
+             newPath.setAttributeNS(null,"y1",xy[1]);
+             newPath.setAttributeNS(null,"x2",xy[2]);
+             newPath.setAttributeNS(null,"y2",xy[3]);
+             newPath.setAttributeNS(null,"stroke-width","3");
+             newPath.setAttributeNS(null,"stroke","rgb(0,0,0)");
+             newPath.setAttributeNS(null,"fill","none");
+             newPath.setAttributeNS(null,"id",id1+"to"+id2);
+             newPath.setAttributeNS(null,"class","itsaline");
+             }
+             else 
+             {
+            var newd=figurePath(document.getElementById("box"+id1),document.getElementById("box"+id2));
+            var newPath = document.createElementNS(svgNS,"path");
+
+             newPath.setAttributeNS(null,"stroke","rgb(0,0,0)");
+             newPath.setAttributeNS(null,"stroke-width","3");
+             newPath.setAttributeNS(null,"fill","none");
+             newPath.setAttributeNS(null,"id",id1+"to"+id2);
+             newPath.setAttributeNS(null,"class","itsapath");
+             newPath.setAttributeNS(null,"d",newd);
+             }
+             
+             document.getElementById("firstGroup").appendChild(newPath);
+                 
+      }
+      
+      function brighten(id)
+      {
+        document.getElementById(id).setAttribute("fill","green");
+      }
+      
+      function dimmen(id)
+      {
+        if(!attachLock) document.getElementById(id).setAttribute("fill","red");
+      }
+      
+      function mhighlight(num)
+      {
+       var box=document.getElementById("menuop"+num);
+       box.setAttribute("stroke","#111144");
+       box.setAttribute("fill","#aaaae9");
+      }
+      
+      function mdehighlight(num)
+      {
+       var box=document.getElementById("menuop"+num);
+       box.setAttribute("stroke","#ddddff");
+       box.setAttribute("fill","#ddddff");
+      }
+
+
+      function highlightFriends(e)
+      {
+
+        var target = e.target != null ? e.target : e.srcElement;
+        if(!target.getAttribute("id")) return false;
+        var id=String(parseInt(target.getAttribute("id").substr(3)));
+        var origitem=document.getElementById("box"+id);
+        if(connx[id])
+        {
+
+
+             for(var i=0; i<connx[id].length; i++)
+             {
+             var item=document.getElementById("box"+connx[id][i]);
+             var path=document.getElementById(id+"to"+connx[id][i]);
+             path.setAttributeNS(null,"stroke","rgb(50,200,50)");
+            
+             var label=document.getElementById("pathlabel"+(i+1));
+             var ltext=document.getElementById("pathtext"+(i+1));
+             while(ltext.firstChild)
+             {
+               ltext.removeChild(ltext.firstChild);
+             }
+            //  var label=document.getElementById("pathlabel1");
+            // var ltext=document.getElementById("pathtext1");
+             if(allscreens[id]) var labeltext=stripHTML(top.Encoder.htmlDecode(top.Encoder.htmlDecode(allscreens[id]['choice'+(i+1)])));
+             else labeltext="[no text]";
+             var texts=labeltext.split("|Q-D-|");
+             if(texts[0]!="")
+             {
+             var tlength=texts[0].length;
+             var b1x=parseInt(origitem.getAttributeNS(null,"x"));
+             var b1y=parseInt(origitem.getAttributeNS(null,"y"));
+             var b1h=parseInt(origitem.getAttributeNS(null,"height"));
+             var b1w=parseInt(origitem.getAttributeNS(null,"width"));
+           
+             var b2x=parseInt(item.getAttributeNS(null,"x"));
+             var b2y=parseInt(item.getAttributeNS(null,"y"));
+             var b2h=parseInt(item.getAttributeNS(null,"height"));
+             var b2w=parseInt(item.getAttributeNS(null,"width"));
+             var newxs=b1x+b1w;
+             var newys=b1y+(b1h*.5);
+             var newxe=b2x;
+             var newye=b2y+(b1h*.5);
+             var middlex=(newxs+newxe)/2;
+             var middley=(newys+newye)/2;
+             var newwidth=10+(6*tlength);
+             var startx=middlex-(newwidth/2);
+             var starty=middley-10;
+             
+             var textNode = document.createTextNode(texts[0]);
+             ltext.appendChild(textNode);
+             ltext.setAttribute("x",startx+3);
+             ltext.setAttribute("y",starty+12);
+             label.setAttribute("x",startx);
+             label.setAttribute("width",newwidth);
+             label.setAttribute("y",starty);
+             }
+             
+             if(item.getAttribute("id")!=attach1 && item.getAttribute("id")!=attach2) 
+              {
+               item.setAttributeNS(null,"stroke","rgb(50,200,50)");
+               //item.setAttributeNS(null,"fill","rgb(204,255,204)");
+              }
+                           var newindex = highlightedfriends.length;
+                           highlightedfriends[newindex] = new Array();
+                           highlightedfriends[newindex]["item"]=item;
+                           highlightedfriends[newindex]["path"]=path;
+             }
+
+        }
+        if(getx[id])
+        {
+             for(var i=0; i<getx[id].length; i++)
+             {
+             var item=document.getElementById("box"+getx[id][i]);
+             var path=document.getElementById(getx[id][i]+"to"+id);
+             path.setAttributeNS(null,"stroke","rgb(200,50,50)");
+             if(item.getAttribute("id")!=attach1 && item.getAttribute("id")!=attach2)
+             {
+               if(item.getAttributeNS(null,"stroke")=="rgb(50,200,50)")
+               {
+                 item.setAttributeNS(null,"stroke","rgb(200,200,50)");
+                 //item.setAttributeNS(null,"fill","rgb(255,255,204)");
+               }
+               else
+               {
+                 item.setAttributeNS(null,"stroke","rgb(200,50,50)");
+                // item.setAttributeNS(null,"fill","rgb(255,204,204)");
+               }
+             }
+                          var newindex = highlightedfriends.length;
+                          highlightedfriends[newindex] = new Array();
+                          highlightedfriends[newindex]["item"]=item;
+                          highlightedfriends[newindex]["path"]=path;
+             }
+
+        }
+
+      }
+      
+      function dimFriends(e)
+      {
+          var target = e.target != null ? e.target : e.srcElement;
+          if(!target.getAttribute("id")) return false;
+          var id=target.getAttribute("id").substr(3);
+
+        for (var j=1; j<9; j++)
+        {
+             var label=document.getElementById("pathlabel"+(j));
+             if(document.getElementById("pathtext"+j))var ltext=document.getElementById("pathtext"+(j));
+            
+            if(ltext.firstChild)
+            {
+             ltext.removeChild(ltext.firstChild);
+             ltext.setAttribute("x",-110);
+             ltext.setAttribute("y",-110);
+             label.setAttribute("x",-110);
+             label.setAttribute("y",-110);
+             }
+         }
+         for (var x in highlightedfriends)
+         {
+
+               var item=highlightedfriends[x]["item"];
+               var path=highlightedfriends[x]["path"];
+               path.setAttributeNS(null,"stroke","rgb(0,0,0)");
+               if(item.getAttribute("id")!=attach1 && item.getAttribute("id")!=attach2)
+               {
+                 item.setAttributeNS(null,"stroke","rgb(0,0,0)");
+                // item.setAttributeNS(null,"fill","rgb(204,204,255)");
+               }
+
+         }
+
+        /*
+        if(connx[id])
+        {
+             for(var i=0; i<connx[id].length; i++)
+             {
+             var item=document.getElementById("box"+connx[id][i]);
+             var path=document.getElementById(id+"to"+connx[id][i]);
+             path.setAttributeNS(null,"stroke","rgb(0,0,0)");
+
+             if(item.getAttribute("id")!=attach1 && item.getAttribute("id")!=attach2) 
+              {                                                                
+               item.setAttributeNS(null,"stroke","rgb(0,0,0)");
+              // item.setAttributeNS(null,"fill","rgb(204,204,255)");
+              }
+             }
+        }
+        if(getx[id])
+        {
+             for(var i=0; i<getx[id].length; i++)
+             {
+             var item=document.getElementById("box"+getx[id][i]);
+             var path=document.getElementById(getx[id][i]+"to"+id);
+             path.setAttributeNS(null,"stroke","rgb(17,17,102)");
+             if(item.getAttribute("id")!=attach1 && item.getAttribute("id")!=attach2) 
+              {
+               item.setAttributeNS(null,"stroke","rgb(0,0,0)");
+               //item.setAttributeNS(null,"fill","rgb(204,204,255)");
+              }
+             }
+        }*/
+
+      }
+      
+      function getEditScreen()
+      {
+         var screen=top.screentoedit;
+         if(!screen || screen==0) return false;
+         top.screentoedit=0;
+         mid=screen;
+         top.switchSec("vised");
+         editScreen(screen, 0, 1);
+      }
+      
+      function openMenu(e)
+      {
+      if(top.advavail=="public") return false;
+      if(e.detail>1) return false;
+      if(attachLock) return false;
+        var target = e.target != null ? e.target : e.srcElement;
+       if(menuopen==1) // close it up
+       {
+        if(mid==parseInt(target.getAttribute("id").substr(3)))
+        {
+        closeMenu();
+        return false;
+        }
+        else 
+        {
+        closeMenu();
+        }
+       }
+        //getMouseXY(e);
+        
+        
+        mid=parseInt(target.getAttribute("id").substr(3));
+        mid=String(mid);
+        if(target=document.getElementById('box'+mid))
+        {
+        }
+        else return false;
+        var theight=target.getAttribute("height");
+        var tx=target.getAttribute("x");
+        var ty=target.getAttribute("y");
+        tox=tx;
+        toy=parseInt(ty)+parseInt(theight)-3;
+        if(justmoved && justmoved.substr(3)==mid)   // we just dragged this box so no menu... but clear the justmoved
+        {
+          justmoved=0;
+          mid=0;
+          return false;
+        }
+        var boxmenu=document.getElementById("menuGroup");
+        var cthing=null;
+        
+        for(var i=0; boxmenu.childNodes.length>i; i++)
+        {
+            if(boxmenu.childNodes[i].id)
+            {
+            cthing=document.getElementById(boxmenu.childNodes[i].id) ;
+            cthing.setAttribute("x",parseInt(cthing.getAttribute("x"))+510+parseInt(tox));
+            cthing.setAttribute("y",parseInt(cthing.getAttribute("y"))+510+parseInt(toy));
+            }
+        }
+        menuopen=1;
+        //!!!menutimer!!!    
+      }
+      
+      function closeMenu()
+      {
+        if(!menuopen)
+        {
+        mid=0;
+        return false;
+        }   
+        var midbox=document.getElementById("box"+mid);
+        var theight=midbox.getAttribute("height");
+        var tx=midbox.getAttribute("x");
+        var ty=midbox.getAttribute("y");
+        var boxmenu=document.getElementById("menuGroup");
+        var cthing=null;
+        for(var i=0; boxmenu.childNodes.length>i; i++)
+        {
+            if(boxmenu.childNodes[i].id)
+            {
+            cthing=document.getElementById(boxmenu.childNodes[i].id);
+            cthing.setAttribute("x",parseInt(cthing.getAttribute("x"))-510-parseInt(tox));
+            cthing.setAttribute("y",parseInt(cthing.getAttribute("y"))-510-parseInt(toy));
+            }
+        }
+      menuopen=0;
+      mid=0;
+      return false;
+      }
+      
+      function editScreen(sid, udb, quick)
+      {
+        if(top.advavail=="public") return false;
+        if(!udb)  udb=0;
+        if(!quick)  quick=0;
+        if(!sid || sid==0) 
+          {
+          getEditScreen();
+          return false;
+          }
+          if(sid.target) 
+          {
+            var tar = sid.target != null ? sid.target : sid.srcElement;
+            sid=tar.getAttribute("id");
+            sid=String(parseInt(sid.substring(3)));
+    
+          }
+        var du=top.document.getElementById("divup1");
+        if(du.innerHTML==false || du.style.display=="none" || true) 
+        {
+           
+           top.screentoedit=sid;
+           var size=top.openDivUp('editscreen.php', new Array('id','screen'), new Array(top.advid,sid), false, sid, quick);
+           
+        }
+
+      }
+
+      function saveAndClose()
+      {
+         updateDB(allscreens);
+         if(top.document.getElementById("divup1").style.display="block")
+         {
+            closeDivUp();
+         }
+      }
+           
+    
+]]></script>
+    <rect x="1" y="1" rx="1" ry="1" height="30" stroke="#111166" fill="#ccccff" width="355" id="menubar" style='position:fixed; z-index:10'/>
+    <rect x="361" y="1" rx="1" ry="1" height="30" stroke="#111166" fill="#ccccff" width="170" id="totalcountbutton" style='position:fixed; z-index:10'/>
+    <text x="367" y="20" style="cursor:arrow;font-weight:bold;font-size:12px;" fill="#000" id="totalcounttext">Total Word Count: </text>
+    <text x="5" y="20" style="cursor:arrow;font-weight:bold;font-size:12px;" fill="#000" id="nodestext">Nodes: </text>
+    <rect x="87" y="5" rx="0" ry="0" height="20" stroke="none" fill="#ccccff" width="30px"
+ id="attach"/>
+     <text x="90" y="20" style="cursor:arrow;font-weight:bold;font-size:12px;" fill="#ccccff" id="attachtext">ATT</text>
+    <rect x="117" y="5" rx="0" ry="0" height="20" stroke="none" fill="#ccccff" width="30px"
+ id="detach"/>
+     <text x="120" y="20" style="cursor:arrow;font-weight:bold;font-size:12px;" fill="#ccccff" id="detachtext">DET</text>
+    <rect x="147" y="5" rx="0" ry="0" height="20" stroke="none" fill="#ccccff" width="200px"
+ id="avail"/>
+     <text x="150" y="20" style="cursor:arrow;font-weight:bold;font-size:12px;" fill="#ccccff" id="availtext">Cannot edit: Adventure available!</text>
+     
+    
+    <rect x="285" y="1" rx="3" ry="3" height="30" stroke="#111166" fill="#ccccff" style="font-weight:bold;font-size:12px;display:none;" onclick="updateDB(allscreens);" width="50" id="savebutton"/>
+    <text x="290" y="20" style="cursor:pointer;font-weight:bold;font-size:12px;display:none;" fill="#000000" onclick="updateDB(allscreens);" id="savetext">Save!</text>
+    <text x="290" y="20" style="font-weight:bold;font-size:12px;visibility:hidden;" fill="#000000" id='savingtext'>Saving...</text>
+    <g id="firstGroup"> 
+
+    </g>
+    
+    <g id="pathsGroup">
+    <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel1"/>
+    <text x="-110" y="-110" id="pathtext1"></text>
+        <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel2"/>
+    <text x="-110" y="-110" id="pathtext2"></text>
+        <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel3"/>
+    <text x="-110" y="-110" id="pathtext3"></text>
+    
+    <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel4"/>
+    <text x="-110" y="-110" id="pathtext4"></text>
+    <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel5"/>
+    <text x="-110" y="-110" id="pathtext5"></text>
+    <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel6"/>
+    <text x="-110" y="-110" id="pathtext6"></text>
+    <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel7"/>
+    <text x="-110" y="-110" id="pathtext7"></text>
+    <rect x="-110" y="-110" rx="1" ry="1" height="15" stroke="rgb(17,102,17)" fill="rgb(204,255,204)" width="100" id="pathlabel8"/>
+    <text x="-110" y="-110" id="pathtext8"></text>
+    </g>
+    <g id="menuGroup">
+    <rect x="-510" y="-510" rx="1" ry="1" height="100" stroke="#444499" fill="#ddddff" width="150" id="boxmenu"/>
+          <rect x="-509" y="-509" height="18" stroke="#ddddff" fill="#ddddff" width="148" id="menuop1" onclick='editScreen(mid)' onmouseover="mhighlight(1)" onmouseout="mdehighlight(1)"/>
+      <text x="-505" y="-494" id="menuop1t" onmouseover="mhighlight(1)" onmouseout="mdehighlight(1)" onclick='editScreen(mid)'>Edit...</text>
+
+    <rect x="-509" y="-489" height="18" stroke="#ddddff" fill="#ddddff" width="148" id="menuop2" onmouseover="mhighlight(2)" onclick="attachStart(mid)" onmouseout="mdehighlight(2)"/>
+      <text x="-505" y="-474" id="menuop2t" onmouseover="mhighlight(2)" onmouseout="mdehighlight(2)" onclick="attachStart(mid)">Connect To...</text>
+    <rect x="-509" y="-469" height="18" stroke="#ddddff" fill="#ddddff" width="148" id="menuop3" onmouseover="mhighlight(3)" onclick="detachStart(mid)" onmouseout="mdehighlight(3)"/>
+      <text x="-505" y="-454" id="menuop3t" onmouseover="mhighlight(3)" onmouseout="mdehighlight(3)" onclick="detachStart(mid)" >Detach From...</text>
+    <rect x="-509" y="-449" height="18" stroke="#ddddff" fill="#ddddff" width="148" id="menuop4" onmouseover="mhighlight(4)" onmouseout="mdehighlight(4)" onclick="makeChild(mid, false);updateDB(allscreens)"/>
+      <text x="-505" y="-434" id="menuop4t" onclick="makeChild(mid, false);updateDB(allscreens)" onmouseover="mhighlight(4)" onmouseout="mdehighlight(4)">Make New Child</text>
+    <rect x="-509" y="-429" height="18" stroke="#ddddff" fill="#ddddff" width="148" id="menuop5" onmouseover="mhighlight(5)" onmouseout="mdehighlight(5)" onclick="deleteScreen(mid)"/>
+      <text x="-505" y="-414" id="menuop5t" onclick="deleteScreen(mid)" onmouseover="mhighlight(5)" onmouseout="mdehighlight(5)">Delete</text>
+    </g>
+    
+
+        <rect x="-509" y="-429" height="0" stroke="#ddddff" fill="#ddddff" width="0" style='display:none;' id="toadvresponse" onclick="advResponse()"/>
+                <rect x="-509" y="-429" height="0" stroke="#ddddff" fill="#ddddff" width="0" style='display:none;' id="editfinder" onclick="getEditScreen()"/> 
+                <rect x="-509" y="-509" height="18" stroke="#ddddff" fill="#ddddff" width="118" id="menuop1fake" onclick='editScreen(mid, 1, 1)'/>    
+                                <rect x="-509" y="-509" height="18" stroke="#ddddff" fill="#ddddff" width="118" id="getallscreensfake" onclick='checkOffScreen()'/> 
+                <rect x="-509" y="-509" height="18" stroke="#ddddff" fill="#ddddff" width="118" id="closemenuaccess" onclick='closeMenu()'/>  
+</svg>
