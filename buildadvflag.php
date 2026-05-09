@@ -106,13 +106,18 @@ function buildAdvFlag($id, $user, $mini = 0)
 
     <div class='slideinfo' style='$pagestyle; $titlestyle'>";
     if($pic) $out .= "<img class='advflagicon' src = '$pic' />";
-    $out .= "<a class='link' onclick=\"location.href='#/view/$id'\">$title</a><br />
-     <small>by <a class='link' onclick=\"location.href='#/mystuff/$id'\">{$r['advuser']}</a> </small>
-     
-     <br>
-     <small>Published $published</small><br>
-     $tags
-     <div class='advflagrating'>$rating</div>
+    $out .= "<div class='slideinfo-inner'>
+    <div class='slideinfo-toprow'>
+    <div class='slideinfo-titlewrap'><a class='link' onclick=\"location.href='#/view/$id'\">$title</a></div>
+    <div class='advflagrating'>$rating</div>
+    </div>
+    <div class='slideinfo-meta'>
+    <small>by <a class='link' onclick=\"location.href='#/mystuff/$id'\">{$r['advuser']}</a></small>
+    <br />
+    <small>Published $published</small><br />
+    $tags
+    </div>
+    </div>
     </div>
     <div class='oneslide oneslide-teaser' style = '$pagestyle'>
     <div class='slidetitle' style='$textstyle'>

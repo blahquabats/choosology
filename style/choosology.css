@@ -85,6 +85,11 @@ body
     /* #ebeef4*/
 }
 
+html
+{
+    height: 100%;
+}
+
 h1
 {
     display: block;
@@ -323,19 +328,22 @@ label.sel:before {
 
 .footer
 {
-    position: absolute;
-    bottom: -2px;
-    right: 100px;
-    width:70%;
-    margin-left: auto;
-    margin-right: auto;
+    position: fixed;
+    bottom: 0;
+    left: 230px;
+    right: 0;
+    width: auto;
+    margin: 0;
     border: 1px solid black;
     border-radius: 3px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     background-color: #eeeeee;
-    padding:5px;
+    padding: 5px;
     text-align: center;
-    z-index:5;
+    z-index: 5;
     font-size: small;
+    box-sizing: border-box;
 }
 
 .homep
@@ -981,13 +989,15 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     overflow:hidden;
 }
 
-/* Only .slidefolder nodes cycle here; arrows stay siblings on .featuredslides */
+/* Only .slidefolder nodes cycle here; arrows stay siblings on .featuredslides.
+   Fixed pixel height keeps every slide the same size (Cycle's containerResize otherwise varies by first paint). */
 .featuredslides-cycle
 {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 300px;
     min-height: 300px;
+    max-height: 300px;
     overflow: hidden;
 }
 
@@ -1016,17 +1026,40 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     min-height: 280px;
 }
 
-/* Home featured slideshow: description only (opening scene lives on #/view/:id) */
+/* Home featured slideshow: description only; column flex so header height can grow without overlapping notes */
 .featuredslides .slidefolder
 {
     height: 300px;
     max-height: 300px;
-    min-height: 0;
+    min-height: 300px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 6px;
+}
+.featuredslides .slideinfo
+{
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    margin: 0;
+    flex: 0 0 auto;
 }
 .featuredslides .oneslide.oneslide-teaser
 {
-    top: 108px;
-    height: calc(100% - 118px);
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto !important;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -1053,20 +1086,66 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 }
 .slideinfo
 {
-    -webkit-box-sizing: content-box; /* Safari/Chrome, other WebKit */
-    -moz-box-sizing: content-box;    /* Firefox, other Gecko */
-    box-sizing: content-box;         /* Opera/IE 8+ */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     width: 60%;
     position:absolute;
     left:10%;
     top:3%;
-    height:95px;
+    min-height: 95px;
+    height: auto;
     text-align: left !important;
     background-color: #f5f3e5;
-    padding-left: 105px;
-    padding-top: 5px;
+    padding: 6px 10px 8px 8px;
     border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
 
+.slideinfo-inner
+{
+    padding-left: 100px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.slideinfo-toprow
+{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+}
+
+.slideinfo-titlewrap
+{
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.slideinfo-meta
+{
+    line-height: 1.35;
+}
+
+.slideinfo .advflagrating
+{
+    position: static;
+    top: auto;
+    right: auto;
+    flex: 0 0 auto;
+    align-self: flex-start;
+    max-width: 40%;
 }
 
 .oneslide

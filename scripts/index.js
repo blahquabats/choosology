@@ -146,6 +146,7 @@ $(function() {
                         rememberlogin: $("#rememberlogin").is(":checked")}
                 }).done(function(response) {
             
+                        response = $.trim(response);
                         if(response != 2)
                         {
                             var newtext = "Logged in as "+response;
@@ -162,7 +163,7 @@ $(function() {
                         else
                         {
                             var topbox = $("#topbox");
-                            topbox.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</style><br />");
+                            topbox.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</span><br />");
                             topbox.effect("shake", {distance: 5, times: 2});
                             $(".wrongpass").fadeOut(2000, "easeInExpo", function(){
                                 this.remove();
@@ -170,6 +171,10 @@ $(function() {
                             $('#loginsubmit').prop('disabled', false);
                             $("#loginpass").val("").focus();
                         }
+                    }).fail(function(xhr, status, err) {
+                        var msg = (xhr.responseText && xhr.responseText.length < 500) ? xhr.responseText : (err || status || "Network error");
+                        $("#topbox").append("<div class='login-ajax-error' style='color:#b00;font-weight:bold;margin-top:6px;'>Login failed (" + xhr.status + "): " + $("<div>").text(msg).html() + "</div>");
+                        $('#loginsubmit').prop('disabled', false);
                     });
             });
             $(document).on("click", "#logoutsubmit", function(){

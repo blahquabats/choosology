@@ -133,8 +133,10 @@
     <div id = 'editscreenwindowcontents'></div>
 </div>
 
+</div>
+
 <div class='footer' id='footer'>
-    Copyright 2015 The Grasssmith & Grasssmithery Worldwide
+    Copyright &copy; 2015&ndash;<?php echo date('Y'); ?> The Grasssmith &amp; Grasssmithery Worldwide
 </div>
 
 </body>

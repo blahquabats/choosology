@@ -19,9 +19,9 @@ require_once("auxfuncs.php");
 
 
     <?php
-    //<span id='tinyshowhide'>&uarr;hide&uarr;</span>
+    /* DISTINCT + explicit adv columns only: SELECT * from JOIN can overwrite advs.description with another table's column in mysqli_fetch_assoc */
     $query = "
-        SELECT *, a.id AS aid
+        SELECT DISTINCT a.id AS aid, a.description AS adv_description
         FROM advs a
         INNER JOIN advscreens s ON s.id = a.`begin`
         WHERE a.avail = 'public'
@@ -31,10 +31,17 @@ require_once("auxfuncs.php");
              OR (SELECT AVG(r.rating) FROM ratings r WHERE r.adv = a.id) > 2.5
           )
         ORDER BY a.id DESC
-        LIMIT 10";
+        LIMIT 40";
     $res = runquery_assoc($query);
     if (is_array($res) && count($res) > 0) {
-        shuffle($res);
+        $res = array_values(array_filter($res, function ($row) {
+            $text = trim(decode($row['adv_description'] ?? '', 1));
+            return $text !== '';
+        }));
+        if (count($res) > 0) {
+            shuffle($res);
+            $res = array_slice($res, 0, 10);
+        }
     }
     ?>
     <div class='featuredslides'>
@@ -75,7 +82,9 @@ echo "";
                 fx: "scrollHorz",
                 pauseOnHover: true,
                 prev: ".featuredslides .cycle-prev",
-                next: ".featuredslides .cycle-next"
+                next: ".featuredslides .cycle-next",
+                containerResize: 0,
+                slideResize: 0
             });
         } else if (slideCount === 1) {
             $(".featuredslides .cycle-prev, .featuredslides .cycle-next").hide();
