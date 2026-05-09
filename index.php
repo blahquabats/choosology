@@ -1,6 +1,14 @@
 <?php
     require_once("./connect.php");
     require_once("./auxfuncs.php");
+    /* Web path to app root (empty when installed at domain root, e.g. "/choosology" in a subfolder). */
+    $choosology_web_base = '';
+    if (!empty($_SERVER['SCRIPT_NAME'])) {
+        $sd = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+        if ($sd !== '/' && $sd !== '.' && $sd !== '') {
+            $choosology_web_base = rtrim($sd, '/');
+        }
+    }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -26,6 +34,20 @@
     <link rel="stylesheet" href="style/choosology.css" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
+    <script>
+    window.CHOOSOLOGY_BASE = <?php echo json_encode($choosology_web_base, JSON_UNESCAPED_SLASHES); ?>;
+    function choosologyUrl(path) {
+        path = String(path || '').replace(/^\//, '');
+        var b = typeof window.CHOOSOLOGY_BASE === 'string' ? window.CHOOSOLOGY_BASE : '';
+        if (!path) {
+            return b ? (b + '/') : '/';
+        }
+        if (!b) {
+            return '/' + path;
+        }
+        return b + '/' + path;
+    }
+    </script>
     <!-- jquery-ui: use code.jquery.com JS (browser IIFE). jsDelivr npm build uses require("jquery") and breaks without a bundler. -->
     <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle/3.0.3/jquery.cycle.all.min.js"></script>

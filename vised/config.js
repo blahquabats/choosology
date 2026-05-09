@@ -26,20 +26,23 @@
     var mode = modes[modename];
     var menubox;
     var stopmenuonce = 0;
+    var _tex = typeof choosologyUrl === 'function' ? choosologyUrl : function (p) {
+        return '/' + String(p).replace(/^\//, '');
+    };
     var texPurple = new Image();
-    texPurple.src = '/images/tex-purple.png';
+    texPurple.src = _tex('images/tex-purple.png');
     var texRed = new Image();
-    texRed.src = '/images/tex-red.png';
+    texRed.src = _tex('images/tex-red.png');
     var texWhite = new Image();
-    texWhite.src = '/images/tex-white.png';
+    texWhite.src = _tex('images/tex-white.png');
     var texGreen = new Image();
-    texGreen.src = '/images/tex-green.png';
+    texGreen.src = _tex('images/tex-green.png');
     var texTeal = new Image();
-    texTeal.src = '/images/tex-teal.png';
+    texTeal.src = _tex('images/tex-teal.png');
     var texYellow = new Image();
-    texYellow.src = '/images/tex-yellow.png';
+    texYellow.src = _tex('images/tex-yellow.png');
     var texOrange = new Image();
-    texOrange.src = '/images/tex-orange.png';
+    texOrange.src = _tex('images/tex-orange.png');
     var config = {
       std_color: "#000000",
       box_color: "#cdcdff",

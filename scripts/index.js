@@ -315,6 +315,9 @@ function showMenuOption(which, param)
                             if(param) url = url+"?"+param;
                             toshow.load(url);
                         }
+                    if (which === "mystuff") {
+                        try { $("#tabswindow").tabs("refresh"); } catch (err) { /* ignore */ }
+                    }
                 }
             });
         //}

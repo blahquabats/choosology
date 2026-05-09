@@ -25,16 +25,16 @@
         $.ajax({
             type: "POST",
             url: "ajax/loadadvstructure.php",
+            dataType: "json",
             data: {
                     advid: advid
                 }
         }).done(function(response) {
 
-            response = $.parseJSON(response);
             if(response[0] == "0") 
             {
                 showAlert(response[1], "error");
-                $("#visedload").hide();
+                $("#visedloader").hide();
                 return false;
             }
             currinfo['adv'] = response[0];
@@ -50,7 +50,20 @@
                 buildFrom(i);
             }
             $("#visedloader").hide();
-        });    
+        }).fail(function(xhr) {
+            $("#visedloader").hide();
+            var msg = "Could not load experiment data.";
+            try {
+                var t = xhr.responseText && xhr.responseText.trim().charAt(0);
+                if (t === '<' || t === '') {
+                    msg += " (server returned non-JSON).";
+                }
+            } catch (e) { /* ignore */ }
+            if (xhr.status === 0) {
+                msg = "Network error loading experiment data.";
+            }
+            showAlert(msg, "error");
+        });
     }
     
     function buildFrom(id)
@@ -1008,6 +1021,7 @@ function drawPath(box1, box2)
 
 // init
     $(document).ready(function(){
+        var texWhiteCssUrl = choosologyUrl('images/tex-white.png');
         pie1.setZIndex(1);
         pie2.setZIndex(2);
         pie3.setZIndex(3);
@@ -1020,7 +1034,7 @@ function drawPath(box1, box2)
             pie4.fillPatternImage(config.menu_bg);
             pieleft.fillPatternImage(config.menu_bg);
             pieright.fillPatternImage(config.menu_bg);
-            $('#newswindow').css('background-image', 'url(images/tex-white.png)');
+            $('#newswindow').css('background-image', 'url("' + texWhiteCssUrl + '")');
         };
         pie1.fillPatternImage(config.menu_bg);
         pie2.fillPatternImage(config.menu_bg);
@@ -1028,7 +1042,7 @@ function drawPath(box1, box2)
         pie4.fillPatternImage(config.menu_bg);
         pieleft.fillPatternImage(config.menu_bg);
             pieright.fillPatternImage(config.menu_bg);
-        $('#newswindow').css('background-image', 'url(images/tex-white.png)');
+        $('#newswindow').css('background-image', 'url("' + texWhiteCssUrl + '")');
 
       // $('#newswindow').css('background-image', 'url(images/tex-teal.png)');
 

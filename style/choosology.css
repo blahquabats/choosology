@@ -769,10 +769,13 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     position: absolute;
     top:55px;
     margin-right: 70px;
-    left:2000px;
+    left: 0;
+    /* Like .genericwindow: hidden until showMenuOption("mystuff") runs jQuery .show().
+       Previously left:2000px hid it visually; without display:none it covered Home/News on left:0. */
+    display: none;
+    z-index: 2;
     background: transparent;
     border: none;
-    visibility: visible;
     padding: 0px;
     font-size: 17px;
     overflow: visible;
