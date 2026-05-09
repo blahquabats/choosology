@@ -1,0 +1,164 @@
+.advcanvas
+{
+    height:100%;
+    width:100%;
+    margin:0;
+    position: relative;
+    font-size: larger;
+    padding-top:0;
+    overflow: hidden;
+}
+
+.advpic
+{
+    clear:both;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+
+.viewcol1
+{
+    text-align: center;
+    width:195px;
+    height:90%;
+    margin: 0;
+    padding:6px;
+    position:relative;
+    top: 15px;
+    float:left;
+    clear:left;
+    border-radius: 0 4px 4px 0;
+    border-left: none!important;
+    z-index: 10;
+}
+
+.viewcol2
+{
+    position:absolute;
+    top:0;
+    left:0;
+    margin-right: auto;
+    margin-left: auto;
+
+    height:100%;
+    width:100%;
+    float:left;
+    background-color: transparent;
+    overflow: auto;
+}
+
+.text { 
+  position: absolute; 
+  left: 0; 
+  top: 50px; 
+  width: auto; 
+  height: auto; 
+    
+  display: block; 
+  border-spacing: 10px;
+  padding-right:100px;
+  margin-left:240px;
+  margin-right:0px;
+  overflow: hidden;
+}
+
+.text #innards {
+  display: block; 
+  overflow:visible;
+  
+  max-width:1000px;
+  min-width:500px;
+    margin-bottom: 20px;
+}
+
+.text #innards > div {
+  background-color:white;   
+  padding:10px;
+  border-radius: 4px;
+  
+}
+
+.text .choicecontainer {
+  display: block; 
+  position:relative;
+  top:0px;
+  width:70%;
+  max-width:700px;
+  min-width:210px;
+  text-align: center !important; 
+  max-height:auto;
+  margin-left: 15%;
+  margin-bottom:100px;
+  background-color: transparent;
+  font-size: large;
+  overflow:visible;
+}
+
+.choices
+{
+    display:block;
+    position:relative;
+    height:auto;
+    width:100%;
+    border-radius: 4px;
+    overflow: visible;
+  text-align: center !important;   
+}
+
+.choicecover
+{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:10;
+    height: 100%;
+    width:100%;
+    border-radius: 4px;
+}
+
+.choice
+{
+    display:inline-block;
+    width:auto;
+    cursor: pointer;
+    padding:15px;
+    margin:10px;
+    border-radius: 2px;
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+    
+}
+.choice:hover
+{
+    border-width: 5px !important;
+    padding:12px;
+}
+
+.commentsholder
+{
+    position:absolute;
+    width:300px;
+    padding:10px;
+    bottom:-2px;
+    right:-2px;
+    height:50px;
+    border-radius: 4px;
+    border-bottom: none!important;
+    border-right: none!important;
+}
+
+.hidecomments
+{
+    display:none !important;   
+}
+
+#lastscreen
+{
+    display:none;
+}
+
+.spacebox
+{
+    visibility:hidden;
+}

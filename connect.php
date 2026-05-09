@@ -1,5 +1,8 @@
 <?php
-$db = mysqli_connect("mysql.cyocyoa.com", "luser", "l_jU65TaA3", "choosology") or die("Could not connect.");
+require_once __DIR__ . '/db-config.php';
+
+$s = choosology_db_settings('choosology');
+$db = mysqli_connect($s['host'], $s['user'], $s['password'], $s['database']) or die("Could not connect.");
 if (!$db)
 	die("no db");
 
@@ -23,7 +26,7 @@ $sel = "cYo";
 session_start();
 if (!isset($_SESSION['user']) || $_SESSION['user'] == "")
 {
-    if ($_GET['project_lazarus'] != "go") 
+    if (($_GET['project_lazarus'] ?? null) != "go") 
     {
         //echo "Not yet! :)<META http-equiv='refresh' content='0;URL=http://www.cyocyoa.com'>";
         //die();

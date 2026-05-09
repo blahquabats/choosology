@@ -2,9 +2,9 @@
 function registerCheck()
 {
 	global $db, $sel;
-	$e = $_POST['exploded'];
+	$e = $_POST['exploded'] ?? '';
   
-	if (!$_POST['regusername'] || preg_match("/[^a-z0-9 ._-]/i", $_POST['regusername']))
+	if (empty($_POST['regusername']) || preg_match("/[^a-z0-9 ._-]/i", $_POST['regusername']))
 	{
 		$er = "<div class='error'>You need to enter a valid username!</div>";
 		//if (is_numeric($_POST['regusername']))
@@ -14,7 +14,7 @@ function registerCheck()
 		return false;
 	}
 
-	if (!$_POST['regemail'] || !checkEmail($_POST['regemail']))
+	if (empty($_POST['regemail']) || !checkEmail($_POST['regemail']))
 	{
 		echo "<div class='error'>You need to enter a valid email address! </div>";
 		$_POST['regemail'] = "";
@@ -37,12 +37,12 @@ function registerCheck()
 		return false;
 	}
 
-	if ($_POST['regpass1'] != $_POST['regpass2'])
+	if (($_POST['regpass1'] ?? null) != ($_POST['regpass2'] ?? null))
 	{
 		echo "<div class='error'>Your password confirmation didn't match the original password!</div>";
 		return false;
 	}
-	if (strlen($_POST['regpass1']) < 5)
+	if (strlen($_POST['regpass1'] ?? '') < 5)
 	{
 		echo "<div class='error'>Your password is awfully short. Please make it at least 5 characters. For more on password length importance, see <a href='http://www.lockdown.co.uk/?pg=combi' target='_blank'>this link</a>.</div>";
 		return false;
@@ -124,7 +124,7 @@ function eatCookies($user, $c1 = "", $c2 = "")
 }
 
 
-if ($_POST['regsub'])
+if (!empty($_POST['regsub']))
 {
   ob_start();
   $regsuc=registerCheck();
@@ -145,7 +145,18 @@ if ($_POST['regsub'])
 
 if (!$_SESSION['user'] && array_key_exists('choosologyLogin',$_COOKIE))
 {
-    list($cuser, $code1, $code2) = unserialize($_COOKIE['choosologyLogin']);
+	$cookieData = @unserialize($_COOKIE['choosologyLogin'], ['allowed_classes' => false]);
+	if (!is_array($cookieData) || count($cookieData) !== 3) {
+		$cookieData = @unserialize(stripslashes($_COOKIE['choosologyLogin']), ['allowed_classes' => false]);
+	}
+	if (!is_array($cookieData) || count($cookieData) !== 3) {
+		$cookieData = null;
+	}
+	if (!$cookieData) {
+		$cuser = $code1 = $code2 = null;
+	} else {
+		list($cuser, $code1, $code2) = $cookieData;
+	}
 	//	$stuff=unserialize(stripslashes($_COOKIE['choosologyLogin']));
 	//print_r($stuff);
 		//echo "cooookies";
@@ -168,7 +179,7 @@ if (!$_SESSION['user'] && array_key_exists('choosologyLogin',$_COOKIE))
 
 //else echo "no submit";
 
-if ($_GET['logout'] == 1 && !isset($_POST['loginsubmit']))
+if (($_GET['logout'] ?? null) == 1 && !isset($_POST['loginsubmit']))
 {
 	eatCookies($_SESSION['user']);
 	$_SESSION['user'] = false;

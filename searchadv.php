@@ -72,9 +72,9 @@ if(isset($_POST['which']))
     $allthree = $_POST['allthree'];
     if($which == "gs") // special case for general survey
     {
-        $out = buildColumn("Recently Published", "", "published desc", "rp", $limit, "more")."!@!@!";
-        $out .= buildColumn("Top Rated", 'rating!=\"NA\" and rating !=\"\"', "rating desc", "tr", $limit, "more")."!@!@!";
-        $out .= buildColumn("From The Archives", 'rating=\"NA\"', "rand()", "fa", $limit,"more");
+        $out = buildColumn("rp", "Recently Published", "", "published desc", $limit, "more")."!@!@!";
+        $out .= buildColumn("tr", "Top Rated", 'rating!=\"NA\" and rating !=\"\"', "rating desc", $limit, "more")."!@!@!";
+        $out .= buildColumn("fa", "From The Archives", 'rating=\"NA\"', "rand()", $limit,"more");
         echo $out;
         exit;
     }
@@ -92,13 +92,13 @@ if(isset($_POST['which']))
     		$second = $limit.",".$limit;
     		$third = ($limit*2).",".$limit;
     	}
-    $out = buildColumn($title, $where, $orderby, $which, $first, "count")."!@!@!";
+    $out = buildColumn($which, $title, $where, $orderby, $first, "count")."!@!@!";
 
     if($allthree)
     {
     
-        $out .= buildColumn("", $where, $orderby, $which, $second, "prev", $_POST['page'])."!@!@!";
-        $out .= buildColumn("", $where, $orderby, $which, $third, "next", $_POST['page']);
+        $out .= buildColumn($which, "", $where, $orderby, $second, "prev", $_POST['page'])."!@!@!";
+        $out .= buildColumn($which, "", $where, $orderby, $third, "next", $_POST['page']);
     }
     echo $out;
 

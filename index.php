@@ -22,18 +22,18 @@
     ?>
     <meta charset="utf-8" />
     <title>Choosology</title>
-    <link rel="stylesheet" href="jquery-ui-1.10.3/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
     <link rel="stylesheet" href="style/choosology.css" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
-    <script src="jquery-ui-1.10.3/ui/jquery-ui.js"></script>
-    <script src="jquery-ui-1.10.3/jquery-cycle-lite.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle/3.0.3/jquery.cycle.all.min.js"></script>
     <script src="scripts/jquery-dateFormat.js"></script>
     <script src="scripts/jquery-minicolors/jquery.minicolors.min.js"></script>
     <script src="scripts/choosology.js"></script>
     <script src="scripts/konva.js"></script>
     <script src="scripts/sammy.js"></script>
-    <script src='scripts/ckeditor/ckeditor.js'></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
     
     <script src='scripts/index.js'></script>
     <script src='scripts/routes.js'></script>

@@ -257,7 +257,7 @@ function makeStars($rating, $tiny = 0)
     return $output;
 }
 
-function buildColumn($title="", $where = "", $orderby="published desc", $which, $limit = "4", $inhead="more", $page = 1)
+function buildColumn($which, $title = "", $where = "", $orderby = "published desc", $limit = "4", $inhead = "more", $page = 1)
 {
     global $name;
     if(strpos($limit, ","))
