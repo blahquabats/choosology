@@ -116,6 +116,7 @@ function assembleRating($which, $readonly=true)
 		}
 	}
 	if(!$rat) $rat=0;
+	$ratdesc = '';
 	if(!$myrating) 
   {
     $myrating=0;

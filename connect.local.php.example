@@ -1,0 +1,20 @@
+<?php
+/**
+ * Local overrides for database connection (optional).
+ *
+ * 1. Copy this file to connect.local.php in the same directory.
+ * 2. Adjust host (and user/password if your local MySQL differs).
+ * 3. Do not commit connect.local.php if it contains secrets (see .gitignore).
+ *
+ * Example for local MySQL:
+ */
+
+return [
+	'host' => '127.0.0.1',
+	// 'user' => 'root',
+	// 'password' => '',
+
+	// Local picture storage (see paths-config.php). Use forward slashes or doubled backslashes on Windows.
+	// 'pics_root' => 'C:/Apache24/htdocs/choosology/storage/pics',
+	// 'pics_universal' => 'C:/Apache24/htdocs/choosology/storage/pics/universal',
+];

@@ -2,6 +2,13 @@
 
 require_once("../connect.php");
 require_once("../auxfuncs.php");
+
+if (empty($_SESSION['user'])) {
+	echo "<div class='intabs'><p class='error'>Please sign in to view your experiments.</p></div>";
+	return;
+}
+$name = (string) $_SESSION['user'];
+
 ?>
 <div class='intabs'>
 <h2>My Experiments</h2>

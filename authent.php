@@ -205,6 +205,7 @@ else
 	$_SESSION['usertype'] = false;
 	$_SESSION['user'] = false;
 	$loggedin = false;
+	$name = '';
 }
 
 ?>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'paths-config.php';
 require_once("authent.php");
 require_once("comments.php");
 require_once("buildadvflag.php");
@@ -100,39 +101,42 @@ function getNewMessages()
 function playerDir($who = "")
 {
     global $name;
-    if($who=="&everyone") return "/home/abombmcgee/choosology.com/pics/universal";
+    if ($who == "&everyone") {
+        return choosology_pics_universal_dir();
+    }
     $who = ($who != "") ? $who : $name;
 
     $number = ord(strtolower(substr($who, 0, 1)));
     switch ($number)
     {
         case ($number > 96 && $number < 101):
-            $dir = "ad";
+            $bucket = "ad";
             break;
         case ($number > 96 && $number < 106):
-            $dir = "ei";
+            $bucket = "ei";
             break;
         case ($number > 96 && $number < 111):
-            $dir = "jn";
+            $bucket = "jn";
             break;
         case ($number > 96 && $number < 116):
-            $dir = "os";
+            $bucket = "os";
             break;
         case ($number > 96 && $number < 123):
-            $dir = "tz";
+            $bucket = "tz";
             break;
         default:
-            $dir = "else";
+            $bucket = "else";
 
     }
 
-    $finalname = preg_replace("/[^A-Za-z0-9_\-]/", "_", $imgname) . "." . $parts[1];
     $dname = substr($who, 0, 1) . substr(md5($who . "cYo"), 0, 15);
-    $dir = "/home/abombmcgee/choosology.com/pics/$dir/$dname";
+    $root = choosology_pics_root();
+    $dir = $root . DIRECTORY_SEPARATOR . $bucket . DIRECTORY_SEPARATOR . $dname;
     if (!is_dir($dir))
     {
-        if (!mkdir($dir))
+        if (!mkdir($dir, 0775, true)) {
             die("<div class='error'>Something went wrong making the icon directory $dir. Contact admin.</div>");
+        }
     }
     return $dir;
 }
@@ -159,17 +163,26 @@ function decode($str, $strip = 0)
 function assembleRating($which, $readonly=true, $smallrat = 0)
 {
     global $db, $name;
+    $rat = 0;
+    $myrating = null;
+    $avg = null;
     if(!$which) return false;
     if(!$name) $readonly = true;
     $q = "select * from advs where id='$which'";
     $r = mysqli_query($db, $q);
-    $res=mysqli_fetch_array($r);
-    if($res['user']==$name) $readonly=true;
+    $advRow = mysqli_fetch_array($r);
+    if (!$advRow) {
+        return false;
+    }
+    if (($advRow['user'] ?? '') === $name) {
+        $readonly = true;
+    }
     $q = "select * from ratings where adv='$which'";
     $r = mysqli_query($db, $q);
     if ($r && $res = mysqli_fetch_array($r))
     {
-        if($res['who']==$res['user'])
+        // ratings table uses owner (experiment owner), not user
+        if (($res['who'] ?? '') === ($res['owner'] ?? ''))
         {
             $readonly=true;
         }
@@ -202,6 +215,7 @@ function assembleRating($which, $readonly=true, $smallrat = 0)
     }
     if(!$rat) $rat=0;
     if($smallrat) return makeStars($rat, 1);
+    $ratdesc = '';
     if(!$myrating)
     {
         $myrating=0;
