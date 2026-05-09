@@ -276,10 +276,10 @@ function buildColumn($title="", $where = "", $orderby="published desc", $which, 
     $query = "select *,
 a.id as aid
 from advs a, advscreens s
-where avail='public' $where and s.id = a.begin order by $orderby limit $limit";
+where avail='public' $where and s.id = a.`begin` order by $orderby limit $limit";
     $countquery = "select count(a.id) as c
 from advs a, advscreens s
-where avail='public' $where and s.id = a.begin";
+where avail='public' $where and s.id = a.`begin`";
     $res = runquery_assoc($query);
     $cres = runquery_assoc($countquery);
     $titleid = strtolower(preg_replace("/\s/","", $title));

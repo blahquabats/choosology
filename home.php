@@ -20,7 +20,7 @@ require_once("auxfuncs.php");
 
     <?php
     //<span id='tinyshowhide'>&uarr;hide&uarr;</span>
-    $query = "select *, a.id as aid from advs a, advscreens s where avail='public' and s.id = a.begin order by aid desc limit 3";
+    $query = "select *, a.id as aid from advs a, advscreens s where avail='public' and s.id = a.`begin` order by aid desc limit 3";
     $res = runquery_assoc($query);
     ?>
     <div class='featuredslides'>

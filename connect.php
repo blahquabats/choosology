@@ -1,8 +1,10 @@
 <?php
 $db = mysqli_connect("mysql.cyocyoa.com", "luser", "l_jU65TaA3", "choosology") or die("Could not connect.");
-mysqli_query($db, "SET time_zone='-7:05'");
 if (!$db)
 	die("no db");
+
+mysqli_set_charset($db, 'utf8mb4');
+mysqli_query($db, "SET time_zone='-07:00'");
 
 foreach ($_POST as & $post)
 {

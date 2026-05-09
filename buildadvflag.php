@@ -13,7 +13,7 @@ function buildAdvFlag($id, $user, $mini = 0)
     from advs a, advscreens s
     where a.id = '$id' 
     and (avail='public' OR a.user = '$user') 
-    and s.id = a.begin";
+    and s.id = a.`begin`";
     $r = runquery_assoc($query);
     $r = $r[0];
     $pic = getPic($r['advpic']);
