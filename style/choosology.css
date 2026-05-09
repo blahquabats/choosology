@@ -976,8 +976,19 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     max-width: 800px;
     min-width: 650px;
     height: 100%;
+    min-height: 300px;
 
     overflow:hidden;
+}
+
+/* Only .slidefolder nodes cycle here; arrows stay siblings on .featuredslides */
+.featuredslides-cycle
+{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    overflow: hidden;
 }
 
 .slidefolder
@@ -1002,10 +1013,44 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 #featadvs
 {
     height:50%;
-    min-height: 300px;
+    min-height: 280px;
 }
 
-
+/* Home featured slideshow: description only (opening scene lives on #/view/:id) */
+.featuredslides .slidefolder
+{
+    height: 300px;
+    max-height: 300px;
+    min-height: 0;
+}
+.featuredslides .oneslide.oneslide-teaser
+{
+    top: 108px;
+    height: calc(100% - 118px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 6px 6px 8px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+.featuredslides .oneslide.oneslide-teaser .slidetitle
+{
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+    padding: 8px 10px 10px 12px;
+    width: auto;
+    top: auto;
+    left: auto;
+    overflow: hidden;
+    overflow-y: hidden;
+    display: block;
+    line-height: 1.35;
+}
 .slideinfo
 {
     -webkit-box-sizing: content-box; /* Safari/Chrome, other WebKit */
@@ -1067,25 +1112,46 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 .slidenav-right
 {
    /* background-image: url("../images/icons/misc/slideright2.png");*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     width: 50px;
-    height: 220px;
     position:absolute;
     right:0px;
     top:0px;
+    bottom: 0;
+    height: auto;
     cursor: pointer;
     z-index: 110 !important;
 }
 
 .slidenav-left
 {
-    background-image: url("../images/icons/misc/slideleft2.png");
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     width: 50px;
-    height: 220px;
     position:absolute;
-    left:-0px;
+    left:0;
     top:0px;
+    bottom: 0;
+    height: auto;
     cursor: pointer;
     z-index: 110 !important;
+}
+
+.slidenav-left img,
+.slidenav-right img
+{
+    display: block;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    pointer-events: none;
 }
 
 

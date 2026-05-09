@@ -20,28 +20,41 @@ require_once("auxfuncs.php");
 
     <?php
     //<span id='tinyshowhide'>&uarr;hide&uarr;</span>
-    $query = "select *, a.id as aid from advs a, advscreens s where avail='public' and s.id = a.`begin` order by aid desc limit 3";
+    $query = "
+        SELECT *, a.id AS aid
+        FROM advs a
+        INNER JOIN advscreens s ON s.id = a.`begin`
+        WHERE a.avail = 'public'
+          AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
+          AND (
+                NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)
+             OR (SELECT AVG(r.rating) FROM ratings r WHERE r.adv = a.id) > 2.5
+          )
+        ORDER BY a.id DESC
+        LIMIT 10";
     $res = runquery_assoc($query);
+    if (is_array($res) && count($res) > 0) {
+        shuffle($res);
+    }
     ?>
     <div class='featuredslides'>
-        <div class='slidenav-left cycle-prev'>
-
-        </div>
+        <?php if (is_array($res) && count($res) > 0) { ?>
+        <div class='slidenav-left cycle-prev'><img src='images/icons/misc/slideleft2.png' alt="" /></div>
+        <div class='featuredslides-cycle'>
         <?php
-        if(is_array($res))
-        {
-        foreach ($res as $r)
-        {
-            echo buildAdvFlag($r['aid'], $name);
-        }
+            foreach ($res as $r) {
+                echo buildAdvFlag($r['aid'], $name);
+            }
         ?>
-        <div class='slidenav-right cycle-next'>
-            <img src='images/icons/misc/slideright2.png' />
         </div>
-        <?php 
-        } 
-        else echo $res;
-        ?>
+        <div class='slidenav-right cycle-next'>
+            <img src='images/icons/misc/slideright2.png' alt="" />
+        </div>
+        <?php } elseif (is_array($res)) { ?>
+        <p class='home-no-featured'>No public adventures to feature yet.</p>
+        <?php } else {
+            echo $res;
+        } ?>
     </div>
 </div>
 
@@ -51,22 +64,22 @@ echo "";
 <script>
     $(document).ready(function(){
 
-        $(".featuredslides").cycle({
-            speed: 1000,
-            manualSpeed: 1000,
-            timeout: 8000,
-            fx: "scrollHorz",
-            pauseOnHover: true,
-            //fx: "fade",
-            //hideNonActive: false,
-            slides: "> div.slidefolder"
-        });
-        $(".overoneslide").mouseenter(function() {
-            $(this).hide("fade", 500);
-        });
-        $(".oneslide").mouseleave(function() {
-            $(this).find(".overoneslide").show("fade", 500);
-        });
+        /* Cycle 3.x uses slideExpr, not "slides"; prev/next must be outside the cycle root or they become slides */
+        var $cyc = $(".featuredslides-cycle");
+        var slideCount = $cyc.children(".slidefolder").length;
+        if ($cyc.length && slideCount >= 2) {
+            $cyc.cycle({
+                speed: 1000,
+                manualSpeed: 1000,
+                timeout: 8000,
+                fx: "scrollHorz",
+                pauseOnHover: true,
+                prev: ".featuredslides .cycle-prev",
+                next: ".featuredslides .cycle-next"
+            });
+        } else if (slideCount === 1) {
+            $(".featuredslides .cycle-prev, .featuredslides .cycle-next").hide();
+        }
 
         $("#tinyshowhide").click(function() {
             var feats = $("#featadvs");

@@ -2,18 +2,28 @@
 
 function buildAdvFlag($id, $user, $mini = 0)
 {
-    $query = "select *,
-    a.id as aid,
-    a.pic as advpic,
-    a.title as advtitle,
-    a.user as advuser,
-    s.text as screentext,
-    a.avail as avail,
-    a.rating as rating
-    from advs a, advscreens s
-    where a.id = '$id' 
-    and (avail='public' OR a.user = '$user') 
-    and s.id = a.`begin`";
+    /* Explicit columns only: SELECT * from a join makes duplicate names (e.g. description) overwrite in mysqli_fetch_assoc */
+    $query = "SELECT
+        a.id AS aid,
+        a.pic AS advpic,
+        a.title AS advtitle,
+        a.user AS advuser,
+        a.avail AS avail,
+        a.rating AS rating,
+        a.description,
+        a.published,
+        a.bg,
+        a.bgpic,
+        a.tags,
+        a.textstyle,
+        a.titlestyle,
+        a.box,
+        a.borderwidth,
+        a.border
+    FROM advs a
+    INNER JOIN advscreens s ON s.id = a.`begin`
+    WHERE a.id = '$id'
+    AND (a.avail = 'public' OR a.user = '$user')";
     $r = runquery_assoc($query);
     $r = $r[0];
     $pic = getPic($r['advpic']);
@@ -24,7 +34,6 @@ function buildAdvFlag($id, $user, $mini = 0)
         $bgpic = "background-image: url('$bgpic');";
     }
     else $bgpic = "";
-    $text = decode($r['screentext']);
     $avail = decode($r['avail']);
     $desc = decode($r['description']);
     $savedrating = $r['rating'];
@@ -105,26 +114,11 @@ function buildAdvFlag($id, $user, $mini = 0)
      $tags
      <div class='advflagrating'>$rating</div>
     </div>
-    <div class='oneslide' style = '$pagestyle'>
-    <div class='overoneslide' style = '$pagestyle'>
-    
-
+    <div class='oneslide oneslide-teaser' style = '$pagestyle'>
     <div class='slidetitle' style='$textstyle'>
-     
     <span class='expnotes'><b>Experiment&nbsp;notes:</b></span>
     <br />
    $desc
-    </div>
-    </div>
-
-    <div class='overfade'>
-        <div class='slidebottom' onclick=\"location.href='#/view/$id'\">
-        Begin experiment...
-        </div>
-    </div>
-    <div class='showsometext' style='$textstyle'>
-    $text
-
     </div>
     </div>
     </div>
