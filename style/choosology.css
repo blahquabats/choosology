@@ -214,6 +214,19 @@ label.sel:before {
     cursor: default;
 }
 
+/* Home uses class "red"; without this rule it has no `top` and sits flush with the viewport */
+.navbutton.red
+{
+    top: 100px;
+    background-color: #ffcccc;
+    border-color: #775555;
+}
+.navbutton.red.navdisabled:hover
+{
+    border-color: #aa8888 !important;
+    background-color: #ffeeee;
+}
+
 .navbutton.green
 {
     top: 210px;
@@ -445,7 +458,8 @@ label.sel:before {
 
 #homewindow
 {
-    top:0px;
+    top: 100px;
+    margin-top: 0;
     background-color: #edf3ff;
         background-image: url("../images/margin_right.png");
     background-repeat: no-repeat;

@@ -91,6 +91,7 @@ var configmenu = {
         
 
 $(function() {
+            if ($("#tabswindow").length) {
             $( "#tabswindow" ).tabs({
                 beforeLoad: function( event, ui ) {
                     ui.jqXHR.error(function() {
@@ -120,21 +121,21 @@ $(function() {
                     var loc = $(this).attr("data-loc");
                     $(this).attr("href", '#/mystuff/'+loc);
             });
-            
-            
+            }
             $("#fakebackground").cycle({
                 speed: 600,
                 timeout: 0,
                 fx: 'fadeout'
             });
-            $("#loginpass").on("keypress", function(e){
+            $(document).on("keypress", "#loginpass", function(e){
             		if (e.which == 13) {
             	    $('#loginsubmit').trigger("click");
             		return false;  
               }
             });
-            $("#loginsubmit").on("click", function(){
-                this.disabled = true;
+            $(document).on("click", "#loginsubmit", function(){
+                var btn = this;
+                btn.disabled = true;
                 $.ajax({
                     type: "POST",
                     url: "ajax/authentajax.php",
@@ -147,13 +148,14 @@ $(function() {
             
                         if(response != 2)
                         {
-                            var here = $(location).attr("href");
                             var newtext = "Logged in as "+response;
                             newtext += "<br><span id='logoutsubmit'><a href='#'>log out</a></span>";
                             var box = $("#topbox");
                             box.slideUp("slow","swing", function(){
                                 box.html(newtext);
-                                box.slideDown("slow");
+                                box.slideDown("slow", "swing", function() {
+                                    location.reload();
+                                });
                             });
                             if($('#commentsexist').length) reloadScreen($('#screenid').val()); // show interactive comments/rating if you're on a last screen
                         }
@@ -170,8 +172,7 @@ $(function() {
                         }
                     });
             });
-            $("#logoutsubmit").on("click", function(){
-              //  this.disabled = true;
+            $(document).on("click", "#logoutsubmit", function(){
                 $.ajax({
                     type: "POST",
                     url: "ajax/authentajax.php",
@@ -182,7 +183,12 @@ $(function() {
             
                         if(response == 1)
                         {
-                            var here = $(location).attr("href");
+                            $("body").removeAttr("data-logged-in");
+                            $("#mystuff_nav").hide();
+                            $("#tabswindow").hide();
+                            if (window.location.hash.indexOf("mystuff") !== -1) {
+                                window.location.hash = "#/home";
+                            }
                             var newtext = "User Name: <input type='text' name = 'logname' id='loginuser' /><br />"
                                             + "Password: <input type='password' name = 'logpass' id = 'loginpass' /><br />"
                                             + "<div class='rememberme'><input type ='checkbox' name = 'rememberlogin' id = 'rememberlogin'> <label for='rememberlogin'>Remember me?</label></div><button id = 'loginsubmit'>Submit</button>";
@@ -200,6 +206,7 @@ $(function() {
 
 function loadTab(loc)
 {
+    if (!$("#tabswindow").length) return;
     var which = 0;
 
     if(loc =="experiments") which = 0;

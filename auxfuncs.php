@@ -25,6 +25,7 @@ function runquery_assoc($query, $database=null)
     if(!$database) return "<div class='error'>No DB found!</div>";
     $res = mysqli_query($database, $query);
     if(!$res) return mysqli_error($db);
+    $results = [];
     while($result = mysqli_fetch_assoc($res))
     {
         $results[] = $result;

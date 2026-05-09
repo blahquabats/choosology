@@ -22,7 +22,10 @@
         });
         
         this.get(/\#\/mystuff\/?(.*)/, function(context) {
-                
+                if ($("body").attr("data-logged-in") !== "1") {
+                    window.location.hash = "#/home";
+                    return;
+                }
                 showMenuOption("mystuff");
                 if(this.params['splat'] !== "")
                 {

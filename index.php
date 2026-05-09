@@ -41,7 +41,7 @@
 
 
 </head>
-<body>
+<body<?php echo !empty($_SESSION['user']) ? ' data-logged-in="1"' : ''; ?>>
 <div class='fakebackground' id = 'fakebackground'>
 <img src='images/bg_default.jpg' id='bg-blue' />
 <img src='images/bg_green.jpg' id='bg-green' />
@@ -65,10 +65,12 @@
     <?php echo icon("beaker", "64px"); ?><br />
     Browse
 </div>
+<?php if (!empty($_SESSION['user'])) { ?>
 <div class='navbutton orange navdisabled' id="mystuff_nav" onclick="location.href='#/mystuff'" >
     <?php echo icon("person", "64px"); ?><br />
     My&nbsp;Stuff
 </div>
+<?php } ?>
 <div class="header" style='cursor: pointer;' onclick="location.href='#/home'">
 <img src="images/logo_horizontal_sm.png" />
 </div>
@@ -80,7 +82,7 @@
 
 <div class="header" id='topbox'>
     <?php
-    if(!$_SESSION['user'])
+    if (empty($_SESSION['user']))
     {
     
         echo "User Name: <input type='text' name = 'logname' id='loginuser' /><br />
@@ -96,6 +98,7 @@
     ?>
 </div>
 <div class='contentcontainer'>
+<?php if (!empty($_SESSION['user'])) { ?>
 <div id="tabswindow">
     <ul>
         
@@ -107,6 +110,7 @@
         <li><a href="mystuff/account.php" id='mystuff-account' class='tabsa' data-loc='account'>My Information</a></li>
     </ul>
 </div>
+<?php } ?>
 <div class='genericwindow' id="homewindow">
     <div class='ajaxloader'></div>
 </div>
