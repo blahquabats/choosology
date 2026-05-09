@@ -26,7 +26,8 @@
     <link rel="stylesheet" href="style/choosology.css" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/jquery-ui.min.js"></script>
+    <!-- jquery-ui: use code.jquery.com JS (browser IIFE). jsDelivr npm build uses require("jquery") and breaks without a bundler. -->
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle/3.0.3/jquery.cycle.all.min.js"></script>
     <script src="scripts/jquery-dateFormat.js"></script>
     <script src="scripts/jquery-minicolors/jquery.minicolors.min.js"></script>

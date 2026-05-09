@@ -327,7 +327,7 @@ function showMenuOption(which, param)
             $("#contextlink").slideDown("slow");
         }
         else $("#contextlink").slideUp("slow")
-        $("#fakebackground").cycle("goto", conf.bgcol);
+        $("#fakebackground").cycle(parseInt(conf.bgcol, 10));
         //$("#fakebackground").html("here is a sentence");
         /*$("body").animate({
         	backgroundColor: conf.bgcolor

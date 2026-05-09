@@ -85,5 +85,5 @@ foreach ($r as $adv)
             return false;
         }
     });
-    listenToExperimentsButtons();
+    listenToEdit();
 </script>
