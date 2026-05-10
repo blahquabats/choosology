@@ -26,6 +26,4 @@ var advid = "<?php echo htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8'); ?>"
     <script src='vised/config.js'></script>
     <script src='vised/setup.js'></script>
     <script src='vised/vised.js'></script>
-    <script src='vised/setup.js'></script>
-    <script src='vised/vised.js'></script>
 

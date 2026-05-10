@@ -1,9 +1,9 @@
-/* setup.js: Create proto-objects, menu and background assets, stage and layer configurations
-    
-    Konva.pixelRatio = 1;
-    /* PROTO-OBJECTS */
+/* setup.js: Create proto-objects, menu and background assets, stage and layer configurations */
+Konva.pixelRatio = 1;
+Konva.legacyTextRendering = true;
 
-    
+/* PROTO-OBJECTS */
+
         var prototext = new Konva.Text({
             fill: config.std_color,
             x: 5,
@@ -117,20 +117,22 @@
     
 function pieDraw(pie, context) 
 {
+      var w1 = pie.getAttr('w1'), w2 = pie.getAttr('w2'), h1 = pie.getAttr('h1'), h2 = pie.getAttr('h2');
       context.beginPath();
-      context.lineTo(pie.attrs.w1, 0);
-      context.lineTo(pie.attrs.w1-pie.attrs.w2, pie.attrs.h1-pie.attrs.h2);
-      context.lineTo(0, pie.attrs.h1-pie.attrs.h2);
+      context.lineTo(w1, 0);
+      context.lineTo(w1 - w2, h1 - h2);
+      context.lineTo(0, h1 - h2);
       context.lineTo(0, 0);
       context.closePath();
       context.fillStrokeShape(pie);
 }
 function pieHit(pie, context) 
 {
+      var w1 = pie.getAttr('w1'), w2 = pie.getAttr('w2'), h1 = pie.getAttr('h1'), h2 = pie.getAttr('h2');
       context.beginPath();
-      context.lineTo(pie.attrs.w1, 0);
-      context.lineTo(pie.attrs.w1-pie.attrs.w2, pie.attrs.h1-pie.attrs.h2);
-      context.lineTo(0, pie.attrs.h1-pie.attrs.h2);
+      context.lineTo(w1, 0);
+      context.lineTo(w1 - w2, h1 - h2);
+      context.lineTo(0, h1 - h2);
       context.lineTo(0, 0);
       context.closePath();
       context.fillStrokeShape(pie);
@@ -153,7 +155,7 @@ function pieHit(pie, context)
     
     
     layers['bg'] = new Konva.Layer();
-    layers['lines'] = new Konva.FastLayer({listening: false});
+    layers['lines'] = new Konva.Layer({ listening: false });
     
     layers['labels'] = new Konva.Layer({listening: false});
     layers['menu'] = new Konva.Layer();
