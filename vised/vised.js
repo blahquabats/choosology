@@ -1,4 +1,39 @@
 
+    /** TinyMCE: cdnjs serves correct JS MIME type; jsDelivr /npm/ path can be text/plain (blocked with nosniff). */
+    var CHOOSOLOGY_TINYMCE_BASE = 'https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.6.1';
+    var CHOOSOLOGY_TINYMCE_CDN = CHOOSOLOGY_TINYMCE_BASE + '/tinymce.min.js';
+    window.__choosologyTinyMceBaseUrl = CHOOSOLOGY_TINYMCE_BASE;
+    window.__choosologyTinyQueue = window.__choosologyTinyQueue || [];
+    function ensureTinyMCE(callback) {
+        if (!callback) return;
+        if (window.tinymce && typeof tinymce.init === 'function') {
+            callback();
+            return;
+        }
+        window.__choosologyTinyQueue.push(callback);
+        if (window.__choosologyTinyLoading) return;
+        window.__choosologyTinyLoading = true;
+        var s = document.createElement('script');
+        s.src = CHOOSOLOGY_TINYMCE_CDN;
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        s.onload = function () {
+            window.__choosologyTinyLoading = false;
+            var q = window.__choosologyTinyQueue.splice(0);
+            q.forEach(function (cb) {
+                try { cb(); } catch (err) { if (window.console) console.error(err); }
+            });
+        };
+        s.onerror = function () {
+            window.__choosologyTinyLoading = false;
+            window.__choosologyTinyQueue = [];
+            if (typeof showAlert === 'function') {
+                showAlert('Could not load the text editor (TinyMCE). Check your network or CDN.', 'error');
+            }
+        };
+        document.head.appendChild(s);
+    }
+
     //stage.scale({x:2,y:2});
     function loadAdv(advid)
     {   
@@ -50,6 +85,12 @@
                 buildFrom(i);
             }
             $("#visedloader").hide();
+            if (typeof window.__konvaPatternImagesRedraw === 'function') {
+                window.__konvaPatternImagesRedraw();
+                requestAnimationFrame(function () {
+                    window.__konvaPatternImagesRedraw();
+                });
+            }
         }).fail(function(xhr, status, err) {
             $("#visedloader").hide();
             var msg = "Could not load experiment data.";
@@ -208,7 +249,6 @@
 
 
         
-        text.cache();
         connto[name] = [];
         connfrom[name] = [];
         lines[name] = [];
@@ -285,8 +325,10 @@
         
        // alert(es.parent().attr("class"));
         es.switchClass("editscreenclosed", "editscreenopen", 400, "linear", function(){
-            es.load("vised/screeneditor.php?screenid="+idstuff[1]);
-                 resetView();
+            ensureTinyMCE(function () {
+                es.load("vised/screeneditor.php?screenid="+idstuff[1]);
+                resetView();
+            });
         });
         es.animate({
             top: "0",
@@ -309,6 +351,9 @@
         var bg = boxgroups["box_"+boxid];
         var by = bg.y();
         var bx = bg.x();
+        if (window.tinymce && typeof tinymce.remove === "function") {
+            try { tinymce.remove(); } catch (e) { /* ignore */ }
+        }
         $("#editorcontents").empty();  
         es.animate({
             top: by,
@@ -387,13 +432,12 @@
             return false;
         }
         $('html').css("cursor", mode['cursor']);
-        var mb = layers['bg'].find("#topbar_"+modename);
-        var omb = layers['bg'].find("#topbar_"+oldmode);
-        //ct.opacity(1);
-        omb.setOpacity(0);
-        mb.setOpacity(1);
+        var mb = layers['bg'].findOne("#topbar_"+modename);
+        var omb = layers['bg'].findOne("#topbar_"+oldmode);
+        if (omb) omb.opacity(0);
+        if (mb) mb.opacity(1);
         
-        layers['bg'].drawScene();
+        layers['bg'].batchDraw();
         
         return true;
     }
@@ -525,14 +569,15 @@
         box.setDraggable(false);
         var xmid = parseInt(box.x()+box.width()/2);
         var ymid = parseInt(box.y()+box.height()/2);
-        var mg = layers['menu'];//.find("#menugroup2");
-        var mgt = layers['menutext'].find("#menutextgroup");
+        var mg = layers['menu'];
         mg.x(xmid);
         mg.y(ymid);
-        mgt.x(xmid);
-        mgt.y(ymid);
-        layers['menu'].show().draw();
-        layers['menutext'].show().draw();
+        layers['menu'].show();
+        if (typeof layerScene !== 'undefined' && layerScene) {
+            layerScene.batchDraw();
+        } else {
+            stage.batchDraw();
+        }
         //var d = new Date();
         menuup = 3;
         //d.getMilliseconds();
@@ -543,8 +588,12 @@
     function closeMenu()
     {
         if(menubox) menubox.setDraggable(true);
-        layers['menu'].hide().draw();
-        layers['menutext'].hide().draw();
+        layers['menu'].hide();
+        if (typeof layerScene !== 'undefined' && layerScene) {
+            layerScene.batchDraw();
+        } else {
+            stage.batchDraw();
+        }
        // alert(menuup);
         //menuup.setDraggable(true);
         menuup = false;

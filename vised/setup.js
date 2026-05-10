@@ -17,7 +17,8 @@ Konva.legacyTextRendering = true;
         });
         var protobox = new Konva.Rect({
             stroke: config.box_border,
-            strokeWidth: '2',
+            strokeWidth: 2,
+            fill: config.box_color,
             fillPatternImage: config.box_bg,
             cornerRadius: 4,
             x: 0,
@@ -154,13 +155,27 @@ function pieHit(pie, context)
     var dirtyboxes = [];
     
     
+    var layerScene = new Konva.Layer();
+    /* One canvas for map content; groups preserve draw order (Konva warns when using many Layers). */
+    var groupLines = new Konva.Group({ listening: false });
+    var groupBoxes = new Konva.Group();
+    var groupLabels = new Konva.Group({ listening: false });
+    var groupMenuRoot = new Konva.Group({
+        id: 'menu_root',
+        name: 'menu_root',
+        visible: false
+    });
+
+    layerScene.add(groupLines);
+    layerScene.add(groupBoxes);
+    layerScene.add(groupLabels);
+    layerScene.add(groupMenuRoot);
+
     layers['bg'] = new Konva.Layer();
-    layers['lines'] = new Konva.Layer({ listening: false });
-    
-    layers['labels'] = new Konva.Layer({listening: false});
-    layers['menu'] = new Konva.Layer();
-    layers['menutext'] = new Konva.Layer();
-    layers['boxes'] = new Konva.Layer();
+    layers['lines'] = groupLines;
+    layers['boxes'] = groupBoxes;
+    layers['labels'] = groupLabels;
+    layers['menu'] = groupMenuRoot;
     
     var bgrect = new Konva.Rect({
             id: "bgrect",
@@ -284,13 +299,13 @@ function pieHit(pie, context)
 
     pie1.on("mouseover", function (e){
         this.opacity(0);
-        layers['menu'].draw();
+        layerScene.batchDraw();
     });
     
     
     pie1.on("mouseout", function (e){
         this.opacity(1);
-        layers['menu'].draw();
+        layerScene.batchDraw();
     });
     var protopie = pie1.clone();
     var pie1hover = protopie.clone ({
@@ -424,13 +439,13 @@ function pieHit(pie, context)
     });
     pieright.on("mouseover", function (e){
         this.opacity(0);
-        layers['menu'].draw();
+        layerScene.batchDraw();
     });
     
     
     pieright.on("mouseout", function (e){
         this.opacity(1);
-        layers['menu'].draw();
+        layerScene.batchDraw();
     });
 
     var pierighthover = pieright.clone ({
@@ -478,12 +493,12 @@ function pieHit(pie, context)
     });
     pieleft.on("mouseover", function (e){
         this.opacity(0);
-        layers['menu'].draw();
+        layerScene.batchDraw();
     });
     
     pieleft.on("mouseout", function (e){
         this.opacity(1);
-        layers['menu'].draw();
+        layerScene.batchDraw();
     });
 
     var pielefthover = pieleft.clone ({
@@ -599,18 +614,13 @@ function pieHit(pie, context)
 
     layers['bg'].add(bgrect, save, reload, topbar, topbar_normal, topbar_connect_to, topbar_disconnect_from );
 
-    layers['menu'].add(menugroup1);
-    layers['menu'].add(menugroup2);
-    layers['menutext'].add(menutextgroup);
+    groupMenuRoot.add(menugroup1);
+    groupMenuRoot.add(menugroup2);
+    groupMenuRoot.add(menutextgroup);
     
     stage.add(layers['bg']);
-    stage.add(layers['lines']);
-    stage.add(layers['boxes']);
-    stage.add(layers['labels']);
-    stage.add(layers['menu']);
-    stage.add(layers['menutext']);
-    layers['menu'].hide();
-    layers['menutext'].hide();
+    stage.add(layerScene);
+    groupMenuRoot.hide();
 
     /* TWEENS */
     var savetween = new Konva.Tween({
@@ -623,3 +633,25 @@ function pieHit(pie, context)
                   savetween.reverse();
               }
             });
+
+/* Konva 10: fillPatternImage can paint black until layers redraw after PNG decode; hover called draw() which masked this. */
+window.__konvaPatternImagesRedraw = function () {
+    try {
+        if (typeof layers === 'undefined' || typeof stage === 'undefined') return;
+        if (typeof layerScene !== 'undefined' && layerScene) layerScene.batchDraw();
+        if (layers['bg']) layers['bg'].batchDraw();
+        stage.batchDraw();
+    } catch (err) {}
+};
+(function () {
+    var imgs = [texPurple, texRed, texWhite, texGreen, texTeal, texYellow, texOrange];
+    function bump() {
+        window.__konvaPatternImagesRedraw();
+    }
+    imgs.forEach(function (img) {
+        img.addEventListener('load', bump);
+        img.addEventListener('error', bump);
+    });
+    bump();
+    requestAnimationFrame(bump);
+})();

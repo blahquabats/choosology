@@ -13,11 +13,14 @@ foreach ($advres as $v)
     $allscreens[$v['screenid']] = $v;
 }
 $adv = $advres[0];
+// Match ajax/screenajax.php: DB may store entity-encoded HTML (once or twice from legacy saves).
+$editor_body_html = htmlspecialchars_decode(htmlspecialchars_decode((string)($screen['text'] ?? '')));
+$editor_screen_name = htmlspecialchars_decode(htmlspecialchars_decode((string)($screen['name'] ?? '')));
 //echoPre($advres);
 echo "<style>
 #editscreenwindow
 {
-    background-color: ".$adv['advbg'].";
+    background-color: ".preg_replace('/\s+/', ' ', (string)($adv['advbg'] ?? '')).";
 }
 
 .screeneditor-name
@@ -116,13 +119,13 @@ echo "
 <div class='screeneditor-name' id='screenlabel' contentEditable='true'>
 ";
 
-echo $screen['name'];
+echo $editor_screen_name;
 echo "</div>
 <br/>
 <div class='screeneditor-label'>Page Contents:</div>
 <div class='screeneditor-maintext'>
 <textarea id='bodytext'>";
-echo $screen['text']."
+echo $editor_body_html."
 </textarea>
 
 <div class='screeneditor-label'>Connected Screens:</div><br/>";
@@ -132,8 +135,9 @@ for($c = 1; $c <= 8; $c++)
     if($screen["choice$c"] != "")
     {
         $choice = explode("|Q-D-|", $screen["choice$c"]);
+        $choice_label = htmlspecialchars_decode(htmlspecialchars_decode((string)($choice[0] ?? '')));
         echo "<div class='choicecontainer'> 
-            <div class='choicetext' id='choice$c' contenteditable='true'>".$choice[0]."</div>
+            <div class='choicetext' id='choice$c'>".$choice_label."</div>
             <div class='choiceinfo'>Leads to \"".strip_tags($allscreens[$choice[1]]['screenname'])."\"</div>
         <input type='hidden' id = 'choice".$c."id' value='".$choice[1]."'>
         </div>
@@ -162,6 +166,7 @@ echo "<br/><div class='fakebutton fgreen' id = 'savescreen' >Save</div>
 
 
 <script>
+(function () {
 function alertready()
 {
  $("#editorcontents").css("display", "block");  
@@ -173,90 +178,112 @@ function updateSaveTime()
     var nicedate = nicedatetime(new Date());
     $("#savetime").html("Last Saved: "+nicedate);
 }
-CKEDITOR.addCss(".cke_editable{background-color:<?php echo $adv['bg'] ?>;}");
 
-    
-    
-    $(document).ready(function(){
-        CKEDITOR.replace("bodytext", {
-            customConfig: '/custom/cyo-config.js'
-        });
-        CKEDITOR.disableAutoInline = true;
-        $(".choicetext").each(function(){
-        
-            CKEDITOR.inline( $(this).attr("id"), {
-                customConfig: '/custom/cyo-config-simple.js',
-                extraPlugins: 'donothing',
-    	        keystrokes: [
-            		[ 13 , 'donothing'],
-            		[CKEDITOR.SHIFT + 13 , 'donothing' ]
-    	        ]
-                });
-            
-        });
-        CKEDITOR.on("instanceReady",alertready);
-        $(".closewindow").on("click", function(){
-           // alert(data);
-           closeScreenEditor("<?php echo $sid ?>"); 
-        });
-        
-        $("#savescreen").on("click", function(){
-            var err = 0;
-            $(this).removeClass("fgreen");
-            var sid = $("#screenid").val();
-            var screenlabel = $("#screenlabel").text();
-            var content = CKEDITOR.instances.bodytext.getData();
-            var temparray = {};
-            
-            temparray['sid'] = sid;
-            temparray['content'] = content;
-            temparray['screenlabel'] = screenlabel;
-            
-            $(".choicetext").each(function(){
-                var cid = $(this).attr("id");
-                var ct = CKEDITOR.instances[cid].getData();
-                if(!$(ct).text().trim()) 
-                {
-                    err = "Choice labels cannot be empty!";
-                    return false;
-                }
-                var cpointer = $("#"+cid+"id").val(); // get the id of the screen this choice is pointing to
-                
-                temparray[cid] = ct;
-                temparray[cid+"id"] = cpointer;
-                
-            });
-            if(err) 
-            {
-                alert(err);
-                $("#savescreen").addClass("fgreen");
-                return false;
+if (typeof tinymce === "undefined") {
+    alertready();
+    return;
+}
+
+var advBg = <?php echo json_encode(preg_replace('/\s+/', ' ', (string)($adv['advbg'] ?? '')), JSON_UNESCAPED_UNICODE); ?>;
+var contentStyle = advBg ? ("body { background-color: " + advBg + "; margin: 0; }") : "body { margin: 0; }";
+
+var baseInit = {
+    license_key: "gpl",
+    promotion: false,
+    branding: false,
+    content_style: contentStyle,
+    base_url: (typeof window.__choosologyTinyMceBaseUrl === "string" && window.__choosologyTinyMceBaseUrl)
+        ? window.__choosologyTinyMceBaseUrl
+        : "https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.6.1",
+    suffix: ".min"
+};
+
+var bodyPromise = tinymce.init(Object.assign({}, baseInit, {
+    selector: "#bodytext",
+    height: 440,
+    resize: true,
+    plugins: "lists link image table code wordcount autoresize",
+    toolbar: "undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | outdent indent | link image table | removeformat code",
+    menubar: "edit view insert format tools table help"
+}));
+
+var choicePromise = tinymce.init(Object.assign({}, baseInit, {
+    selector: ".choicetext",
+    inline: true,
+    plugins: "lists link wordcount",
+    toolbar: "bold italic underline | removeformat",
+    menubar: false,
+    setup: function (editor) {
+        editor.on("keydown", function (e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
             }
-            
-            
-             $.ajax({
-            type: "POST",
-            url: "vised/saveadvscreen.php",
-            data: temparray,
-            }).error(function(){
-                showAlert("error", "error");
-                $("#savescreen").addClass("fgreen");
-            }).done(function(response){
-                //alert(response);
-                $("#savescreen").addClass("fgreen");
-                
-                 //closeScreenEditor("<?php echo $sid ?>");
-                 updateSaveTime();
-                 loadAdv("<?php echo $advid ?>");
-                
-                //tween.reverse();
-
-            //    save.fill("red");
-                //save.draw();
-                //alert(response);
-            });
         });
-        
+    }
+}));
+
+Promise.all([bodyPromise, choicePromise]).then(function () {
+    alertready();
+}).catch(function (err) {
+    if (window.console) console.error(err);
+    alertready();
+});
+
+$(document).ready(function(){
+    $(".closewindow").on("click", function(){
+       closeScreenEditor("<?php echo $sid ?>"); 
     });
     
+    $("#savescreen").on("click", function(){
+        var err = 0;
+        $(this).removeClass("fgreen");
+        var sid = $("#screenid").val();
+        var screenlabel = $("#screenlabel").text();
+        var ed = tinymce.get("bodytext");
+        var content = ed ? ed.getContent() : $("#bodytext").val();
+        var temparray = {};
+        
+        temparray["sid"] = sid;
+        temparray["content"] = content;
+        temparray["screenlabel"] = screenlabel;
+        
+        $(".choicetext").each(function(){
+            var cid = $(this).attr("id");
+            var choiceEd = tinymce.get(cid);
+            var ct = choiceEd ? choiceEd.getContent() : $(this).html();
+            if(!$(ct).text().trim()) 
+            {
+                err = "Choice labels cannot be empty!";
+                return false;
+            }
+            var cpointer = $("#"+cid+"id").val();
+            
+            temparray[cid] = ct;
+            temparray[cid+"id"] = cpointer;
+            
+        });
+        if(err) 
+        {
+            alert(err);
+            $("#savescreen").addClass("fgreen");
+            return false;
+        }
+        
+        
+         $.ajax({
+        type: "POST",
+        url: "vised/saveadvscreen.php",
+        data: temparray,
+        }).error(function(){
+            showAlert("error", "error");
+            $("#savescreen").addClass("fgreen");
+        }).done(function(response){
+            $("#savescreen").addClass("fgreen");
+             updateSaveTime();
+             loadAdv("<?php echo $advid ?>");
+        });
+    });
+    
+});
+})();
 </script>
