@@ -83,7 +83,10 @@ function getAdv($advid)
     if(!$screenres) return array($advres[0], null);
     foreach($screenres as $sr)
     {
-        $orderedscreens[$sr['id']] = array_map('html_entity_decode', array_map('html_entity_decode', $sr));
+        $orderedscreens[$sr['id']] = array_map(function ($v) {
+            $s = $v === null ? '' : (string) $v;
+            return html_entity_decode(html_entity_decode($s));
+        }, $sr);
     }
     return array($advres[0], $orderedscreens);
 }

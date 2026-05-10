@@ -24,7 +24,7 @@
         
         $.ajax({
             type: "POST",
-            url: "ajax/loadadvstructure.php",
+            url: choosologyUrl("ajax/loadadvstructure.php"),
             dataType: "json",
             data: {
                     advid: advid
@@ -50,17 +50,24 @@
                 buildFrom(i);
             }
             $("#visedloader").hide();
-        }).fail(function(xhr) {
+        }).fail(function(xhr, status, err) {
             $("#visedloader").hide();
             var msg = "Could not load experiment data.";
-            try {
-                var t = xhr.responseText && xhr.responseText.trim().charAt(0);
-                if (t === '<' || t === '') {
-                    msg += " (server returned non-JSON).";
-                }
-            } catch (e) { /* ignore */ }
             if (xhr.status === 0) {
                 msg = "Network error loading experiment data.";
+            } else if (xhr.status === 404) {
+                msg = "Load URL not found (check app base path). Open /choosology/ with a trailing slash or use choosologyUrl for AJAX.";
+            } else if (status === "parsererror") {
+                var rt = (xhr.responseText || "").trim();
+                var c0 = rt.charAt(0);
+                if (c0 === "<") {
+                    msg += " Server returned HTML (often a PHP error or 404).";
+                } else if (rt.length > 0 && c0 !== "[" && c0 !== "{") {
+                    msg += " " + rt.slice(0, 200);
+                }
+            }
+            if (window.console && console.error) {
+                console.error("loadadvstructure", xhr.status, status, err, xhr.responseText && xhr.responseText.slice(0, 500));
             }
             showAlert(msg, "error");
         });
@@ -993,7 +1000,7 @@ function drawPath(box1, box2)
        // alert(jsonarray);
         $.ajax({
             type: "POST",
-            url: "vised/saveadv.php",
+            url: choosologyUrl("vised/saveadv.php"),
             data: temparray,
             }).error(function(){
                 showAlert("error", "error");
