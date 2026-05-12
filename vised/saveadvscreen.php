@@ -36,9 +36,14 @@ function addNew($name, $title)
     return $newid;
 }*/
 
-$sid = $_POST['sid'];
-$content = $_POST['content'];
-$screenlabel = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", $_POST['screenlabel']))); // removing \n since it's already been escaped
+$sid = isset($_POST['sid']) ? preg_replace('/\D/', '', (string) $_POST['sid']) : '';
+if ($sid === '') {
+	exit;
+}
+$content = choosology_sanitize_screen_html_images((string) ($_POST['content'] ?? ''));
+$content = mysqli_real_escape_string($db, $content);
+$screenlabel = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", (string) ($_POST['screenlabel'] ?? ''))));
+$screenlabel = mysqli_real_escape_string($db, $screenlabel);
 
 $screeninfo = runquery_assoc("select * from advscreens where id = '$sid'");
 if(!$screeninfo || $screeninfo[0]['id'] != $sid)
@@ -50,10 +55,14 @@ $screeninfo = $screeninfo[0];
 $q = "update advscreens set text = \"$content\", name = \"$screenlabel\" ";
 for ($c = 1; $c <= 8; $c++)
 {
-    if(!$_POST['choice'.$c]) continue;
-    $choicetext = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", $_POST["choice$c"])));
-    $choice = $db->real_escape_string(html_entity_decode($choicetext."|Q-D-|".$_POST['choice'.$c.'id']));
-    $q .= ", choice$c = \"$choice\"";
+	if (empty($_POST['choice'.$c])) {
+		continue;
+	}
+	$choicetext = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", (string) $_POST["choice$c"])));
+	$choicetext = choosology_sanitize_screen_html_images($choicetext);
+	$cpid = mysqli_real_escape_string($db, (string) ($_POST['choice'.$c.'id'] ?? ''));
+	$choice = mysqli_real_escape_string($db, html_entity_decode($choicetext . '|Q-D-|' . $cpid));
+	$q .= ", choice$c = \"$choice\"";
 }
 $q .= " where id = '$sid' and user = '$user'";
 if(runquery($q))

@@ -541,6 +541,1098 @@ label.sel:before {
     display: block;
 }
 
+.vised-toolbar
+{
+    padding: 8px 12px 10px;
+    background: #dde8dd;
+    border-bottom: 1px solid #aabbaa;
+}
+
+/* Aligns with .contentcontainer / .footer so fixed overlays leave the left nav column usable */
+:root
+{
+    --choosology-left-rail: 230px;
+}
+
+#advsettingswindow.advsettings-hidden
+{
+    display: none !important;
+}
+
+#advsettingswindow.advsettings-open
+{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: var(--choosology-left-rail, 230px);
+    z-index: 5000;
+    background: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    padding: clamp(10px, 2.5vw, 24px);
+    box-sizing: border-box;
+}
+
+#advsettingscontents .advsettings-dialog
+{
+    width: 100%;
+    max-width: min(1120px, calc(100vw - var(--choosology-left-rail, 230px) - clamp(24px, 5vw, 48px)));
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 0 0 16px;
+    border: 1px solid #333;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.advsettings-head
+{
+    position: relative;
+    text-align: center;
+    margin: 0;
+    padding: 22px clamp(48px, 10vw, 88px) 20px;
+    border-bottom: 1px solid #ccc;
+    background: #fff;
+}
+
+.advsettings-head-inner
+{
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.advsettings-head-eyebrow
+{
+    margin: 0 0 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #3d5a73;
+    font-family: Consolas, "Courier New", Courier, monospace;
+}
+
+.advsettings-head-specid
+{
+    letter-spacing: 0.06em;
+    color: #124060;
+    font-weight: 700;
+}
+
+.advsettings-head-title
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    max-width: 100%;
+    padding: 10px 14px 10px 12px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: clamp(0.78rem, 2vw, 0.92rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #0d2137;
+    line-height: 1.25;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid #1c5a7a;
+    background: linear-gradient(90deg, rgba(28, 90, 122, 0.14), rgba(28, 90, 122, 0.03) 45%, transparent 100%);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
+.advsettings-head-title::before
+{
+    content: "00";
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid #1c5a7a;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: #134056;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.advsettings-head .advsettings-close.closewindow
+{
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    float: none;
+    clear: none;
+    margin: 0;
+    z-index: 2;
+    font-size: 2rem;
+    line-height: 1;
+    padding: 4px 8px;
+    color: #2a4055;
+}
+
+.advsettings-head .advsettings-close.closewindow:hover
+{
+    color: #c0392b;
+}
+
+.advsettings-form
+{
+    padding: 16px clamp(12px, 2vw, 20px) 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 880px)
+{
+    .advsettings-form
+    {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        column-gap: clamp(20px, 3vw, 36px);
+        row-gap: 20px;
+        align-items: start;
+    }
+
+    .advsettings-section--basics
+    {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .advsettings-section--publishing
+    {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .advsettings-section--look
+    {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+    }
+
+    .advsettings-actions
+    {
+        grid-column: 1 / -1;
+        grid-row: 3;
+    }
+}
+
+.advsettings-section
+{
+    margin-top: 0;
+    min-width: 0;
+}
+
+.advsettings-section h3
+{
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+/* Protocol-style section headers (Basics / Publishing / Look & feel) */
+.advsettings-section--basics > h3,
+.advsettings-section--publishing > h3,
+.advsettings-section--look > h3
+{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 12px;
+    padding: 10px 14px 10px 12px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #0d2137;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.advsettings-section--basics > h3
+{
+    border-left: 4px solid #2a9d8f;
+    background: linear-gradient(90deg, rgba(42, 157, 143, 0.14), rgba(42, 157, 143, 0.03) 45%, transparent 100%);
+}
+
+.advsettings-section--basics > h3::before
+{
+    content: "01";
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid #2a9d8f;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: #145a50;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.advsettings-section--publishing > h3
+{
+    border-left: 4px solid #2874a6;
+    background: linear-gradient(90deg, rgba(40, 116, 166, 0.14), rgba(40, 116, 166, 0.03) 45%, transparent 100%);
+}
+
+.advsettings-section--publishing > h3::before
+{
+    content: "02";
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid #2874a6;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: #1a4d6e;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+/* Publishing: availability as lab-style radio “specimen cards” */
+.adv-avail-rail
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.adv-avail-option
+{
+    flex: 1 1 200px;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.adv-avail-panel
+{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 4.5rem;
+    padding: 12px 14px 12px 12px;
+    box-sizing: border-box;
+    border: 1px solid #b8c5d6;
+    border-left-width: 4px;
+    border-radius: 0 6px 6px 0;
+    background: linear-gradient(165deg, #fafcfd 0%, #f0f4f8 100%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.adv-avail-option--none .adv-avail-panel
+{
+    border-left-color: #7f8c8d;
+}
+
+.adv-avail-option--private .adv-avail-panel
+{
+    border-left-color: #2874a6;
+}
+
+.adv-avail-option--public .adv-avail-panel
+{
+    border-left-color: #1e8449;
+}
+
+.adv-avail-input
+{
+    flex-shrink: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 3px 0 0;
+    cursor: pointer;
+    accent-color: #2874a6;
+}
+
+.adv-avail-option--none .adv-avail-input
+{
+    accent-color: #5d6d7e;
+}
+
+.adv-avail-option--public .adv-avail-input
+{
+    accent-color: #1e8449;
+}
+
+.adv-avail-main
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    font-family: Consolas, "Courier New", Courier, monospace;
+}
+
+.adv-avail-code
+{
+    display: inline-block;
+    align-self: flex-start;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #1a252f;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #aab7c4;
+}
+
+.adv-avail-option--private .adv-avail-code
+{
+    border-color: #2874a6;
+    color: #1a4d6e;
+}
+
+.adv-avail-option--public .adv-avail-code
+{
+    border-color: #1e8449;
+    color: #145a32;
+}
+
+.adv-avail-name
+{
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0d2137;
+}
+
+.adv-avail-hint
+{
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    color: #4a5f73;
+    line-height: 1.35;
+}
+
+.adv-avail-option:hover .adv-avail-panel
+{
+    background: linear-gradient(165deg, #ffffff 0%, #f4f7fb 100%);
+    border-color: #9aacbf;
+}
+
+.adv-avail-option--none:hover .adv-avail-panel
+{
+    border-left-color: #5d6d7e;
+}
+
+.adv-avail-option--private:hover .adv-avail-panel
+{
+    border-left-color: #1f5f86;
+}
+
+.adv-avail-option--public:hover .adv-avail-panel
+{
+    border-left-color: #196f3d;
+}
+
+
+.adv-avail-option:has(.adv-avail-input:checked) .adv-avail-panel
+{
+    border-color: #2874a6;
+    box-shadow: 0 0 0 2px rgba(40, 116, 166, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(165deg, #f4f9fc 0%, #e8f2fa 100%);
+}
+
+.adv-avail-option--none:has(.adv-avail-input:checked) .adv-avail-panel
+{
+    border-color: #5d6d7e;
+    box-shadow: 0 0 0 2px rgba(93, 109, 126, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(165deg, #f6f7f8 0%, #eceff2 100%);
+}
+
+.adv-avail-option--public:has(.adv-avail-input:checked) .adv-avail-panel
+{
+    border-color: #1e8449;
+    box-shadow: 0 0 0 2px rgba(30, 132, 73, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(165deg, #f4fbf6 0%, #e8f5ed 100%);
+}
+
+.adv-avail-option:focus-within .adv-avail-panel
+{
+    outline: 2px solid #4488cc;
+    outline-offset: 2px;
+}
+
+.advsettings-section--look > h3
+{
+    border-left: 4px solid #6c3483;
+    background: linear-gradient(90deg, rgba(108, 52, 131, 0.14), rgba(108, 52, 131, 0.03) 45%, transparent 100%);
+}
+
+.advsettings-section--look > h3::before
+{
+    content: "03";
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid #6c3483;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: #4a1f6b;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.advsettings-label
+{
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+.advsettings-basics-cols
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 12px clamp(16px, 3vw, 28px);
+    align-items: start;
+}
+
+.advsettings-basics-col
+{
+    min-width: 0;
+}
+
+.advsettings-basics-col > .advsettings-label:first-of-type,
+.advsettings-media-block > .advsettings-label:first-of-type
+{
+    margin-top: 0;
+}
+
+/* Look & feel: live preview (mirrors reader screen: page → panel → text/link) */
+.advsettings-livepreview
+{
+    margin: 0 0 10px;
+    min-width: 0;
+}
+
+.advsettings-livepreview-caption
+{
+    margin: 0 0 6px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #4a1f6b;
+}
+
+.advsettings-livepreview-chrome
+{
+    min-height: 96px;
+    padding: 12px 12px;
+    border-radius: 6px;
+    border: 1px solid #c9b8d4;
+    box-sizing: border-box;
+    /* Page background + optional image (--adv-live-page-* from JS) */
+    background-color: var(--adv-live-page-bg, #ffffff);
+    background-image: var(--adv-live-page-img, none);
+    transition: background-color 0.12s ease, background-image 0.12s ease;
+}
+
+.advsettings-livepreview-panel
+{
+    margin: 0 auto;
+    max-width: 28rem;
+    padding: 10px 12px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #ccddff;
+    border: 2px solid #9999cc;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, border-width 0.12s ease;
+}
+
+.advsettings-livepreview-text
+{
+    margin: 0 0 6px;
+    font-size: 0.85rem;
+    line-height: 1.35;
+}
+
+.advsettings-livepreview-link
+{
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: default;
+}
+
+.advsettings-media-pair
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 16px clamp(16px, 2.5vw, 28px);
+    align-items: start;
+}
+
+.advsettings-media-block
+{
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Global .fakebutton uses height:20px + float — clips labels and breaks layout in this modal */
+.advsettings-dialog .fakebutton
+{
+    float: none;
+    height: auto;
+    min-height: 2.25em;
+    line-height: 1.35;
+    padding: 0.4em 0.75em;
+    box-sizing: border-box;
+}
+
+.advsettings-dialog .adv-thumbrow
+{
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.advsettings-dialog .advsettings-actions .fakebutton
+{
+    margin: 0;
+}
+
+.advsettings-dialog .adv-picbrowser
+{
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 6px;
+    scrollbar-gutter: stable;
+}
+
+.advsettings-dialog .adv-picbrowser-toolbar
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.advsettings-dialog .adv-picbrowser-toolbar .adv-picbrowser-q
+{
+    flex: 1 1 12rem;
+    min-width: 0;
+}
+
+.advsettings-dialog .adv-picbrowser-toolbar .adv-picbrowser-tag
+{
+    flex: 0 1 13rem;
+    min-width: 9rem;
+    max-width: 100%;
+}
+
+.advsettings-dialog .adv-picbrowser-hint
+{
+    margin: 0 0 6px;
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.advsettings-dialog .adv-picbrowser-status
+{
+    font-size: 0.75rem;
+    color: #444;
+    margin-bottom: 4px;
+    min-height: 1.2em;
+}
+
+.advsettings-dialog .adv-picbrowser-scroll
+{
+    max-height: min(52vh, 460px);
+    overflow: auto;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fafafa;
+    padding: 8px;
+}
+
+.advsettings-dialog .adv-picbrowser-grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
+    align-content: start;
+}
+
+@media (min-width: 900px)
+{
+    .advsettings-dialog .adv-picbrowser-grid
+    {
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    }
+}
+
+.adv-picbrowser-tile
+{
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    text-align: left;
+}
+
+.adv-picbrowser-tile:hover
+{
+    border-color: #4488cc;
+}
+
+.adv-picbrowser-tile:focus
+{
+    outline: 2px solid #4488cc;
+    outline-offset: 1px;
+}
+
+.adv-picbrowser-tile--selected
+{
+    border-color: #6c3483;
+    box-shadow: 0 0 0 1px rgba(108, 52, 131, 0.35);
+}
+
+.adv-picbrowser-tile-img
+{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #eee;
+}
+
+.adv-picbrowser-tile-img img
+{
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.adv-picbrowser-tile-cap
+{
+    font-size: 0.62rem;
+    line-height: 1.25;
+    padding: 4px 5px 5px;
+    color: #333;
+    max-height: 2.6em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+}
+
+.advsettings-dialog .adv-picgrid
+{
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* Keep width stable when only one grid scrolls */
+    scrollbar-gutter: stable;
+}
+
+.advsettings-input-narrow
+{
+    max-width: 7rem;
+}
+
+.advsettings-input,
+.advsettings-textarea
+{
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.advsettings-textarea
+{
+    resize: vertical;
+}
+
+.adv-hint
+{
+    font-weight: normal;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.adv-req
+{
+    color: #a00;
+}
+
+.adv-thumbrow
+{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.adv-preview-slot
+{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    min-height: 72px;
+}
+
+.adv-preview-frame
+{
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #f6f6f6;
+    overflow: hidden;
+}
+
+.adv-preview-slot--empty .adv-preview-frame
+{
+    border-style: dashed;
+    background: #fafafa;
+}
+
+.adv-preview-frame .adv-preview-img
+{
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: none;
+}
+
+.adv-preview-frame .adv-preview-empty
+{
+    font-size: 0.72rem;
+    line-height: 1.25;
+    text-align: center;
+    padding: 4px;
+    color: #777;
+    user-select: none;
+}
+
+.adv-preview-clear
+{
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #999;
+    border-radius: 4px;
+    background: #eee;
+    color: #333;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.adv-preview-clear:hover
+{
+    background: #ddd;
+    border-color: #666;
+}
+
+.adv-preview-clear:focus
+{
+    outline: 2px solid #4488cc;
+    outline-offset: 1px;
+}
+
+.adv-preview-img
+{
+    max-width: 72px;
+    max-height: 72px;
+    border: 1px solid #ccc;
+}
+
+.adv-preview-empty
+{
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.adv-picgrid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 64px);
+    gap: 8px;
+    justify-content: start;
+    max-height: min(42vh, 280px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.adv-pictile
+{
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.adv-pictile:hover
+{
+    border-color: #4488cc;
+}
+
+.adv-pictile img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.advsettings-colors
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+    gap: 8px clamp(10px, 1.5vw, 16px);
+    margin-top: 0;
+}
+
+.advsettings-dialog .adv-lf-slot-head--tl
+{
+    align-items: center;
+    gap: 6px 10px;
+}
+
+.advsettings-dialog .adv-lf-auto-inline
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.58rem;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: #4a1f6b;
+    flex-shrink: 0;
+    max-width: min(100%, 9.5rem);
+    line-height: 1.2;
+}
+
+.advsettings-dialog .adv-lf-auto-inline input
+{
+    width: 0.82rem;
+    height: 0.82rem;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.advsettings-dialog .adv-lf-auto-inline-label
+{
+    hyphens: auto;
+}
+
+.advsettings-dialog .adv-lf-slot--tl.adv-lf-slot-locked
+{
+    opacity: 0.72;
+    filter: saturate(0.78);
+}
+
+.advsettings-dialog .adv-minicolors-locked
+{
+    opacity: 0.85;
+}
+
+.advsettings-dialog .adv-minicolors-locked .minicolors-input,
+.advsettings-dialog .adv-minicolors-locked .minicolors-swatch,
+.advsettings-dialog .adv-minicolors-locked .minicolors-swatch-color
+{
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+/* Look & feel: “specimen card” slots (L1–L6), aligned with section 03 / publishing styling */
+.advsettings-dialog .adv-lf-slot
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 6px 8px 7px 8px;
+    border: 1px solid #c9b8d4;
+    border-left: 4px solid #6c3483;
+    border-radius: 0 6px 6px 0;
+    background: linear-gradient(165deg, rgba(108, 52, 131, 0.09) 0%, rgba(255, 255, 255, 0) 42%, #fafafa 100%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-sizing: border-box;
+}
+
+.advsettings-dialog .adv-lf-slot-head
+{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.advsettings-dialog .adv-lf-code
+{
+    flex-shrink: 0;
+    padding: 1px 5px;
+    border: 1px solid #6c3483;
+    border-radius: 3px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #4a1f6b;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.advsettings-dialog .adv-lf-label
+{
+    margin: 0 !important;
+    flex: 1 1 8rem;
+    min-width: 0;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0d2137;
+    line-height: 1.2;
+}
+
+.advsettings-dialog .adv-lf-label .adv-hint
+{
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    font-size: 0.68em;
+}
+
+.advsettings-dialog .adv-lf-slot-control
+{
+    min-width: 0;
+    width: 100%;
+}
+
+.advsettings-dialog .adv-lf-slot:focus-within
+{
+    box-shadow: 0 0 0 2px rgba(108, 52, 131, 0.18), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border-color: #a889bc;
+}
+
+/* Minicolors in adventure settings: full-width row, swatch sized to input height & vertically centered */
+.advsettings-dialog .advsettings-colors .minicolors.minicolors-theme-default
+{
+    display: block;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.advsettings-dialog .advsettings-colors .minicolors-theme-default .minicolors-input
+{
+    display: block;
+    width: 100% !important;
+    max-width: 100%;
+    height: 2.05rem;
+    line-height: 2.05rem;
+    padding: 0 0.45rem 0 2.45rem;
+    margin: 0;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.advsettings-dialog .advsettings-colors .minicolors-theme-default .minicolors-swatch
+{
+    position: absolute;
+    left: 0.45rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.45rem;
+    height: 1.45rem;
+    margin: 0 !important;
+    border-radius: 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.advsettings-dialog .advsettings-colors .minicolors-theme-default .minicolors-swatch:hover
+{
+    box-shadow: 0 0 0 2px rgba(108, 52, 131, 0.35);
+}
+
+.advsettings-dialog .advsettings-colors .minicolors-theme-default .minicolors-swatch-color
+{
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+/* Match border-width control width to color fields (full grid cell) */
+.advsettings-dialog .advsettings-colors .advsettings-input-narrow,
+.advsettings-dialog .advsettings-colors #as_borderwidth
+{
+    width: 100%;
+    max-width: 100%;
+    height: 2.05rem;
+    box-sizing: border-box;
+}
+
+.advsettings-actions
+{
+    margin-top: 0;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
 #viewwindow
 {
     top: 80px;

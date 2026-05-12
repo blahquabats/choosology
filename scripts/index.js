@@ -91,6 +91,14 @@ var configmenu = {
         
 
 $(function() {
+            /* View experiment: Map → graph editor (button only exists for owner, multi-screen advs). */
+            $(document).on("click", "#mapbutton", function (e) {
+                e.preventDefault();
+                var advid = $(this).attr("data-advid");
+                if (advid) {
+                    location.href = "#/edit/" + advid;
+                }
+            });
             if ($("#tabswindow").length) {
             $( "#tabswindow" ).tabs({
                 beforeLoad: function( event, ui ) {

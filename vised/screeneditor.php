@@ -22,7 +22,30 @@ echo "<style>
 {
     background-color: ".preg_replace('/\s+/', ' ', (string)($adv['advbg'] ?? '')).";
 }
-
+#editscreenwindow.editscreenopen
+{
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.screeneditor-maintext
+{
+    width: 90%;
+    max-width: 100%;
+    display: inline-block;
+    margin-left: 50px;
+    margin-right: auto;
+    cursor: text;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+.screeneditor-maintext .tox-tinymce
+{
+    box-sizing: border-box;
+    max-width: 100%;
+}
 .screeneditor-name
 {
     width:30%;
@@ -39,16 +62,6 @@ echo "<style>
     background-color: #eeeeff;
     border-color: #666666;
     
-}
-.screeneditor-maintext
-{
-    width:90%;
-    display: inline-block;
-    margin-left:50px;
-    margin-right:auto;
-    cursor: text;
-    border-radius: 4px;
-    border: 1px solid transparent;
 }
 .screeneditor-label
 {
@@ -91,6 +104,83 @@ font-size:small;
 {
     clear:left;
     font-size: small;
+}
+.choosology-imglib-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    box-sizing: border-box;
+}
+.choosology-imglib-panel {
+    background: #fff;
+    color: #222;
+    border-radius: 8px;
+    max-width: 920px;
+    width: 100%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+.choosology-imglib-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+}
+.choosology-imglib-close {
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    padding: 4px 8px;
+}
+.choosology-imglib-close:hover { color: #c00; }
+.choosology-imglib-grid {
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
+}
+.choosology-imglib-tile {
+    width: 100px;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px;
+    background: #fafafa;
+}
+.choosology-imglib-tile:hover {
+    border-color: #4488cc;
+    background: #eef6ff;
+}
+.choosology-imglib-tile img {
+    max-width: 92px;
+    max-height: 92px;
+    display: block;
+    margin: 0 auto 4px;
+    object-fit: contain;
+}
+.choosology-imglib-caption {
+    font-size: 11px;
+    line-height: 1.2;
+    word-break: break-word;
+    max-height: 2.4em;
+    overflow: hidden;
+}
+.choosology-imglib-msg {
+    padding: 20px;
+    color: #555;
 }
 
 </style>";
@@ -136,10 +226,17 @@ for($c = 1; $c <= 8; $c++)
     {
         $choice = explode("|Q-D-|", $screen["choice$c"]);
         $choice_label = htmlspecialchars_decode(htmlspecialchars_decode((string)($choice[0] ?? '')));
+        $targetId = isset($choice[1]) ? (string) $choice[1] : '';
+        $targetMeta = ($targetId !== '' && isset($allscreens[$targetId])) ? $allscreens[$targetId] : null;
+        if ($targetMeta) {
+            $destLabel = strip_tags((string) ($targetMeta['screenname'] ?? ''));
+        } else {
+            $destLabel = $targetId !== '' ? ('(missing screen #' . $targetId . ')') : '(not connected)';
+        }
         echo "<div class='choicecontainer'> 
             <div class='choicetext' id='choice$c'>".$choice_label."</div>
-            <div class='choiceinfo'>Leads to \"".strip_tags($allscreens[$choice[1]]['screenname'])."\"</div>
-        <input type='hidden' id = 'choice".$c."id' value='".$choice[1]."'>
+            <div class='choiceinfo'>Leads to \"".htmlspecialchars($destLabel, ENT_QUOTES, 'UTF-8')."\"</div>
+        <input type='hidden' id = 'choice".$c."id' value='".htmlspecialchars($targetId, ENT_QUOTES, 'UTF-8')."'>
         </div>
         
         ";
@@ -179,6 +276,86 @@ function updateSaveTime()
     $("#savetime").html("Last Saved: "+nicedate);
 }
 
+function choosologyUrlSafe(path) {
+    if (typeof choosologyUrl === "function") {
+        return choosologyUrl(path);
+    }
+    path = String(path || "").replace(/^\//, "");
+    return path ? ("/" + path) : "/";
+}
+
+function choosologyOpenImageLibrary(callback) {
+    var advid = $("#advid").val();
+    if (!advid) {
+        if (typeof showAlert === "function") {
+            showAlert("Missing experiment id for image list.", "error");
+        }
+        return;
+    }
+    var $ov = $("<div class=\"choosology-imglib-overlay\" role=\"dialog\" aria-modal=\"true\">" +
+        "<div class=\"choosology-imglib-panel\">" +
+        "<div class=\"choosology-imglib-head\"><span>Your Choosology images</span>" +
+        "<span class=\"choosology-imglib-close\" title=\"Close\">&times;</span></div>" +
+        "<div class=\"choosology-imglib-body choosology-imglib-msg\">Loading…</div></div></div>");
+    $("body").append($ov);
+
+    function close() {
+        $ov.remove();
+        $(document).off("keydown.choosology-imglib");
+    }
+    $ov.on("click", function (e) {
+        if (e.target === $ov[0]) {
+            close();
+        }
+    });
+    $ov.find(".choosology-imglib-close").on("click", close);
+    $(document).on("keydown.choosology-imglib", function (e) {
+        if (e.keyCode === 27) {
+            close();
+        }
+    });
+
+    var $body = $ov.find(".choosology-imglib-body");
+    $.getJSON(choosologyUrlSafe("ajax/listuserpics.php"), { advid: advid })
+        .done(function (data) {
+            if (!data || !data.ok) {
+                $body.removeClass("choosology-imglib-grid").addClass("choosology-imglib-msg").text(
+                    (data && data.error) ? data.error : "Could not load images."
+                );
+                return;
+            }
+            var items = data.items || [];
+            $body.removeClass("choosology-imglib-msg").addClass("choosology-imglib-grid").empty();
+            if (!items.length) {
+                $body.append($("<p/>").css({ width: "100%", textAlign: "center", color: "#666", margin: "12px 0" })
+                    .text("No uploaded images yet. Add pictures elsewhere on the site, then reopen this picker."));
+                return;
+            }
+            items.forEach(function (it) {
+                var url = it.imageUrl || "";
+                var title = it.title || ("Image #" + it.id);
+                var thumb = it.thumbUrl || url;
+                var $t = $("<div class=\"choosology-imglib-tile\"/>");
+                $t.append($("<img/>").attr({ src: thumb, alt: title }));
+                $t.append($("<div class=\"choosology-imglib-caption\"/>").text(title));
+                $t.on("click", function () {
+                    if (typeof callback === "function") {
+                        callback(url, { alt: title });
+                    }
+                    close();
+                });
+                $body.append($t);
+            });
+        })
+        .fail(function () {
+            $body.removeClass("choosology-imglib-grid").addClass("choosology-imglib-msg")
+                .text("Network error loading your images.");
+            if (typeof showAlert === "function") {
+                showAlert("Could not load image library.", "error");
+            }
+        });
+}
+
 if (typeof tinymce === "undefined") {
     alertready();
     return;
@@ -200,11 +377,17 @@ var baseInit = {
 
 var bodyPromise = tinymce.init(Object.assign({}, baseInit, {
     selector: "#bodytext",
-    height: 440,
-    resize: true,
-    plugins: "lists link image table code wordcount autoresize",
+    height: 360,
+    max_height: 520,
+    resize: false,
+    plugins: "lists link image table code wordcount",
     toolbar: "undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | outdent indent | link image table | removeformat code",
-    menubar: "edit view insert format tools table help"
+    menubar: "edit view insert format tools table help",
+    file_picker_callback: function (cb, value, meta) {
+        if (meta.filetype === "image") {
+            choosologyOpenImageLibrary(cb);
+        }
+    }
 }));
 
 var choicePromise = tinymce.init(Object.assign({}, baseInit, {

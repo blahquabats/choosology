@@ -364,6 +364,63 @@ function decodeEntities(input)
     return y.value.replace(/(<([^>]+)>)/ig,"");
 }
 
+function choosologyUrlSafeGlobal(path) {
+    if (typeof choosologyUrl === "function") {
+        return choosologyUrl(path);
+    }
+    path = String(path || "").replace(/^\//, "");
+    return path ? ("/" + path) : "/";
+}
+
+/**
+ * Create a new experiment from My Stuff (or elsewhere) and open the graph editor.
+ */
+function makeNewExperiment(title) {
+    title = String(title || "").trim();
+    if (!title) {
+        if (typeof showAlert === "function") {
+            showAlert("Please enter a name for the experiment.", "error");
+        }
+        return;
+    }
+    var $btn = $("#ms_e_newexperiment_submit");
+    if ($btn.length) {
+        $btn.css("pointer-events", "none").addClass("fgreen");
+    }
+    $.ajax({
+        type: "POST",
+        url: choosologyUrlSafeGlobal("ajax/newadventure.php"),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify({ title: title })
+    }).done(function (res) {
+        if ($btn.length) {
+            $btn.css("pointer-events", "").removeClass("fgreen");
+        }
+        if (res && res.ok && res.id) {
+            if (typeof showAlert === "function") {
+                showAlert("Experiment created. Opening editor…", "success");
+            }
+            window.location.href = "#/edit/" + res.id;
+            return;
+        }
+        if (typeof showAlert === "function") {
+            showAlert((res && res.error) ? res.error : "Could not create experiment.", "error");
+        }
+    }).fail(function (xhr) {
+        if ($btn.length) {
+            $btn.css("pointer-events", "").removeClass("fgreen");
+        }
+        var msg = "Could not create experiment.";
+        if (xhr.responseJSON && xhr.responseJSON.error) {
+            msg = xhr.responseJSON.error;
+        }
+        if (typeof showAlert === "function") {
+            showAlert(msg, "error");
+        }
+    });
+}
+
 function listenToEdit()
 {
     $(function() {

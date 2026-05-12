@@ -5,8 +5,6 @@ require_once("../auxfuncs.php");
 
 // get all relevant images to populate chooser
 $pics = getUserPics($name);
-$mydir = playerDir($name);
-$unidir = playerDir("&everyone");
 $picsholder = "<div class='imagepicker'>
             <input type='hidden' name='newform_image' value='' />
             <div class='imagepicker_selected'>
@@ -15,12 +13,12 @@ $picsholder = "<div class='imagepicker'>
 ";
 foreach ($pics as $pic)
 {
-    if ($pic['user'] == "&everyone") $dir = $unidir."/thumbs/".$pic['filename'];
-    else $dir = $mydir."/thumbs/".$pic['filename'];
-    $picsholder .= "<div class='imagepicker_result' data-attribute='".$pic['id']."'>
-    <img src='$dir'>
+	$pid = (int) ($pic['id'] ?? 0);
+	$thumbUrl = $pid > 0 ? getPicUrl($pid, true) : '';
+	$picsholder .= "<div class='imagepicker_result' data-attribute='".$pic['id']."'>
+    <img src=\"" . htmlspecialchars($thumbUrl, ENT_QUOTES, 'UTF-8') . "\" alt=\"\">
     <div class='imagepicker_caption'>
-    ".$pics['imagename']."
+    ".htmlspecialchars((string)($pic['imagename'] ?? $pic['filename'] ?? ''), ENT_QUOTES, 'UTF-8')."
     </div>
     </div>";
 }

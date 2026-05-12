@@ -42,6 +42,17 @@ if ($id === '' || !is_numeric($id)) {
 }
 $adv = getAdvInfo($id);
 
+/** "Map" opens the graph editor; only useful for the owner when there is more than one active screen. */
+$showExpMap = false;
+if (!empty($_SESSION['user']) && (string) $_SESSION['user'] === (string) ($adv['user'] ?? '')) {
+	$escAdvid = mysqli_real_escape_string($db, (string) $id);
+	$cnt = runquery_assoc(
+		"SELECT COUNT(*) AS c FROM advscreens WHERE advused = '$escAdvid' AND IFNULL(deleted,0) NOT IN (1, '1')"
+	);
+	if ($cnt && (int) ($cnt[0]['c'] ?? 0) > 1) {
+		$showExpMap = true;
+	}
+}
 
 if (!empty($_GET['screen'])) {
 	$sid = $_GET['screen'];
@@ -52,13 +63,19 @@ if (!$sid) die ("Can't find page information!");
 $screen = getScreenInfo($sid);
 
 //16345 for lots of choices
-if ($adv['pic']) $image = "<img class='advpic' src='".getPic($adv['pic'])."' />";
-else $image = "";
+if ($adv['pic']) {
+	$pu = getPicUrl($adv['pic'], true);
+	$image = $pu !== '' ? "<img class='advpic' src=\"" . htmlspecialchars($pu, ENT_QUOTES, 'UTF-8') . "\" />" : "";
+} else {
+	$image = "";
+}
 
 // foreground/background should be screen pic->screencolor->advpic->advcolor
 if ($screen['screenbgcolor']) $bg = "background-color: ".$screen['screenbgcolor'];
-else if ($adv['bgpic']) $bg = "background-image: url(\"".getPic($adv['bgpic'])."\")";
-else $bg = "background-color: ".$adv['bg'];
+else if ($adv['bgpic']) {
+	$bgu = getPicUrl($adv['bgpic'], false);
+	$bg = $bgu !== '' ? "background-image: url(\"" . htmlspecialchars($bgu, ENT_QUOTES, 'UTF-8') . "\")" : "background-color: ".$adv['bg'];
+} else $bg = "background-color: ".$adv['bg'];
 
 if($screen['screenboxcolor']) $box = "background-color: ".$screen['screenboxcolor'];
 else if($adv['box']) $box = "background-color: ".$adv['box'];
@@ -118,9 +135,9 @@ by ".$adv['user']."
 <div class='choice' id='firstscreen' onclick=\"goToScreen('".$adv['begin']."', $sid,1)\">
     &larr; Start over
 </div>
-<div class='choice' id='mapbutton'>
+".($showExpMap ? "<div class='choice' id='mapbutton' data-advid='".htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8')."'>
     Map
-</div>
+</div>" : "")."
 <div class='choice' id='lastscreen'>
     &larr; Return to previous screen
 </div>

@@ -34,6 +34,30 @@
         document.head.appendChild(s);
     }
 
+    function closeAdvSettings() {
+        var w = $("#advsettingswindow");
+        w.removeClass("advsettings-open").addClass("advsettings-hidden").attr("aria-hidden", "true");
+        $("#advsettingscontents").empty();
+        $(document).off("keydown.advsettings");
+    }
+
+    function openAdvSettings() {
+        var w = $("#advsettingswindow");
+        w.removeClass("advsettings-hidden").addClass("advsettings-open").attr("aria-hidden", "false");
+        var url = choosologyUrl("vised/advsettings.php?advid=" + encodeURIComponent(String(typeof advid !== "undefined" ? advid : "")));
+        $("#advsettingscontents").html("<div class='ajaxloader'>Loading…</div>");
+        $("#advsettingscontents").load(url, function (response, status) {
+            if (status === "error" && typeof showAlert === "function") {
+                showAlert("Could not load experiment settings.", "error");
+            }
+        });
+        $(document).on("keydown.advsettings", function (e) {
+            if (e.keyCode === 27) {
+                closeAdvSettings();
+            }
+        });
+    }
+
     //stage.scale({x:2,y:2});
     function loadAdv(advid)
     {   
@@ -312,6 +336,9 @@
     
     function editScreen(box)
     {
+        if (typeof closeAdvSettings === "function") {
+            closeAdvSettings();
+        }
         
         var es = $("#editscreenwindow");
         var id = box.id();
@@ -1109,6 +1136,10 @@ function drawPath(box1, box2)
         });*/
         
     loadAdv(advid);
+
+    $(document).on("click", "#vised_opensettings", function () {
+        openAdvSettings();
+    });
    // doStuff();
     // c.drawLayers();
     

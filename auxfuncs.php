@@ -151,16 +151,143 @@ function getPic($id)
     $squery = "select * from pics where id='$id'";
     $sres = runquery($squery);
     $result = mysqli_fetch_array($sres);
+    if (!$result) {
+        return 0;
+    }
     $img = $result['filename'];
     $dir = playerDir($result['user']);
     $imagepath = "$dir/thumbs/$img";
     return $imagepath;
 }
 
+/**
+ * Browser URL for a row in pics (thumbnails and player-facing images). Uses ajax/pic.php.
+ * For server-side file access, use {@see getPic()} which returns a filesystem path under pics_root.
+ */
+function getPicUrl($id, bool $useThumb = true): string
+{
+	if ($id === null || $id === '' || $id === 0 || $id === '0') {
+		return '';
+	}
+	$pid = (int) $id;
+	if ($pid < 1) {
+		return '';
+	}
+	if ($useThumb) {
+		return choosology_site_url('ajax/pic.php?id=' . $pid . '&thumb=1');
+	}
+	return choosology_site_url('ajax/pic.php?id=' . $pid);
+}
+
+/**
+ * Pictures available to a user: their uploads plus universal (&everyone) assets.
+ *
+ * @return list<array<string, mixed>>
+ */
+function getUserPics(string $username): array
+{
+	global $db;
+	$username = mysqli_real_escape_string($db, $username);
+	$q = "SELECT * FROM pics WHERE user = '$username' OR user = '&everyone' ORDER BY (user = '&everyone') ASC, id DESC";
+	$res = runquery_assoc($q);
+	if (!is_array($res)) {
+		return [];
+	}
+	return $res;
+}
+
+/**
+ * Filesystem path for a pics row (full image or thumb); prefers requested variant, falls back if missing.
+ */
+function choosology_pic_filesystem_path(array $row, bool $wantThumb): ?string
+{
+	$fn = (string) ($row['filename'] ?? '');
+	if ($fn === '') {
+		return null;
+	}
+	$user = (string) ($row['user'] ?? '');
+	$base = playerDir($user !== '' ? $user : '&everyone');
+	$thumbPath = $base . DIRECTORY_SEPARATOR . 'thumbs' . DIRECTORY_SEPARATOR . $fn;
+	$fullPath = $base . DIRECTORY_SEPARATOR . $fn;
+	if ($wantThumb) {
+		if (is_file($thumbPath)) {
+			return $thumbPath;
+		}
+		if (is_file($fullPath)) {
+			return $fullPath;
+		}
+		return null;
+	}
+	if (is_file($fullPath)) {
+		return $fullPath;
+	}
+	if (is_file($thumbPath)) {
+		return $thumbPath;
+	}
+	return null;
+}
+
+/**
+ * Whether an <img src> is allowed in saved screen HTML: Choosology library URLs or http(s)// URLs whose path ends in a common raster/vector image extension.
+ */
+function choosology_screen_html_img_src_allowed(string $src): bool
+{
+	$src = trim(html_entity_decode($src, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	if ($src === '') {
+		return false;
+	}
+	if (stripos($src, 'data:') === 0 || stripos($src, 'javascript:') === 0) {
+		return false;
+	}
+	$parts = parse_url($src);
+	$path = isset($parts['path']) ? str_replace('\\', '/', (string) $parts['path']) : '';
+	$query = isset($parts['query']) ? (string) $parts['query'] : '';
+
+	if (preg_match('#(?:.*/)?ajax/pic\.php$#i', $path)) {
+		parse_str($query, $qp);
+		if (!empty($qp['id']) && is_numeric($qp['id']) && (int) $qp['id'] > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	$pathForExt = $path;
+	if ($pathForExt === '' && (preg_match('#^https?://#i', $src) || strncmp($src, '//', 2) === 0)) {
+		$abs = strncmp($src, '//', 2) === 0 ? 'https:' . $src : $src;
+		$pathForExt = (string) (parse_url($abs, PHP_URL_PATH) ?? '');
+	}
+	if ($pathForExt === '' && !preg_match('#^[a-z][a-z0-9+.-]*:#i', $src)) {
+		$pathForExt = preg_replace('/[?#].*$/', '', str_replace('\\', '/', $src));
+	}
+	if ($pathForExt === '') {
+		return false;
+	}
+	return (bool) preg_match('/\.(jpe?g|png|gif|webp|svg|avif|bmp|tiff?)(?:$|[?#])/i', $pathForExt);
+}
+
+/** Remove <img> tags whose src fails {@see choosology_screen_html_img_src_allowed}. */
+function choosology_sanitize_screen_html_images(string $html): string
+{
+	return (string) preg_replace_callback('/<img\b[^>]*>/i', function (array $m): string {
+		$tag = $m[0];
+		if (preg_match('/\bsrc\s*=\s*"([^"]*)"/i', $tag, $sm)) {
+			$src = $sm[1];
+		} elseif (preg_match("/\bsrc\s*=\s*'([^']*)'/i", $tag, $sm)) {
+			$src = $sm[1];
+		} else {
+			return '';
+		}
+		return choosology_screen_html_img_src_allowed($src) ? $tag : '';
+	}, $html);
+}
+
 function decode($str, $strip = 0)
 {
+    $str = (string) ($str ?? '');
     $str = html_entity_decode($str);
-    if ($strip) $str = strip_tags($str);
+    if ($strip) {
+        $str = strip_tags($str);
+    }
     return html_entity_decode($str);
 }
 

@@ -49,7 +49,10 @@ if (isset($_POST['screen']))
     
     // foreground/background should be screen pic->screencolor->advpic->advcolor
     if ($screen['screenbgcolor']) $bg = "background-color: ".$screen['screenbgcolor'];
-    else if ($screen['bgpic']) $bg = "background-image: url(\"".getPic($screen['bgpic'])."\")";
+    else if ($screen['bgpic']) {
+        $bgu = getPicUrl($screen['bgpic'], false);
+        $bg = $bgu !== '' ? "background-image: url(\"" . htmlspecialchars($bgu, ENT_QUOTES, 'UTF-8') . "\")" : "background-color: ".$screen['bg'];
+    }
     else $bg = "background-color: ".$screen['bg'];
     
     if($screen['screenboxcolor']) $box = "background-color: ".$screen['screenboxcolor'];

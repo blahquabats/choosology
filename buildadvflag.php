@@ -26,12 +26,12 @@ function buildAdvFlag($id, $user, $mini = 0)
     AND (a.avail = 'public' OR a.user = '$user')";
     $r = runquery_assoc($query);
     $r = $r[0];
-    $pic = getPic($r['advpic']);
+    $pic = getPicUrl($r['advpic'], true);
     $bg = $r['bg'];
-    $bgpic = getPic($r['bgpic']);
-    if ($bgpic)
+    $bgpicUrl = getPicUrl($r['bgpic'], false);
+    if ($bgpicUrl !== '')
     {
-        $bgpic = "background-image: url('$bgpic');";
+        $bgpic = "background-image: url('" . htmlspecialchars($bgpicUrl, ENT_QUOTES, 'UTF-8') . "');";
     }
     else $bgpic = "";
     $avail = decode($r['avail']);
@@ -91,7 +91,7 @@ function buildAdvFlag($id, $user, $mini = 0)
         if ($avail == "none" && $savedrating == "NA") $rating = ""; // if there's a rating, always show it; if not, only show the "not rated" for published exps
         $out = "<div class='miniflag' data-viewid = \"$id\">
     $title<hr />";
-        if($pic) $out .= "<img src = '$pic' />";
+        if($pic) $out .= "<img src=\"" . htmlspecialchars($pic, ENT_QUOTES, 'UTF-8') . "\" alt=\"\" />";
         $out .= "<div class='tinyrating'>$rating</div><br />Tagged: $tags";
         if($mine) 
         {
@@ -105,7 +105,7 @@ function buildAdvFlag($id, $user, $mini = 0)
     <div class='slidefolder' style = \"background-color: $bg; $bgpic\">
 
     <div class='slideinfo' style='$pagestyle; $titlestyle'>";
-    if($pic) $out .= "<img class='advflagicon' src = '$pic' />";
+    if($pic) $out .= "<img class='advflagicon' src=\"" . htmlspecialchars($pic, ENT_QUOTES, 'UTF-8') . "\" alt=\"\" />";
     $out .= "<div class='slideinfo-inner'>
     <div class='slideinfo-toprow'>
     <div class='slideinfo-titlewrap'><a class='link' onclick=\"location.href='#/view/$id'\">$title</a></div>
