@@ -64,23 +64,24 @@ if(isset($_POST['which']))
             {
                 $title = "Recently Published";
                 $where = "";
-                $orderby = "published desc";
+                $orderby = "COALESCE(a.published, a.created) desc";
             }
             break;
     }
     $limit = $_POST['limit'];
     $allthree = $_POST['allthree'];
+    $page = isset($_POST['page']) ? max(1, (int) $_POST['page']) : 1;
     if($which == "gs") // special case for general survey
     {
-        $out = buildColumn("rp", "Recently Published", "", "published desc", $limit, "more")."!@!@!";
+        $out = buildColumn("rp", "Recently Published", "", "COALESCE(a.published, a.created) desc", $limit, "more")."!@!@!";
         $out .= buildColumn("tr", "Top Rated", 'rating!=\"NA\" and rating !=\"\"', "rating desc", $limit, "more")."!@!@!";
         $out .= buildColumn("fa", "From The Archives", 'rating=\"NA\"', "rand()", $limit,"more");
         echo $out;
         exit;
     }
-    	if($_POST['page'])
+    	if(!empty($_POST['page']))
     	{
-    		$p = $_POST['page']-1;
+    		$p = max(1, (int) $_POST['page']) - 1;
     		$begin = $limit*3*$p;
     		$first = $begin.",".$limit;
     		$second = $begin+$limit.",".$limit;
@@ -92,15 +93,12 @@ if(isset($_POST['which']))
     		$second = $limit.",".$limit;
     		$third = ($limit*2).",".$limit;
     	}
-    $out = buildColumn($which, $title, $where, $orderby, $first, "count")."!@!@!";
-
-    if($allthree)
+    if ($allthree)
     {
-    
-        $out .= buildColumn($which, "", $where, $orderby, $second, "prev", $_POST['page'])."!@!@!";
-        $out .= buildColumn($which, "", $where, $orderby, $third, "next", $_POST['page']);
+        echo buildBrowseUnifiedFourPack($which, $title, $where, $orderby, $first, $second, $third, $page);
+        exit;
     }
-    echo $out;
+    echo buildColumn($which, $title, $where, $orderby, $first, "count", $page) . "!@!@!";
 
 }
 

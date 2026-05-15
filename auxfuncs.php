@@ -228,6 +228,42 @@ function choosology_pic_filesystem_path(array $row, bool $wantThumb): ?string
 }
 
 /**
+ * True if advs.pic points to a pics row whose image (thumb preferred) exists on disk.
+ * Used so miniflags / flags do not show a broken icon when the row or file is missing.
+ */
+function choosology_adv_pic_usable_for_display($picId): bool
+{
+	static $cache = array();
+	if ($picId === null || $picId === '') {
+		return false;
+	}
+	$key = (string) $picId;
+	if (array_key_exists($key, $cache)) {
+		return $cache[$key];
+	}
+	$pid = (int) $picId;
+	if ($pid < 1) {
+		$cache[$key] = false;
+		return false;
+	}
+	global $db;
+	$res = mysqli_query($db, 'SELECT id, user, filename FROM pics WHERE id = ' . $pid . ' LIMIT 1');
+	if (!$res || mysqli_num_rows($res) < 1) {
+		$cache[$key] = false;
+		return false;
+	}
+	$row = mysqli_fetch_assoc($res);
+	if (!is_array($row)) {
+		$cache[$key] = false;
+		return false;
+	}
+	$path = choosology_pic_filesystem_path($row, true);
+	$ok = $path !== null && is_readable($path);
+	$cache[$key] = $ok;
+	return $ok;
+}
+
+/**
  * Whether an <img src> is allowed in saved screen HTML: Choosology library URLs or http(s)// URLs whose path ends in a common raster/vector image extension.
  */
 function choosology_screen_html_img_src_allowed(string $src): bool
@@ -386,7 +422,7 @@ function makeStars($rating, $tiny = 0)
     if($rating == 0) $ratetext = "No rating yet";
     else $ratetext = "$rating stars";
     $output = " <div class='tinystarsholder' title='$ratetext'>";
-    if ($rating == 0)  return $output."not rated</div>";
+    if ($rating == 0)  return $output."<span class=\"tinystarsholder-norating\">not rated</span></div>";
     for($x=1.0; $x<=5.0; $x = $x + 1.0)
     {
         if($rating >= $x) $w = 100;
@@ -402,7 +438,7 @@ function makeStars($rating, $tiny = 0)
     return $output;
 }
 
-function buildColumn($which, $title = "", $where = "", $orderby = "published desc", $limit = "4", $inhead = "more", $page = 1)
+function buildColumn($which, $title = "", $where = "", $orderby = "COALESCE(a.published, a.created) desc", $limit = "4", $inhead = "more", $page = 1)
 {
     global $name;
     if(strpos($limit, ","))
@@ -475,10 +511,127 @@ EOD;
     if(!$res) return $out;
     foreach ($res as $r)
     {
-        $out.=buildMiniFlag($r['aid'], $name);
+        $out.=buildMiniFlag($r['aid'], $name, true);
     }
 
     return $out;
+}
+
+/**
+ * Miniflag HTML only (no column header) — used for unified browse layout.
+ */
+function buildColumnFlagsOnly($where, $orderby, $limit)
+{
+    global $name;
+    if (strpos($limit, ","))
+    {
+        $limits = explode(",", $limit);
+        $limit = $limits[0] . "," . $limits[1];
+    }
+    else
+    {
+        $limit = "0," . $limit;
+    }
+    $where = stripslashes(html_entity_decode($where));
+    if ($where) {
+        $where = "and " . $where;
+    }
+    $query = "select *,
+a.id as aid
+from advs a, advscreens s
+where avail='public' $where and s.id = a.`begin` order by $orderby limit $limit";
+    $res = runquery_assoc($query);
+    $out = "";
+    if (!is_array($res) || count($res) === 0) {
+        return $out;
+    }
+    foreach ($res as $r)
+    {
+        $out .= buildMiniFlag($r['aid'], $name, true);
+    }
+    return $out;
+}
+
+/**
+ * Single full-width toolbar + three flag-only columns for Browse (matches one logical result set).
+ */
+function buildBrowseUnifiedToolbarHtml($which, $title, $where, $orderby, $first, $second, $third, $page)
+{
+    $whereSql = stripslashes(html_entity_decode($where));
+    if ($whereSql) {
+        $whereSql = "and " . $whereSql;
+    }
+    $countquery = "select count(a.id) as c
+from advs a, advscreens s
+where avail='public' $whereSql and s.id = a.`begin`";
+    $cres = runquery_assoc($countquery);
+    $fullcount = isset($cres[0]["c"]) ? (int) $cres[0]["c"] : 0;
+
+    $parseL = static function ($lim) {
+        if (strpos($lim, ",") !== false)
+        {
+            $a = explode(",", $lim);
+            return array((int) $a[0], (int) $a[1]);
+        }
+        return array(0, (int) $lim);
+    };
+    $L1 = $parseL($first);
+    $L2 = $parseL($second);
+    $L3 = $parseL($third);
+    $limits = $L1;
+    $limitinterval = $limits[1];
+
+    $advstart = $limits[0] + 1;
+    $advcount = $limits[1] * 3;
+    if ($fullcount < ($advstart + $advcount - 1)) {
+        $advend = $fullcount;
+    } else {
+        $advend = $advcount + $limits[0];
+    }
+    if ($advstart > $advend) {
+        $advstart = $advend;
+    }
+
+    $titleEsc = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+    $whichAttr = htmlspecialchars((string) $which, ENT_QUOTES, 'UTF-8');
+    $limAttr = (int) $limitinterval;
+
+    if ($fullcount === 0) {
+        $rangeHtml = '<span class="columntitle-range">(No results)</span>';
+    } else {
+        $rangeHtml = '<span class="columntitle-range">(' . (int) $advstart . "–" . (int) $advend . ' of ' . $fullcount . ")</span>";
+    }
+
+    $limits2 = $L2;
+    $advstart2 = $limits2[0] + 1;
+    $prevLink = "";
+    if ($advstart2 != $limitinterval + 1)
+    {
+        $prevPage = max(1, (int) $page - 1);
+        $prevLink = '<a href="#" class="seemore browse-nav-prev" data-which="' . $whichAttr . '" data-limit="' . $limAttr . '" data-page="' . $prevPage . '">&larr; previous</a>';
+    }
+
+    $limits3 = $L3;
+    $advstart3 = $limits3[0] + 1;
+    $advend3 = $advstart3 + $limitinterval;
+    $nextLink = "";
+    if ($advend3 < $fullcount)
+    {
+        $nextPage = (int) $page + 1;
+        $nextLink = '<a href="#" class="seemore browse-nav-next" data-which="' . $whichAttr . '" data-limit="' . $limAttr . '" data-page="' . $nextPage . '">next &rarr;</a>';
+    }
+
+    return "<div class=\"columntitle columntitle--unified\" role=\"toolbar\" aria-label=\"Result navigation\"><span class=\"columntitle-cluster\"><span class=\"columntitle-label\">"
+        . $titleEsc . "</span>" . $rangeHtml . "</span><span class=\"columntitle-navcluster\">" . $prevLink . $nextLink . "</span></div>";
+}
+
+function buildBrowseUnifiedFourPack($which, $title, $where, $orderby, $first, $second, $third, $page)
+{
+    $toolbar = buildBrowseUnifiedToolbarHtml($which, $title, $where, $orderby, $first, $second, $third, $page);
+    $b1 = buildColumnFlagsOnly($where, $orderby, $first);
+    $b2 = buildColumnFlagsOnly($where, $orderby, $second);
+    $b3 = buildColumnFlagsOnly($where, $orderby, $third);
+    return $toolbar . "!@!@!" . $b1 . "!@!@!" . $b2 . "!@!@!" . $b3;
 }
 
 function makeFakeButton($id, $onclick, $href, $icon, $text, $color="gray", $style=false, $check=false, $rollover=false)

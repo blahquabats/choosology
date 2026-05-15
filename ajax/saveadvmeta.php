@@ -36,11 +36,14 @@ if ($advid < 1) {
 }
 
 $escUser = mysqli_real_escape_string($db, $user);
-$own = runquery_assoc("SELECT id FROM advs WHERE id = '$advid' AND user = '$escUser' LIMIT 1");
+$escAdvid = mysqli_real_escape_string($db, (string) $advid);
+$own = runquery_assoc("SELECT id, avail, published FROM advs WHERE id = '$escAdvid' AND user = '$escUser' LIMIT 1");
 if (!is_array($own) || count($own) === 0) {
 	echo json_encode(array('ok' => 0, 'error' => 'Adventure not found or not yours.'), $jsonFlags);
 	exit;
 }
+$oldAvail = (string) ($own[0]['avail'] ?? '');
+$oldPublished = $own[0]['published'] ?? null;
 
 $title = isset($data['title']) ? trim((string) $data['title']) : '';
 if ($title === '') {
@@ -57,8 +60,16 @@ if (strlen($description) > 275) {
 }
 
 $tags = isset($data['tags']) ? trim((string) $data['tags']) : '';
-if (strlen($tags) > 255) {
-	$tags = substr($tags, 0, 255);
+$tagParts = array_values(array_filter(array_map('trim', explode(',', $tags)), static function ($x) {
+	return $x !== '';
+}));
+$tagParts = array_slice($tagParts, 0, 10);
+$tagParts = array_map(static function ($x) {
+	return substr($x, 0, 50);
+}, $tagParts);
+$tags = implode(',', $tagParts);
+if (strlen($tags) > 1024) {
+	$tags = substr($tags, 0, 1024);
 }
 
 $avail = isset($data['avail']) ? trim((string) $data['avail']) : 'none';
@@ -159,6 +170,14 @@ $bgEsc = mysqli_real_escape_string($db, $bg);
 $boxEsc = mysqli_real_escape_string($db, $box);
 $borderEsc = mysqli_real_escape_string($db, $border);
 
+$publishedSet = '';
+if ($avail === 'public' && $oldAvail !== 'public') {
+	$pubEmpty = ($oldPublished === null || $oldPublished === '' || $oldPublished === '0000-00-00 00:00:00');
+	if ($pubEmpty) {
+		$publishedSet = ", published = NOW()";
+	}
+}
+
 $q = "UPDATE advs SET
 	title = '$tEsc',
 	description = '$dEsc',
@@ -174,7 +193,8 @@ $q = "UPDATE advs SET
 	textcolor = $textcolorSql,
 	linkcolor = $linkcolorSql,
 	edited = NOW()
-	WHERE id = '$advid' AND user = '$escUser' LIMIT 1";
+	$publishedSet
+	WHERE id = '$escAdvid' AND user = '$escUser' LIMIT 1";
 
 if (!runquery($q)) {
 	echo json_encode(array('ok' => 0, 'error' => 'Database update failed.'), $jsonFlags);

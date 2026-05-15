@@ -66,14 +66,18 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		<div class="advsettings-basics-cols">
 			<div class="advsettings-basics-col">
 				<label class="advsettings-label">Title <span class="adv-req">*</span></label>
-				<input type="text" id="as_title" maxlength="255" class="advsettings-input" value="<?php echo $title; ?>" />
+				<input type="text" id="as_title" maxlength="255" class="advsettings-input adv-title-input" value="<?php echo $title; ?>" />
 
 				<label class="advsettings-label">Description</label>
 				<textarea id="as_description" maxlength="275" rows="4" class="advsettings-textarea"><?php echo $description; ?></textarea>
 			</div>
 			<div class="advsettings-basics-col">
-				<label class="advsettings-label">Tags <span class="adv-hint">(comma-separated)</span></label>
-				<input type="text" id="as_tags" maxlength="255" class="advsettings-input" value="<?php echo $tags; ?>" />
+				<label class="advsettings-label" for="as_tags_input">Tags <span class="adv-hint">(Enter to add · max 10 · 50 chars each)</span></label>
+				<div class="adv-tags-field" id="as_tags_field">
+					<div class="adv-tags-pills" id="as_tags_pills" aria-live="polite"></div>
+					<input type="text" id="as_tags_input" class="advsettings-input adv-tags-input" maxlength="50" autocomplete="off" placeholder="Type a tag, then press Enter" />
+					<input type="hidden" id="as_tags" value="<?php echo $tags; ?>" />
+				</div>
 
 				<label class="advsettings-label">Starting screen</label>
 				<select id="as_begin" class="advsettings-input">
@@ -131,61 +135,41 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		<h3>Look &amp; feel</h3>
 		<div class="advsettings-media-pair">
 			<div class="advsettings-media-block">
-				<label class="advsettings-label">Experiment icon</label>
+				<label class="advsettings-label" id="as_pic_legend">Experiment icon</label>
 				<input type="hidden" id="as_pic" value="<?php echo htmlspecialchars($picVal, ENT_QUOTES, 'UTF-8'); ?>" />
-				<div class="adv-thumbrow">
-					<div class="adv-preview-slot<?php echo $iconPreviewUrl === '' ? ' adv-preview-slot--empty' : ''; ?>" id="as_pic_slot">
-						<div class="adv-preview-frame">
-							<?php if ($iconPreviewUrl !== '') { ?>
-							<img id="as_pic_preview" class="adv-preview-img" src="<?php echo htmlspecialchars($iconPreviewUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="" />
-							<?php } else { ?>
-							<span id="as_pic_preview" class="adv-preview-empty">No icon</span>
-							<?php } ?>
-						</div>
+				<div class="adv-media-picker">
+					<div class="adv-preview-slot<?php echo $iconPreviewUrl === '' ? ' adv-preview-slot--empty' : ''; ?>" id="as_pic_slot" aria-labelledby="as_pic_legend">
+						<button type="button" class="adv-preview-hit adv-picmodal-trigger" data-picmodal-target="pic" aria-labelledby="as_pic_legend" aria-describedby="as_pic_hint" title="Open image library">
+							<span class="adv-preview-frame">
+								<?php if ($iconPreviewUrl !== '') { ?>
+								<img id="as_pic_preview" class="adv-preview-img" src="<?php echo htmlspecialchars($iconPreviewUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="" />
+								<?php } else { ?>
+								<span id="as_pic_preview" class="adv-preview-empty">No icon</span>
+								<?php } ?>
+							</span>
+						</button>
 						<button type="button" class="adv-preview-clear" id="as_pic_clear" title="Clear icon" aria-label="Clear icon">&times;</button>
 					</div>
-				</div>
-				<div class="adv-picbrowser" data-target="pic">
-					<div class="adv-picbrowser-toolbar">
-						<input type="search" class="advsettings-input adv-picbrowser-q" placeholder="Search by title or filename…" autocomplete="off" />
-						<select class="advsettings-input adv-picbrowser-tag" aria-label="Filter by category or tag">
-							<option value="">All tags &amp; categories</option>
-						</select>
-					</div>
-					<p class="adv-picbrowser-hint adv-hint">Search matches title, filename, and category text. The filter lists tokens from each image’s category field (comma-separated values); richer tag organization can plug in here later.</p>
-					<div class="adv-picbrowser-status" aria-live="polite"></div>
-					<div class="adv-picbrowser-scroll">
-						<div class="adv-picbrowser-grid"></div>
-					</div>
+					<p class="adv-preview-tap-hint" id="as_pic_hint">Click image to change</p>
 				</div>
 			</div>
 			<div class="advsettings-media-block">
-				<label class="advsettings-label">Background image <span class="adv-hint">(optional)</span></label>
+				<label class="advsettings-label" id="as_bgpic_legend">Background image</label>
 				<input type="hidden" id="as_bgpic" value="<?php echo (int) $bgpicVal; ?>" />
-				<div class="adv-thumbrow">
-					<div class="adv-preview-slot<?php echo $bgpicVal < 1 ? ' adv-preview-slot--empty' : ''; ?>" id="as_bgpic_slot">
-						<div class="adv-preview-frame">
-							<?php if ($bgPreviewUrl !== '') { ?>
-							<img id="as_bgpic_preview" class="adv-preview-img" src="<?php echo htmlspecialchars($bgPreviewUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="" />
-							<?php } else { ?>
-							<span id="as_bgpic_preview" class="adv-preview-empty">No background</span>
-							<?php } ?>
-						</div>
+				<div class="adv-media-picker">
+					<div class="adv-preview-slot<?php echo $bgpicVal < 1 ? ' adv-preview-slot--empty' : ''; ?>" id="as_bgpic_slot" aria-labelledby="as_bgpic_legend">
+						<button type="button" class="adv-preview-hit adv-picmodal-trigger" data-picmodal-target="bgpic" aria-labelledby="as_bgpic_legend" aria-describedby="as_bgpic_hint" title="Open image library">
+							<span class="adv-preview-frame">
+								<?php if ($bgPreviewUrl !== '') { ?>
+								<img id="as_bgpic_preview" class="adv-preview-img" src="<?php echo htmlspecialchars($bgPreviewUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="" />
+								<?php } else { ?>
+								<span id="as_bgpic_preview" class="adv-preview-empty">No background</span>
+								<?php } ?>
+							</span>
+						</button>
 						<button type="button" class="adv-preview-clear" id="as_bgpic_clear" title="Clear background image" aria-label="Clear background">&times;</button>
 					</div>
-				</div>
-				<div class="adv-picbrowser" data-target="bgpic">
-					<div class="adv-picbrowser-toolbar">
-						<input type="search" class="advsettings-input adv-picbrowser-q" placeholder="Search by title or filename…" autocomplete="off" />
-						<select class="advsettings-input adv-picbrowser-tag" aria-label="Filter by category or tag">
-							<option value="">All tags &amp; categories</option>
-						</select>
-					</div>
-					<p class="adv-picbrowser-hint adv-hint">Search matches title, filename, and category text. The filter lists tokens from each image’s category field (comma-separated values); richer tag organization can plug in here later.</p>
-					<div class="adv-picbrowser-status" aria-live="polite"></div>
-					<div class="adv-picbrowser-scroll">
-						<div class="adv-picbrowser-grid"></div>
-					</div>
+					<p class="adv-preview-tap-hint" id="as_bgpic_hint">Click image to change</p>
 				</div>
 			</div>
 		</div>
@@ -271,6 +255,29 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		<span class="fakebutton" id="as_cancel">Cancel</span>
 	</div>
 </form>
+
+<div id="as_picmodal" class="adv-picmodal adv-picmodal--hidden" aria-hidden="true">
+	<div class="adv-picmodal-backdrop" tabindex="-1"></div>
+	<div class="adv-picmodal-panel" role="dialog" aria-modal="true" aria-labelledby="as_picmodal_title">
+		<div class="adv-picmodal-header">
+			<h3 class="adv-picmodal-title" id="as_picmodal_title">Choose image</h3>
+			<button type="button" class="adv-picmodal-x" id="as_picmodal_close" aria-label="Close">&times;</button>
+		</div>
+		<div class="adv-picbrowser adv-picbrowser--modal" id="as_picmodal_browser" data-target="pic">
+			<div class="adv-picbrowser-toolbar">
+				<input type="search" class="advsettings-input adv-picbrowser-q" placeholder="Search by title or filename…" autocomplete="off" />
+				<select class="advsettings-input adv-picbrowser-tag" aria-label="Filter by category or tag">
+					<option value="">All tags &amp; categories</option>
+				</select>
+			</div>
+			<p class="adv-picbrowser-hint adv-hint">Search matches title, filename, and category text. The filter lists tokens from each image’s category field (comma-separated values); richer tag organization can plug in here later.</p>
+			<div class="adv-picbrowser-status" aria-live="polite"></div>
+			<div class="adv-picbrowser-scroll">
+				<div class="adv-picbrowser-grid"></div>
+			</div>
+		</div>
+	</div>
+</div>
 </div>
 <script>
 (function () {
@@ -327,7 +334,11 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 	}
 
 	function refreshAdvPicBrowserSelection() {
-		$(".adv-picbrowser").each(function () {
+		var $roots = $("#as_picmodal_browser");
+		if (!$roots.length) {
+			return;
+		}
+		$roots.each(function () {
 			var $root = $(this);
 			var target = $root.attr("data-target") || "pic";
 			var sel = target === "bgpic" ? String(parseInt($("#as_bgpic").val(), 10) || 0) : String($("#as_pic").val() || "").trim();
@@ -337,6 +348,47 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				$(this).toggleClass("adv-picbrowser-tile--selected", isSel);
 			});
 		});
+	}
+
+	var advPicModalReturnFocus = null;
+
+	function closeAdvPicModal() {
+		var $m = $("#as_picmodal");
+		if (!$m.length || $m.hasClass("adv-picmodal--hidden")) {
+			return;
+		}
+		$m.addClass("adv-picmodal--hidden").attr("aria-hidden", "true");
+		$("body").removeClass("adv-picmodal-open");
+		if (advPicModalReturnFocus && advPicModalReturnFocus.focus) {
+			try {
+				advPicModalReturnFocus.focus();
+			} catch (e1) {
+				/* ignore */
+			}
+		}
+		advPicModalReturnFocus = null;
+	}
+
+	function openAdvPicModal(target) {
+		var $m = $("#as_picmodal");
+		var $browser = $("#as_picmodal_browser");
+		if (!$m.length || !$browser.length) {
+			return;
+		}
+		advPicModalReturnFocus = document.activeElement;
+		$browser.attr("data-target", target === "bgpic" ? "bgpic" : "pic");
+		$("#as_picmodal_title").text(target === "bgpic" ? "Choose background image" : "Choose experiment icon");
+		$browser.find(".adv-picbrowser-q").val("");
+		$browser.find(".adv-picbrowser-tag").val("");
+		var redraw = $browser.data("advPicRedraw");
+		if (typeof redraw === "function") {
+			redraw();
+		}
+		$m.removeClass("adv-picmodal--hidden").attr("aria-hidden", "false");
+		$("body").addClass("adv-picmodal-open");
+		window.setTimeout(function () {
+			$browser.find(".adv-picbrowser-q").trigger("focus");
+		}, 0);
 	}
 
 	function initAdvPicBrowsers() {
@@ -703,21 +755,32 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 	}
 
 	$(".advsettings-close, #as_cancel").on("click", function () {
+		closeAdvPicModal();
 		if (typeof closeAdvSettings === "function") {
 			closeAdvSettings();
 		}
 	});
 
-	$("#as_pic_clear").on("click", function () {
-		$("#as_pic").val("");
-		setPicPreview("pic", "");
-	});
-	$("#as_bgpic_clear").on("click", function () {
-		$("#as_bgpic").val("0");
-		setPicPreview("bgpic", "");
+	$("#advsettingsform").off("click.advPicTrigger").on("click.advPicTrigger", ".adv-picmodal-trigger", function () {
+		openAdvPicModal($(this).attr("data-picmodal-target") || "pic");
 	});
 
-	$("#advsettingsform").on("click", ".adv-picbrowser-tile", function () {
+	$("#as_picmodal_close, #as_picmodal .adv-picmodal-backdrop").off("click.advPicModal").on("click.advPicModal", function () {
+		closeAdvPicModal();
+	});
+
+	$(document).off("keydown.advPicModalEsc").on("keydown.advPicModalEsc", function (e) {
+		if (e.key !== "Escape") {
+			return;
+		}
+		var $m = $("#as_picmodal");
+		if ($m.length && !$m.hasClass("adv-picmodal--hidden")) {
+			e.preventDefault();
+			closeAdvPicModal();
+		}
+	});
+
+	$("#as_picmodal").off("click.advPicPick").on("click.advPicPick", ".adv-picbrowser-tile", function () {
 		var $t = $(this);
 		var $root = $t.closest(".adv-picbrowser");
 		var target = $root.attr("data-target") || "pic";
@@ -733,13 +796,23 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			$("#as_pic").val(pid);
 			setPicPreview("pic", url);
 		}
+		closeAdvPicModal();
 	});
 
-	$("#advsettingsform").on("keydown", ".adv-picbrowser-tile", function (e) {
+	$("#as_picmodal").off("keydown.advPicPick").on("keydown.advPicPick", ".adv-picbrowser-tile", function (e) {
 		if (e.key === "Enter" || e.key === " ") {
 			e.preventDefault();
 			$(this).trigger("click");
 		}
+	});
+
+	$("#as_pic_clear").on("click", function () {
+		$("#as_pic").val("");
+		setPicPreview("pic", "");
+	});
+	$("#as_bgpic_clear").on("click", function () {
+		$("#as_bgpic").val("0");
+		setPicPreview("bgpic", "");
 	});
 
 	if (typeof $.fn.minicolors === "function") {
@@ -768,7 +841,140 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 	}, 80);
 	initAdvPicBrowsers();
 
+	var advTagsFlushPending = function () {};
+
+	(function initAdvTagsPills() {
+		var $hidden = $("#as_tags");
+		var $pills = $("#as_tags_pills");
+		var $input = $("#as_tags_input");
+		if (!$hidden.length || !$pills.length || !$input.length) {
+			return;
+		}
+		var maxTagLen = 50;
+		var maxTagCount = 10;
+		var maxSerialized = 1024;
+
+		function getTagListFromDom() {
+			var tags = [];
+			$pills.find(".adv-tags-pill").each(function () {
+				var t = $(this).data("tagText");
+				if (t !== undefined && t !== null && String(t).trim() !== "") {
+					tags.push(String(t).trim());
+				}
+			});
+			return tags;
+		}
+
+		function syncHidden() {
+			$hidden.val(getTagListFromDom().join(","));
+		}
+
+		function tagExists(t) {
+			var want = String(t || "").trim().toLowerCase();
+			if (!want) {
+				return true;
+			}
+			var dup = false;
+			$pills.find(".adv-tags-pill").each(function () {
+				if (String($(this).data("tagText") || "").trim().toLowerCase() === want) {
+					dup = true;
+					return false;
+				}
+			});
+			return dup;
+		}
+
+		function renderPill(text) {
+			var t = String(text || "").trim();
+			if (t.length > maxTagLen) {
+				t = t.slice(0, maxTagLen);
+			}
+			if (!t) {
+				return false;
+			}
+			if (getTagListFromDom().length >= maxTagCount) {
+				return false;
+			}
+			if (tagExists(t)) {
+				return false;
+			}
+			var trial = getTagListFromDom().concat([t]).join(",");
+			if (trial.length > maxSerialized) {
+				return false;
+			}
+			var $pill = $("<span/>", { class: "adv-tags-pill" });
+			$pill.data("tagText", t);
+			$pill.append($("<span/>", { class: "adv-tags-pill-text", text: t }));
+			var $rm = $("<button/>", {
+				type: "button",
+				class: "adv-tags-pill-remove",
+				"aria-label": "Remove tag: " + t
+			});
+			$rm.text("\u00D7");
+			$pill.append($rm);
+			$pills.append($pill);
+			return true;
+		}
+
+		function loadFromHidden() {
+			$pills.empty();
+			var raw = String($hidden.val() || "");
+			var parts = raw.split(",");
+			var i;
+			for (i = 0; i < parts.length; i++) {
+				if (getTagListFromDom().length >= maxTagCount) {
+					break;
+				}
+				var chunk = String(parts[i] || "").trim();
+				if (chunk.length > maxTagLen) {
+					chunk = chunk.slice(0, maxTagLen);
+				}
+				if (chunk) {
+					renderPill(chunk);
+				}
+			}
+			syncHidden();
+		}
+
+		advTagsFlushPending = function () {
+			var v = String($input.val() || "").trim();
+			if (!v) {
+				return;
+			}
+			if (renderPill(v)) {
+				$input.val("");
+				syncHidden();
+			}
+		};
+
+		$input.on("keydown", function (e) {
+			if (e.key === "Enter") {
+				e.preventDefault();
+				advTagsFlushPending();
+				return;
+			}
+			if (e.key === "Backspace" && String($input.val() || "") === "") {
+				var $last = $pills.find(".adv-tags-pill").last();
+				if ($last.length) {
+					$last.remove();
+					syncHidden();
+				}
+			}
+		});
+
+		$pills.on("click", ".adv-tags-pill-remove", function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			$(this).closest(".adv-tags-pill").remove();
+			syncHidden();
+			$input.trigger("focus");
+		});
+
+		loadFromHidden();
+	})();
+
 	$("#as_save").on("click", function () {
+		advTagsFlushPending();
 		var $btn = $(this);
 		$btn.removeClass("fgreen");
 		var payload = {

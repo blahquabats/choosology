@@ -37,7 +37,7 @@ var configmenu = {
       load: "browse.php",
       bgtop: 0,
       bgleft: 0,
-      bgcolor: "#D9D1D3",
+      bgcolor: "#d8e0eb",
       direction: "up",
       effect: "blind",
       bgcol: 2
