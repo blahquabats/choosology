@@ -17,8 +17,11 @@
         });
       
         this.get(/\#\/news\/?(.*)/, function(context) {
-                // splat is built-in regex-grabbing 
-                showMenuOption("news", "id="+this.params['splat']);
+                var splat = this.params['splat'];
+                if (splat === undefined || splat === null) {
+                    splat = '';
+                }
+                showMenuOption("news", "id=" + splat);
         });
         
         this.get(/\#\/mystuff\/?(.*)/, function(context) {
@@ -26,8 +29,12 @@
                     window.location.hash = "#/home";
                     return;
                 }
-                showMenuOption("mystuff");
                 if(this.params['splat'] !== "")
+                {
+                    pendingMystuffTab = this.params['splat'];
+                }
+                showMenuOption("mystuff");
+                if(this.params['splat'] !== "" && activemenu === "mystuff")
                 {
                     loadTab(this.params['splat']);
                 }

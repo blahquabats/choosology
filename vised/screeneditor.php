@@ -381,7 +381,7 @@ var bodyPromise = tinymce.init(Object.assign({}, baseInit, {
     max_height: 520,
     resize: false,
     plugins: "lists link image table code wordcount",
-    toolbar: "undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | outdent indent | link image table | removeformat code",
+    toolbar: "undo redo | styles | bold italic underline forecolor backcolor | alignleft aligncenter alignright | bullist numlist | outdent indent | link image table | removeformat code",
     menubar: "edit view insert format tools table help",
     file_picker_callback: function (cb, value, meta) {
         if (meta.filetype === "image") {
@@ -394,7 +394,7 @@ var choicePromise = tinymce.init(Object.assign({}, baseInit, {
     selector: ".choicetext",
     inline: true,
     plugins: "lists link wordcount",
-    toolbar: "bold italic underline | removeformat",
+    toolbar: "bold italic underline forecolor backcolor | removeformat",
     menubar: false,
     setup: function (editor) {
         editor.on("keydown", function (e) {

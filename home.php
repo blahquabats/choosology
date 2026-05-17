@@ -2,19 +2,41 @@
 require_once("connect.php");
 require_once("auxfuncs.php");
 ?>
-<h1>Welcome to Choosology Labs!</h1>
-<div class='homep'>
-    Here at Choosology Labs, we're at the forefront of interactive storytelling technology. Our ever-growing team of Choosologists is hard at work every day
-    discovering new elements of fiction, exciting and efficient methods of exposition, and novel uses for the written word.
+<div class="home-splash">
+    <section class="home-hero" aria-labelledby="home-hero-title">
+        <div class="home-hero-lockup">
+            <img class="home-hero-logo" src="images/logo_horizontal.png" alt="Choosology">
+            <div class="home-hero-copy">
+                <p class="home-hero-eyebrow">Interactive storytelling laboratory</p>
+                <h1 id="home-hero-title" class="home-hero-title">Welcome to Choosology Labs</h1>
+            </div>
+        </div>
+    </section>
 
+    <section class="home-copy-grid" aria-label="About Choosology Labs">
+        <article class="home-copy-card">
+            <span class="home-copy-code" aria-hidden="true">01</span>
+            <p>
+                Here at Choosology Labs, we're at the forefront of interactive storytelling technology.
+                Our ever-growing team of Choosologists is hard at work every day discovering new elements of fiction,
+                exciting and efficient methods of exposition, and novel uses for the written word.
+            </p>
+        </article>
+
+        <article class="home-copy-card">
+            <span class="home-copy-code" aria-hidden="true">02</span>
+            <p>
+                If you're already one of our Choosologists, sign in above to access your workstation.
+                If you're new here, browse the currently-running experiments or read the latest lab notes.
+            </p>
+            <div class="home-copy-actions">
+                <a class="home-copy-action" href="#/browse">Browse experiments</a>
+                <a class="home-copy-action" href="#/news">Read lab notes</a>
+            </div>
+        </article>
+    </section>
 </div>
-<br />
-<div class='homep'>
-    If you're already one of our Choosologists, go ahead and sign in above to access your workstation. If you're new here, feel free to <a>browse</a> the
-    currently-running experiments or read <a>more about the site</a>.
-</div>
-<br />
-<h2>Newly Featured</h2>
+<h2 class="home-featured-title">Newly Featured</h2>
 <div class='intabs' id = "featadvs" >
 
 

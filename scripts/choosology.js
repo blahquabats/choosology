@@ -375,7 +375,8 @@ function choosologyUrlSafeGlobal(path) {
 /**
  * Create a new experiment from My Stuff (or elsewhere) and open the graph editor.
  */
-function makeNewExperiment(title) {
+function makeNewExperiment(title, options) {
+    options = options || {};
     title = String(title || "").trim();
     if (!title) {
         if (typeof showAlert === "function") {
@@ -399,7 +400,14 @@ function makeNewExperiment(title) {
         }
         if (res && res.ok && res.id) {
             if (typeof showAlert === "function") {
-                showAlert("Experiment created. Opening editor…", "success");
+                showAlert(options.openSettings ? "Draft created. Opening settings..." : "Experiment created. Opening editor...", "success");
+            }
+            if (options.openSettings && window.sessionStorage) {
+                try {
+                    window.sessionStorage.setItem("choosologyOpenSettingsForAdvid", String(res.id));
+                } catch (err) {
+                    /* Ignore private browsing / storage failures; the editor still opens. */
+                }
             }
             window.location.href = "#/edit/" + res.id;
             return;
@@ -424,18 +432,59 @@ function makeNewExperiment(title) {
 function listenToEdit()
 {
     $(function() {
-       $(".editadvbutton").on("click", function(e){
+       $(".editadvbutton").off("click.choosologyEdit").on("click.choosologyEdit", function(e){
            
            var advid = $(this).attr("data-advid");
             location.href='#/edit/'+advid;
             e.stopPropagation();
        });
-       $(".deleteadvbutton").on("click", function(e){
-           
-           var advid = $(this).attr("data-advid");
-            //location.href='#/edit/'+advid;
-            showAlert("Deleting "+advid);
+       $(".deleteadvbutton").off("click.choosologyDelete").on("click.choosologyDelete", function(e){
+            e.preventDefault();
             e.stopPropagation();
+            var $btn = $(this);
+            var advid = $btn.attr("data-advid");
+            var title = $.trim($btn.closest(".miniflag").find(".miniflag-title").text());
+            var prompt = title ? "Delete \"" + title + "\"? This cannot be undone." : "Delete this experiment? This cannot be undone.";
+            if (!advid || !window.confirm(prompt)) {
+                return false;
+            }
+            $btn.css("pointer-events", "none").text("...");
+            $.ajax({
+                type: "POST",
+                url: choosologyUrlSafeGlobal("ajax/deleteadventure.php"),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify({ advid: advid })
+            }).done(function(res) {
+                if (res && res.ok) {
+                    if (typeof showAlert === "function") {
+                        showAlert("Experiment deleted.", "success");
+                    }
+                    var $panel = $btn.closest(".intabs").parent();
+                    if ($panel.length) {
+                        $panel.load(choosologyUrlSafeGlobal("mystuff/experiments.php"));
+                    } else {
+                        $btn.closest(".miniflag").fadeOut(200, function() {
+                            $(this).remove();
+                        });
+                    }
+                    return;
+                }
+                $btn.css("pointer-events", "").text("X");
+                if (typeof showAlert === "function") {
+                    showAlert((res && res.error) ? res.error : "Could not delete experiment.", "error");
+                }
+            }).fail(function(xhr) {
+                $btn.css("pointer-events", "").text("X");
+                var msg = "Could not delete experiment.";
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    msg = xhr.responseJSON.error;
+                }
+                if (typeof showAlert === "function") {
+                    showAlert(msg, "error");
+                }
+            });
+            return false;
        });
     });
 }

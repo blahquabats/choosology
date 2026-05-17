@@ -1,4 +1,7 @@
-<?php date_default_timezone_set('America/Los_Angeles'); 
+<?php
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'db-config.php';
+date_default_timezone_set('America/Los_Angeles');
+
 function registerCheck()
 {
 	global $db, $sel;
@@ -108,7 +111,19 @@ function makeCookies($name, $c1 = "", $c2 = "")
 	$q = "insert into oven (user,code1,code2,assigned) values(\"$name\",\"$code1\",\"$code2\",NOW())";
 	mysqli_query($db, $q);
 	$cookie = serialize(array($name, $code1, $code2));
-	setcookie("choosologyLogin", $cookie, time() + 60 * 60 * 24 * 30,"/","",false,true);
+	$secure = choosology_request_is_https();
+	$exp = time() + 60 * 60 * 24 * 30;
+	if (PHP_VERSION_ID >= 70300) {
+		setcookie('choosologyLogin', $cookie, array(
+			'expires' => $exp,
+			'path' => '/',
+			'secure' => $secure,
+			'httponly' => true,
+			'samesite' => 'Lax',
+		));
+	} else {
+		setcookie('choosologyLogin', $cookie, $exp, '/', '', $secure, true);
+	}
 }
 
 function eatCookies($user, $c1 = "", $c2 = "")

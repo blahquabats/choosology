@@ -14,7 +14,7 @@ if (isset($_GET['id']) && $_GET['id'] !== '' && is_numeric($_GET['id'])) {
 ?>
 <div class='ajaxloader' id = 'visedloader'></div>
 <div class='vised-toolbar'>
-	<span class='fakebutton' id='vised_opensettings'>Experiment settings…</span>
+	<span class='fakebutton vised-settings-button' id='vised_opensettings'>Experiment settings…</span>
 </div>
 <div id='visedcontainer' class='intabs'>
     

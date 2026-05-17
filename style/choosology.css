@@ -480,6 +480,256 @@ label.sel:before {
     background-color: #dce7ff;
 }
 
+.home-splash
+{
+    width: min(920px, calc(100% - 64px));
+    margin: 24px auto 18px;
+    box-sizing: border-box;
+}
+
+.home-hero
+{
+    position: relative;
+    padding: 22px clamp(18px, 4vw, 42px) 20px;
+    border: 1px solid #c7d7e8;
+    border-left: 6px solid #604b91;
+    border-radius: 0 12px 12px 0;
+    background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(239, 244, 251, 0.94) 100%);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.13);
+    overflow: hidden;
+}
+
+.home-hero::before
+{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 16% 18%, rgba(96, 75, 145, 0.12), transparent 28%),
+        linear-gradient(90deg, rgba(96, 75, 145, 0.08), rgba(28, 90, 122, 0.03) 52%, transparent 100%);
+    pointer-events: none;
+}
+
+.home-hero-lockup
+{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 4vw, 34px);
+    min-width: 0;
+}
+
+.home-hero-logo
+{
+    display: block;
+    width: clamp(240px, 36vw, 420px);
+    max-width: 48%;
+    height: auto;
+    flex: 0 1 auto;
+}
+
+.home-hero-copy
+{
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.home-hero-eyebrow
+{
+    margin: 0 0 10px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #604b91;
+}
+
+#homewindow .home-hero-title
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 10px 14px 10px 12px;
+    border: none;
+    border-left: 4px solid #1f1f2d;
+    border-radius: 0 6px 6px 0;
+    background: linear-gradient(90deg, rgba(96, 75, 145, 0.16), rgba(96, 75, 145, 0.04) 52%, transparent 100%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: clamp(0.86rem, 2vw, 1.02rem);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    line-height: 1.25;
+    text-align: left;
+    text-transform: uppercase;
+    color: #1f1f2d;
+    box-sizing: border-box;
+}
+
+.home-hero-title::before
+{
+    content: "LAB";
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid #604b91;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: #4b3b77;
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.home-copy-grid
+{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.home-copy-card
+{
+    position: relative;
+    padding: 14px 15px 15px;
+    border: 1px solid #c5d0e0;
+    border-left: 5px solid #2874a6;
+    border-radius: 0 10px 10px 0;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.94) 0%, rgba(240, 244, 250, 0.94) 100%);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.09);
+    box-sizing: border-box;
+}
+
+.home-copy-card p
+{
+    margin: 0;
+    padding-left: 42px;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #263747;
+}
+
+.home-copy-code
+{
+    position: absolute;
+    top: 14px;
+    left: 13px;
+    padding: 3px 7px;
+    border: 1px solid #2874a6;
+    border-radius: 3px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #134056;
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.home-copy-actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 0 42px;
+}
+
+.home-copy-action
+{
+    display: inline-block;
+    padding: 6px 9px;
+    border: 1px solid #604b91;
+    border-left: 4px solid #4b3b77;
+    border-radius: 0 5px 5px 0;
+    background: rgba(255, 255, 255, 0.82);
+    color: #302454;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.home-copy-action:hover
+{
+    background: #f4f0fb;
+    color: #1f1f2d;
+}
+
+#homewindow .home-featured-title
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: auto;
+    margin: 6px auto 14px;
+    padding: 10px 14px 10px 12px;
+    border: none;
+    border-left: 4px solid #2874a6;
+    border-radius: 0 6px 6px 0;
+    background: linear-gradient(90deg, rgba(40, 116, 166, 0.14), rgba(40, 116, 166, 0.03) 45%, transparent 100%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: clamp(0.78rem, 2vw, 0.92rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    line-height: 1.25;
+    text-transform: uppercase;
+    color: #0d2137;
+}
+
+.home-featured-title::before
+{
+    content: "FX";
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid #1c5a7a;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: #134056;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 900px)
+{
+    .home-splash
+    {
+        width: min(94%, 920px);
+    }
+
+    .home-hero-lockup,
+    .home-copy-grid
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .home-hero-lockup
+    {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .home-hero-logo
+    {
+        max-width: min(420px, 90%);
+    }
+
+    .home-hero-copy
+    {
+        align-items: center;
+    }
+}
+
 #browsewindow
 {
     top:0px;
@@ -495,9 +745,18 @@ label.sel:before {
     background-color: #ffd6d6;
 }
 
+/* News tab: green tint + margin_right art (same pattern as #homewindow); trim extra bottom gap (~20px scroll). */
 #newswindow
 {
-
+    top: 0;
+    bottom: 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    background-color: #e4f0e4;
+    background-image: url("../images/margin_right.png");
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: auto 80%;
 }
 
 #editscreenwindow
@@ -2707,6 +2966,242 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     overflow: hidden;
 }
 
+/********************* News archive (Browse-aligned shell) *********************/
+
+.browse-program--news .browse-program-title::before
+{
+    content: "NW";
+}
+
+.news-archive-layout
+{
+    align-items: stretch;
+}
+
+.news-archive-results
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    padding: 2px 4px 4px 0;
+    box-sizing: border-box;
+}
+
+/* News shell: drop bottom margin so #newswindow + inner card don’t exceed .genericwindow height (~20px stray scroll). */
+#newswindow .browse-program.browse-program--news
+{
+    margin: 0 auto 0;
+}
+
+/* Keeps the main column from collapsing to zero while swapping articles (blind up / down). */
+.news-article-mount
+{
+    min-height: 5rem;
+    box-sizing: border-box;
+}
+
+.news-admin-section
+{
+    margin-top: 14px;
+}
+
+.news-admin-form
+{
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.news-admin-label
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #34495e;
+}
+
+.news-admin-form input,
+.news-admin-form textarea
+{
+    width: 100%;
+    border: 1px solid #b8c6d8;
+    border-radius: 4px;
+    padding: 6px 7px;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+.news-admin-form textarea
+{
+    resize: vertical;
+}
+
+.news-admin-actions
+{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.news-article-admin
+{
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.news-admin-status
+{
+    font-size: 0.78rem;
+    color: #24543a;
+}
+
+.news-admin-status--error
+{
+    color: #9b1c1c;
+    font-weight: 700;
+}
+
+.news-card
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 1px solid #c5d0e0;
+    border-left: 4px solid #2874a6;
+    border-radius: 0 8px 8px 0;
+    background: linear-gradient(165deg, #fafbfd 0%, #f0f4fa 100%);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.news-card:hover
+{
+    border-color: #7aa7c2;
+    border-left-color: #1c5a7a;
+    box-shadow: 0 4px 12px rgba(40, 116, 166, 0.14);
+    transform: translateY(-1px);
+}
+
+.news-card--active
+{
+    border-color: #2874a6;
+    border-left-color: #134056;
+    box-shadow: 0 2px 10px rgba(40, 116, 166, 0.2);
+}
+
+.news-card-title
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #0d2137;
+    line-height: 1.35;
+}
+
+.news-card-date
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5a6b7d;
+}
+
+.news-card-excerpt
+{
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #2a3d4d;
+    letter-spacing: 0.02em;
+}
+
+.news-empty
+{
+    margin: 0;
+    padding: 12px;
+    font-size: 0.9rem;
+    color: #4a5f73;
+    border: 1px dashed #b8c4d4;
+    border-radius: 6px;
+    background: #fafbfd;
+}
+
+.news-empty--main
+{
+    max-width: 40rem;
+}
+
+.news-article
+{
+    max-width: 40rem;
+}
+
+.news-article-title
+{
+    margin: 0 0 8px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0d2137;
+    line-height: 1.35;
+}
+
+.news-meta
+{
+    margin: 0 0 14px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5a6b7d;
+}
+
+.news-byline
+{
+    margin: -4px 0 12px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: #2a4a5c;
+    font-style: italic;
+}
+
+.news-article-body
+{
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #1a2a38;
+}
+
+.news-article-body p
+{
+    margin: 0 0 0.85em;
+}
+
+.news-article-body p:last-child
+{
+    margin-bottom: 0;
+}
+
+.news-article-body a
+{
+    color: #1c5a7a;
+    text-decoration: underline;
+}
+
 .browse-oecont
 {
     width: 100%;
@@ -3135,6 +3630,14 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     text-transform: uppercase;
     text-align: left;
     margin-top: 2px;
+}
+
+.miniflag-description
+{
+    margin: 6px 0 0;
+    font-size: 0.68rem;
+    line-height: 1.35;
+    color: #34495e;
 }
 
 .miniflag-tagsrow
@@ -3850,6 +4353,60 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
   }
   
   /* Screen editing */
+
+  .vised-toolbar
+  {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px 4px;
+  }
+
+  .vised-toolbar .vised-settings-button
+  {
+      float: none;
+      height: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 8px 13px 8px 12px;
+      border: 2px solid #14532d;
+      border-radius: 9px;
+      color: #effaf1;
+      background: linear-gradient(165deg, #1f7a45 0%, #14532d 100%);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 3px 9px rgba(20, 83, 45, 0.32);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      font-variant: normal;
+      transition: background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+  }
+
+  .vised-toolbar .vised-settings-button::before
+  {
+      content: "EXP";
+      display: inline-block;
+      margin-right: 8px;
+      padding: 2px 5px;
+      border: 1px solid rgba(239, 250, 241, 0.55);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #f6fffa;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+  }
+
+  .vised-toolbar .vised-settings-button:hover
+  {
+      border-color: #052e16;
+      background: linear-gradient(165deg, #23834d 0%, #0f3f24 100%);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.24) inset, 0 4px 12px rgba(20, 83, 45, 0.42);
+      transform: translateY(-1px);
+  }
   
   #visedcontainer
   {
@@ -3857,6 +4414,78 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
   }
   
   /* My stuff */
+
+  .ms-e-banner
+  {
+      position: relative;
+      width: calc(80% + 20px);
+      margin: 0 0 4px 10%;
+      padding: 20px clamp(16px, 4vw, 40px) 18px;
+      border: 1px solid #c7d7e8;
+      border-radius: 0 10px 10px 0;
+      border-left: 6px solid #2874a6;
+      background: linear-gradient(165deg, #ffffff 0%, #eef4fb 100%);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+      box-sizing: border-box;
+      text-align: center;
+      clear: both;
+  }
+  .ms-e-banner-inner
+  {
+      max-width: 42rem;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+  .ms-e-banner-eyebrow
+  {
+      margin: 0 0 10px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #3d5a73;
+  }
+  .ms-e-banner-tag
+  {
+      letter-spacing: 0.16em;
+      color: #124060;
+      font-weight: 700;
+  }
+  .ms-e-banner-title
+  {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      max-width: 100%;
+      padding: 10px 14px 10px 12px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: clamp(0.78rem, 2vw, 0.92rem);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #0d2137;
+      line-height: 1.25;
+      border-radius: 0 6px 6px 0;
+      border-left: 4px solid #1c5a7a;
+      background: linear-gradient(90deg, rgba(28, 90, 122, 0.14), rgba(28, 90, 122, 0.03) 45%, transparent 100%);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      box-sizing: border-box;
+  }
+  .ms-e-banner-title::before
+  {
+      content: "ME";
+      flex-shrink: 0;
+      padding: 3px 7px;
+      border: 1px solid #1c5a7a;
+      border-radius: 3px;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      color: #134056;
+      background: rgba(255, 255, 255, 0.75);
+  }
   
   .ms_e_experimentslist
   {
@@ -3871,7 +4500,108 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
   }
   .ms_e_experimentslist .miniflag
   {
-      border: 1px solid grey;
+      width: 100%;
+      max-width: 100%;
+      min-height: 118px;
+      margin: 12px 0 14px;
+      padding: 13px 14px;
+      gap: 14px;
+      border: 1px solid #c5d0e0;
+      border-left: 6px solid #2874a6;
+      border-bottom: none;
+      border-radius: 0 10px 10px 0;
+      background: linear-gradient(165deg, #fafbfd 0%, #eef4fb 100%);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+      transition: box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  }
+  .ms_e_experimentslist .miniflag:hover
+  {
+      background: linear-gradient(165deg, #f4f9fc 0%, #e4eff8 100%);
+      border-color: #7aa7c2;
+      border-left-color: #1c5a7a;
+      box-shadow: 0 6px 18px rgba(40, 116, 166, 0.17);
+      transform: translateY(-2px);
+  }
+  .ms_e_experimentslist .miniflag-media
+  {
+      flex-basis: 92px;
+      width: 92px;
+  }
+  .ms_e_experimentslist .miniflag-media img
+  {
+      width: 92px;
+      height: 92px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+  }
+  .ms_e_experimentslist .miniflag-title
+  {
+      font-size: 0.76rem;
+      line-height: 1.35;
+  }
+  .ms_e_experimentslist .miniflag-rule
+  {
+      margin: 7px 0 8px;
+  }
+  .ms_e_experimentslist .miniflag .tinyrating
+  {
+      font-size: 0.68rem;
+  }
+  .ms_e_experimentslist .miniflag-tagsrow
+  {
+      font-size: 0.64rem;
+  }
+  .ms_e_experimentslist .miniflag-actions .deleteadvbutton,
+  .ms_e_experimentslist .miniflag-actions .editadvbutton
+  {
+      min-width: 2.1rem;
+      padding: 3px 8px;
+      font-size: 0.6rem;
+  }
+  .ms_e_experimentslist .miniflag-actions .deleteadvbutton:hover,
+  .ms_e_experimentslist .miniflag-actions .editadvbutton:hover
+  {
+      padding: 3px 9px;
+  }
+  .ms_e_experimentslist .miniflag.miniflag--advcol
+  {
+      position: relative;
+      border-left-color: var(--adv-rule);
+  }
+  .ms_e_experimentslist .miniflag.miniflag--advcol .miniflag-media,
+  .ms_e_experimentslist .miniflag.miniflag--advcol .miniflag-main
+  {
+      position: relative;
+      z-index: 3;
+  }
+  .ms_e_experimentslist .miniflag.miniflag--advcol::after
+  {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: var(--adv-page-bg);
+      opacity: 0.09;
+      pointer-events: none;
+      z-index: 1;
+  }
+  .ms_e_experimentslist .miniflag.miniflag--advcol:hover::after
+  {
+      opacity: 0.12;
+  }
+  .ms_e_experimentslist .miniflag.miniflag--advcol::before
+  {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--adv-panel), var(--adv-rule));
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 0 10px 0 0;
   }
   .ms_e_newexperiment
   {
@@ -3880,30 +4610,70 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     float:left;
     width:35%;
     margin-left:10%;
-    border: 1px solid green;
-    background-color: lightgreen;
-    border-radius: 6px;
-    
+    border: 0;
+    background-color: transparent;
+    border-radius: 0;
     padding: 10px;
   }
-  .ms_e_newexperiment:hover
+  .ms-e-new-experiment-button
   {
-      background-color: #bbffbb;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin: 0;
+      padding: 12px 14px 12px 10px;
+      border: 2px solid #14532d;
+      border-left: 5px solid #052e16;
+      border-radius: 0 6px 6px 0;
+      background: linear-gradient(180deg, #16a34a 0%, #15803d 55%, #166534 100%);
+      color: #ffffff;
       cursor: pointer;
+      box-sizing: border-box;
+      text-align: left;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 2px 6px rgba(5, 46, 22, 0.35);
+      transition: border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
   }
-  
-  
-  .ms_e_launchinput
+  .ms-e-new-experiment-button:hover
   {
-      float:left;
-      padding:4px;
-      border: 1px solid black;
-      font-size:large;
+      border-color: #052e16;
+      border-left-color: #022c0f;
+      background: linear-gradient(180deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 3px 10px rgba(5, 46, 22, 0.4);
+  }
+  .ms-e-new-experiment-code
+  {
+      flex: 0 0 auto;
+      padding: 3px 7px;
+      border: 1px solid rgba(255, 255, 255, 0.75);
       border-radius: 3px;
-      font-weight: bold;
-      border: 3px solid #ccffcc;
-      font-variant: small-caps;
-      
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+  }
+  .ms-e-new-experiment-copy
+  {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+  }
+  .ms-e-new-experiment-title
+  {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+  }
+  .ms-e-new-experiment-hint
+  {
+      font-size: 0.82rem;
+      line-height: 1.3;
+      color: rgba(255, 255, 255, 0.86);
   }
   
     .ms_e_recentcomments
@@ -3913,25 +4683,1482 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     float:left;
     width:35%;
     margin-left:10%;
-    border: 1px solid grey;
+    border: 0;
     background-color: transparent;
-    border-radius: 6px;
-    
+    border-radius: 0;
     padding: 10px;
+  }
+
+  .ms-e-comments-panel
+  {
+      border: 1px solid #c7d7e8;
+      border-left: 5px solid #2874a6;
+      border-radius: 0 10px 10px 0;
+      background: linear-gradient(165deg, #ffffff 0%, #eef4fb 100%);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+      overflow: hidden;
+  }
+
+  .ms-e-comments-head
+  {
+      padding: 13px 14px 11px;
+      border-bottom: 1px solid #d5e0eb;
+      background: linear-gradient(90deg, rgba(40, 116, 166, 0.12), rgba(40, 116, 166, 0.03) 55%, transparent 100%);
+  }
+
+  .ms-e-comments-eyebrow
+  {
+      margin: 0 0 5px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #3d5a73;
+  }
+
+  .ms-e-comments-head h3
+  {
+      margin: 0;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #0d2137;
+  }
+
+  .ms-e-comments-list
+  {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: min(56vh, 520px);
+      overflow-y: auto;
+      padding: 12px;
+      box-sizing: border-box;
+  }
+
+  .ms-e-comment-card
+  {
+      padding: 10px 11px;
+      border: 1px solid #c5d0e0;
+      border-left: 4px solid #2874a6;
+      border-radius: 0 8px 8px 0;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+  }
+
+  .ms-e-comment-meta
+  {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      align-items: baseline;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #5a6b7d;
+  }
+
+  .ms-e-comment-author
+  {
+      font-weight: 700;
+      color: #134056;
+  }
+
+  .ms-e-comment-text
+  {
+      margin: 7px 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: #263747;
+  }
+
+  .ms-e-comment-target
+  {
+      display: inline-block;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #124060;
+      text-decoration: none;
+  }
+
+  .ms-e-comment-target:hover
+  {
+      text-decoration: underline;
+  }
+
+  .ms-e-comments-empty
+  {
+      margin: 0;
+      padding: 10px;
+      font-size: 0.86rem;
+      color: #5a6b7d;
   }
   
   .ms_e_recentexp
   {
-     border: 2px solid #ccddff;
-     background-color: #eef6ff;
-     padding:3px;
+     border: 1px solid #c7d7e8;
+     border-radius: 0 10px 10px 0;
+     background: linear-gradient(165deg, rgba(238, 246, 255, 0.9) 0%, rgba(247, 250, 253, 0.92) 100%);
+     padding: 10px;
+     box-shadow: 0 1px 5px rgba(15, 23, 42, 0.08);
   }
 
   .ms_e_lastedited
   {
     text-align: left;     
     font-weight: bold;
-    font-size: normal;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #34495e;
+    margin-bottom: 6px;
+  }
+
+  /******** My Experiments: manila folder / messy desk treatment ********/
+
+  .ms-e-folder-page
+  {
+      position: relative;
+      box-sizing: border-box;
+      padding: 18px 22px 28px 16px;
+      background: transparent;
+      font-family: "Trebuchet MS", "Comic Sans MS", "Segoe Print", cursive, sans-serif;
+      overflow: hidden;
+  }
+
+  .ms-e-folder-page::before
+  {
+      content: "";
+      position: absolute;
+      inset: 14px 26px 18px 14px;
+      z-index: 0;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.32)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 2px 3px rgba(63, 46, 26, 0.16), 0 11px 28px rgba(63, 46, 26, 0.13);
+      pointer-events: none;
+      transform: rotate(-0.45deg);
+      transform-origin: 52% 48%;
+  }
+
+  .ms-e-folder-page > *
+  {
+      position: relative;
+      z-index: 1;
+  }
+
+  #tabswindow .ms-e-folder-page .ms-e-page-title
+  {
+      display: block;
+      width: auto;
+      margin: 4px 0 0 8%;
+      padding: 0 0 3px;
+      border: none;
+      border-bottom: 2px solid rgba(86, 67, 38, 0.32);
+      background: transparent;
+      box-shadow: none;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-align: left;
+      text-transform: none;
+      color: #2d2a24;
+      transform: rotate(-0.35deg);
+  }
+
+  .ms-e-folder-page .ms-e-banner
+  {
+      width: calc(80% + 24px);
+      margin: 0 0 10px 8%;
+      padding: 18px clamp(14px, 3vw, 34px) 16px;
+      border: 1px solid #d0a45e;
+      border-left: 0;
+      border-radius: 2px 10px 10px 2px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.18)),
+          url("../images/tex-orange.png"),
+          linear-gradient(165deg, #f2d59a 0%, #e3b86f 100%);
+      box-shadow: 2px 4px 10px rgba(91, 66, 33, 0.2);
+      transform: rotate(-0.35deg);
+      text-align: left;
+  }
+
+  .ms-e-folder-page .ms-e-banner::before
+  {
+      content: none;
+  }
+
+  .ms-e-folder-page .ms-e-banner-inner
+  {
+      align-items: flex-start;
+      max-width: none;
+  }
+
+  .ms-e-folder-page .ms-e-banner-eyebrow
+  {
+      margin-bottom: 8px;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: #6f4f25;
+  }
+
+  .ms-e-folder-page .ms-e-banner-tag
+  {
+      color: #4f6b66;
+      font-weight: 700;
+  }
+
+  .ms-e-folder-page .ms-e-banner-title
+  {
+      padding: 6px 12px 7px 10px;
+      border: none;
+      border-bottom: 2px solid rgba(79, 107, 102, 0.45);
+      border-radius: 0;
+      background: rgba(255, 250, 221, 0.56);
+      box-shadow: none;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: clamp(1.15rem, 2.5vw, 1.65rem);
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: #2d2a24;
+      transform: rotate(0.25deg);
+  }
+
+  .ms-e-folder-page .ms-e-banner-title::before
+  {
+      content: "mark";
+      border-color: rgba(79, 107, 102, 0.45);
+      background:
+          url("../images/tex-teal.png"),
+          rgba(217, 241, 236, 0.78);
+      color: #36524e;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      text-transform: uppercase;
+      position: relative;
+      margin-left: -22px;
+      margin-right: 2px;
+      padding: 4px 13px 4px 8px;
+      border-radius: 2px 0 0 2px;
+      clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%);
+      box-shadow: 1px 1px 2px rgba(38, 66, 63, 0.16);
+      transform: rotate(-1.6deg);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist,
+  .ms-e-folder-page .ms_e_newexperiment,
+  .ms-e-folder-page .ms_e_recentcomments
+  {
+      margin-top: 0.9em;
+      padding: 10px;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist
+  {
+      margin-left: 8%;
+      width: 41%;
+      border-right: 1px dashed rgba(112, 84, 51, 0.35);
+      height: calc(100% - 82px);
+      max-height: calc(100% - 82px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 14px;
+      box-sizing: border-box;
+  }
+
+  .ms-e-folder-page .ms_e_newexperiment,
+  .ms-e-folder-page .ms_e_recentcomments
+  {
+      margin-left: 5%;
+      width: 36%;
+  }
+
+  .ms-e-folder-page .ms_e_recentcomments
+  {
+      max-height: calc(100% - 170px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 14px;
+      box-sizing: border-box;
+  }
+
+  .ms-e-folder-page .ms_e_recentexp
+  {
+      padding: 12px;
+      border: none;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.16)),
+          url("../images/tex-yellow.png"),
+          #fff1a8;
+      box-shadow: 0 2px 2px rgba(70, 52, 26, 0.14), 0 8px 18px rgba(70, 52, 26, 0.11);
+      transform: rotate(-0.65deg);
+  }
+
+  .ms-e-folder-page .ms_e_lastedited,
+  .ms-e-folder-page .ms-e-previous-label
+  {
+      width: fit-content;
+      margin: 0 0 8px 8px;
+      padding: 3px 8px 4px;
+      border-bottom: 2px solid rgba(86, 67, 38, 0.25);
+      background: rgba(255, 255, 255, 0.35);
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      color: #4a3924;
+      transform: rotate(-0.45deg);
+  }
+
+  .ms-e-folder-page .ms-e-previous-label
+  {
+      margin: 14px 0 2px 16px;
+      transform: rotate(0.55deg);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag
+  {
+      min-height: 112px;
+      margin: 7px 0 8px;
+      padding: 13px 14px 56px;
+      gap: 13px;
+      border: none;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.42)),
+          url("../images/tex-white.png"),
+          var(--adv-page-bg, #fffdf0);
+      box-shadow: 0 1px 2px rgba(59, 43, 24, 0.18), 0 7px 16px rgba(59, 43, 24, 0.12);
+      transform: rotate(0.45deg);
+      transition: box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist > .miniflag:nth-of-type(2n),
+  .ms-e-folder-page .ms_e_experimentslist > br + .miniflag:nth-of-type(2n)
+  {
+      transform: rotate(-0.6deg);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag:hover
+  {
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.38)),
+          url("../images/tex-white.png"),
+          var(--adv-page-bg, #fffdf0);
+      box-shadow: 0 2px 4px rgba(59, 43, 24, 0.2), 0 10px 22px rgba(59, 43, 24, 0.16);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag.miniflag--advcol::before
+  {
+      height: 0;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag.miniflag--advcol::after
+  {
+      opacity: 0.03;
+      z-index: 0;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag.miniflag--advcol .miniflag-main
+  {
+      position: static;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-media img
+  {
+      width: 86px;
+      height: 86px;
+      border: 4px solid rgba(255, 255, 255, 0.86);
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(56, 39, 17, 0.28);
+      transform: rotate(-1.2deg);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-title
+  {
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      color: #2d2a24;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-rule
+  {
+      border-top: 1px dashed rgba(88, 70, 44, 0.34);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag .tinyrating,
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-description,
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-tagsrow
+  {
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: #58462c;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-description
+  {
+      margin-top: 7px;
+      padding-top: 6px;
+      border-top: 1px dotted rgba(88, 70, 44, 0.28);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      font-style: italic;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag .smalltag
+  {
+      border-color: rgba(79, 107, 102, 0.38);
+      background:
+          url("../images/tex-teal.png"),
+          rgba(217, 241, 236, 0.78);
+      color: #36524e;
+      text-transform: none;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .deleteadvbutton,
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .editadvbutton
+  {
+      border: 1px solid rgba(72, 57, 37, 0.25);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      color: #4a3924;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions
+  {
+      display: block;
+      position: static;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .deleteadvbutton
+  {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      min-width: 1.55rem;
+      padding: 1px 6px 2px;
+      font-size: 0.72rem;
+      line-height: 1.2;
+      z-index: 5;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .editadvbutton
+  {
+      position: absolute;
+      right: 12px;
+      bottom: 14px;
+      min-width: 4.6rem;
+      padding: 4px 12px 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: none;
+      font-size: 0.82rem;
+      line-height: 1.1;
+      text-align: center;
+      transform: rotate(-0.8deg);
+      z-index: 5;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .editadvbutton::after
+  {
+      content: " \2192";
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-weight: 700;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .deleteadvbutton:hover,
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .editadvbutton:hover
+  {
+      background: rgba(255, 238, 220, 0.9);
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .deleteadvbutton:hover
+  {
+      background: rgba(255, 210, 210, 0.95);
+      border-color: rgba(145, 45, 45, 0.42);
+      color: #7f1d1d;
+  }
+
+  .ms-e-folder-page .ms_e_experimentslist .miniflag-actions .editadvbutton:hover
+  {
+      background: rgba(255, 238, 185, 0.95);
+      border-color: rgba(72, 57, 37, 0.48);
+      box-shadow: 0 1px 3px rgba(70, 52, 26, 0.18);
+      transform: rotate(0deg);
+  }
+
+  .ms-e-folder-page .ms-e-new-experiment-button
+  {
+      align-items: flex-start;
+      border: none;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)),
+          url("../images/tex-orange.png"),
+          #f1b36a;
+      color: #3f2c16;
+      box-shadow: 0 2px 2px rgba(70, 52, 26, 0.14), 0 8px 18px rgba(70, 52, 26, 0.12);
+      transform: rotate(0.9deg);
+  }
+
+  .ms-e-folder-page .ms-e-new-experiment-button:hover
+  {
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1)),
+          url("../images/tex-orange.png"),
+          #f4bf7e;
+      box-shadow: 0 3px 5px rgba(70, 52, 26, 0.18), 0 11px 22px rgba(70, 52, 26, 0.15);
+      transform: rotate(0deg) translateY(-2px);
+  }
+
+  .ms-e-folder-page .ms-e-new-experiment-code
+  {
+      border-color: rgba(63, 44, 22, 0.28);
+      color: #3f2c16;
+      background: rgba(255, 255, 255, 0.35);
+  }
+
+  .ms-e-folder-page .ms-e-new-experiment-title
+  {
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      text-transform: none;
+  }
+
+  .ms-e-folder-page .ms-e-new-experiment-hint
+  {
+      color: rgba(63, 44, 22, 0.78);
+  }
+
+  .ms-e-folder-page .ms-e-comments-panel
+  {
+      border: none;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+          url("../images/tex-teal.png"),
+          #cdebe6;
+      box-shadow: 0 2px 2px rgba(32, 65, 62, 0.13), 0 8px 18px rgba(32, 65, 62, 0.1);
+      transform: rotate(-0.8deg);
+  }
+
+  .ms-e-folder-page .ms-e-comments-head
+  {
+      border-bottom: 1px dashed rgba(48, 83, 79, 0.35);
+      background: rgba(255, 255, 255, 0.18);
+  }
+
+  .ms-e-folder-page .ms-e-comments-eyebrow,
+  .ms-e-folder-page .ms-e-comments-head h3
+  {
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: #31534f;
+  }
+
+  .ms-e-folder-page .ms-e-comments-head h3
+  {
+      font-size: 1rem;
+  }
+
+  .ms-e-folder-page .ms-e-comment-card
+  {
+      border: none;
+      border-radius: 2px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.48)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 1px 2px rgba(35, 54, 51, 0.16);
+      transform: rotate(0.35deg);
+  }
+
+  .ms-e-folder-page .ms-e-comment-card:nth-child(2n)
+  {
+      transform: rotate(-0.45deg);
+  }
+
+  .ms-e-folder-page .ms-e-comment-meta,
+  .ms-e-folder-page .ms-e-comment-target
+  {
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      letter-spacing: 0.02em;
+      text-transform: none;
+  }
+
+  .ms-e-folder-page .ms-e-comment-text
+  {
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      color: #2d2a24;
+  }
+
+  /******** My Information account page ********/
+
+  .ms-account-page
+  {
+      position: relative;
+      box-sizing: border-box;
+      padding: 18px 24px 30px 18px;
+      background: transparent;
+      overflow: auto;
+      font-family: "Trebuchet MS", "Comic Sans MS", "Segoe Print", cursive, sans-serif;
+  }
+
+  .ms-account-paper
+  {
+      position: relative;
+      width: min(960px, calc(100% - 44px));
+      margin: 8px auto 28px;
+      padding: 24px 26px 28px;
+      border: none;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 2px 3px rgba(63, 46, 26, 0.16), 0 11px 28px rgba(63, 46, 26, 0.13);
+      box-sizing: border-box;
+      transform: rotate(-0.25deg);
+  }
+
+  .ms-account-paper > *
+  {
+      transform: rotate(0.25deg);
+  }
+
+  .ms-account-head
+  {
+      margin: 0 0 18px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(86, 67, 38, 0.28);
+  }
+
+  .ms-account-eyebrow
+  {
+      margin: 0 0 5px;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 0.82rem;
+      letter-spacing: 0.03em;
+      color: #6f4f25;
+  }
+
+  #tabswindow .ms-account-title
+  {
+      width: auto;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      letter-spacing: 0.02em;
+      text-align: left;
+      text-transform: none;
+      color: #2d2a24;
+  }
+
+  .ms-account-layout
+  {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.75fr) minmax(280px, 1.25fr);
+      gap: 16px;
+      align-items: start;
+  }
+
+  .ms-account-note
+  {
+      padding: 14px;
+      border-radius: 3px;
+      box-shadow: 0 2px 2px rgba(70, 52, 26, 0.14), 0 8px 18px rgba(70, 52, 26, 0.1);
+      box-sizing: border-box;
+  }
+
+  .ms-account-note h3
+  {
+      display: block;
+      margin: 0 0 10px;
+      padding: 0 0 4px;
+      border-bottom: 1px dashed rgba(72, 57, 37, 0.32);
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 1rem;
+      font-variant: normal;
+      color: #3f2c16;
+  }
+
+  .ms-account-note--photo,
+  .ms-account-note--password
+  {
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12)),
+          url("../images/tex-yellow.png"),
+          #fff1a8;
+      transform: rotate(-0.55deg);
+  }
+
+  .ms-account-note--bio
+  {
+      grid-row: span 2;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.48)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      transform: rotate(0.35deg);
+  }
+
+  .ms-account-note--settings
+  {
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+          url("../images/tex-teal.png"),
+          #cdebe6;
+      transform: rotate(0.65deg);
+  }
+
+  .acct-preview-hit
+  {
+      display: block;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 10px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+  }
+
+  .acct-preview-frame
+  {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 140px;
+      height: 140px;
+      border: 6px solid rgba(255, 255, 255, 0.88);
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 1px 4px rgba(56, 39, 17, 0.28);
+      box-sizing: border-box;
+      overflow: hidden;
+      transform: rotate(-1.2deg);
+  }
+
+  .acct-preview-frame img
+  {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  .acct-preview-empty
+  {
+      color: #6f5b39;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-size: 0.9rem;
+  }
+
+  .ms-account-label
+  {
+      display: block;
+      margin: 9px 0 4px;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      color: #4a3924;
+      font-weight: 700;
+  }
+
+  .ms-account-page input[type="email"],
+  .ms-account-page input[type="password"]
+  {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid rgba(86, 67, 38, 0.32);
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.7);
+      box-sizing: border-box;
+      font: inherit;
+  }
+
+  .ms-account-page input[readonly]
+  {
+      color: #6a604f;
+      background: rgba(255, 255, 255, 0.46);
+  }
+
+  .ms-account-check
+  {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin: 4px 0 12px;
+      color: #31534f;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+  }
+
+  .ms-account-hint
+  {
+      display: block;
+      margin: 6px 0 0;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: rgba(63, 44, 22, 0.75);
+  }
+
+  .ms-account-count--over
+  {
+      color: #a32626;
+      font-weight: 700;
+  }
+
+  .ms-account-inline-actions
+  {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+  }
+
+  .ms-account-inline-actions button,
+  .ms-account-actions button
+  {
+      border: 1px solid rgba(72, 57, 37, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      padding: 6px 11px;
+      color: #4a3924;
+      cursor: pointer;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+  }
+
+  .ms-account-actions
+  {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(86, 67, 38, 0.28);
+  }
+
+  #acct_status
+  {
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      color: #31534f;
+      font-weight: 700;
+  }
+
+  #acct_status.ms-account-status--error
+  {
+      color: #9b1c1c;
+  }
+
+  .acct-picmodal
+  {
+      position: fixed;
+      inset: 0;
+      z-index: 7000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: min(3vw, 1.25rem);
+      box-sizing: border-box;
+  }
+
+  .acct-picmodal--hidden
+  {
+      display: none !important;
+  }
+
+  .acct-picmodal-backdrop
+  {
+      position: absolute;
+      inset: 0;
+      background: rgba(40, 30, 16, 0.48);
+  }
+
+  .acct-picmodal-panel
+  {
+      position: relative;
+      z-index: 1;
+      width: min(94vw, 720px);
+      max-height: min(90vh, 700px);
+      display: flex;
+      flex-direction: column;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.28)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+  }
+
+  .acct-picmodal-header
+  {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px dashed rgba(86, 67, 38, 0.28);
+  }
+
+  .acct-picmodal-header h3
+  {
+      margin: 0;
+      padding: 0;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      color: #2d2a24;
+  }
+
+  .acct-picmodal-x
+  {
+      border: none;
+      background: transparent;
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
+  }
+
+  .acct-picbrowser
+  {
+      min-height: 0;
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .acct-picbrowser-toolbar
+  {
+      display: flex;
+      gap: 8px;
+  }
+
+  .acct-picbrowser-toolbar input,
+  .acct-picbrowser-toolbar select
+  {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 7px 8px;
+      border: 1px solid rgba(86, 67, 38, 0.32);
+      background: rgba(255, 255, 255, 0.72);
+  }
+
+  .acct-picbrowser-status
+  {
+      font-size: 0.82rem;
+      color: #6f5b39;
+  }
+
+  .acct-picbrowser-scroll
+  {
+      overflow-y: auto;
+      max-height: min(48vh, 420px);
+  }
+
+  .acct-picbrowser-grid
+  {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 10px;
+  }
+
+  .acct-pic-tile
+  {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      border: 1px solid rgba(72, 57, 37, 0.22);
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.62);
+      padding: 7px;
+      cursor: pointer;
+      text-align: left;
+  }
+
+  .acct-pic-tile--selected
+  {
+      box-shadow: 0 0 0 3px rgba(49, 83, 79, 0.28);
+  }
+
+  .acct-pic-tile-img
+  {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.6);
+  }
+
+  .acct-pic-tile-img img
+  {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  .acct-pic-tile-cap
+  {
+      font-size: 0.76rem;
+      color: #4a3924;
+  }
+
+  @media (max-width: 900px)
+  {
+      .ms-account-layout
+      {
+          grid-template-columns: 1fr;
+      }
+
+      .ms-account-note--bio
+      {
+          grid-row: auto;
+      }
+  }
+
+  /******** My Resources picture manager ********/
+
+  .ms-resources-page
+  {
+      position: relative;
+      box-sizing: border-box;
+      padding: 18px 24px 30px 18px;
+      background: transparent;
+      overflow: auto;
+      font-family: "Trebuchet MS", "Comic Sans MS", "Segoe Print", cursive, sans-serif;
+  }
+
+  .ms-resources-paper
+  {
+      width: min(1280px, calc(100% - 28px));
+      margin: 8px auto 28px;
+      padding: 22px 24px 28px;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 2px 3px rgba(63, 46, 26, 0.16), 0 11px 28px rgba(63, 46, 26, 0.13);
+      box-sizing: border-box;
+      transform: rotate(0.2deg);
+  }
+
+  .ms-resources-paper > *
+  {
+      transform: rotate(-0.2deg);
+  }
+
+  .ms-resources-head
+  {
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      border-bottom: 1px dashed rgba(86, 67, 38, 0.28);
+  }
+
+  .ms-resources-eyebrow,
+  .ms-resources-note
+  {
+      margin: 0 0 6px;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      color: #6f4f25;
+  }
+
+  #tabswindow .ms-resources-title
+  {
+      width: auto;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      text-align: left;
+      text-transform: none;
+      color: #2d2a24;
+  }
+
+  .ms-resources-upload,
+  .ms-resources-list-card,
+  .ms-resources-detail-card
+  {
+      padding: 14px;
+      border-radius: 3px;
+      box-shadow: 0 2px 2px rgba(70, 52, 26, 0.14), 0 8px 18px rgba(70, 52, 26, 0.1);
+      box-sizing: border-box;
+  }
+
+  .ms-resources-upload
+  {
+      margin-bottom: 16px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)),
+          url("../images/tex-orange.png"),
+          #f1b36a;
+      transform: rotate(-0.35deg);
+  }
+
+  .ms-resources-layout
+  {
+      display: grid;
+      grid-template-columns: minmax(460px, 1.45fr) minmax(300px, 0.85fr);
+      gap: 16px;
+      align-items: start;
+  }
+
+  .ms-resources-list-card
+  {
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12)),
+          url("../images/tex-yellow.png"),
+          #fff1a8;
+      transform: rotate(0.35deg);
+  }
+
+  .ms-resources-detail-card
+  {
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+          url("../images/tex-teal.png"),
+          #cdebe6;
+      transform: rotate(-0.35deg);
+  }
+
+  .ms-resources-page h3
+  {
+      display: block;
+      margin: 0 0 10px;
+      padding: 0 0 4px;
+      border-bottom: 1px dashed rgba(72, 57, 37, 0.32);
+      font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand ITC", cursive;
+      font-size: 1rem;
+      font-variant: normal;
+      color: #3f2c16;
+  }
+
+  .ms-resources-label
+  {
+      display: block;
+      margin: 8px 0 4px;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+      color: #4a3924;
+  }
+
+  .ms-resources-page input[type="text"],
+  .ms-resources-page input[type="file"]
+  {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid rgba(86, 67, 38, 0.32);
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.7);
+      box-sizing: border-box;
+      font: inherit;
+  }
+
+  #ms_resource_file
+  {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+  }
+
+  .ms-resources-dropzone
+  {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-height: 96px;
+      padding: 16px;
+      border: 2px dashed rgba(86, 67, 38, 0.42);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      text-align: center;
+      box-sizing: border-box;
+  }
+
+  .ms-resources-dropzone--active
+  {
+      background: rgba(255, 255, 255, 0.58);
+      border-color: rgba(49, 83, 79, 0.7);
+      box-shadow: inset 0 0 0 3px rgba(49, 83, 79, 0.12);
+  }
+
+  .ms-resources-drop-title
+  {
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #3f2c16;
+  }
+
+  .ms-resources-drop-hint
+  {
+      color: rgba(63, 44, 22, 0.76);
+      font-size: 0.82rem;
+  }
+
+  .ms-resources-pending
+  {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+  }
+
+  .ms-resource-pending-row
+  {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      padding: 8px;
+      border-radius: 3px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.48)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 1px 2px rgba(35, 54, 51, 0.12);
+  }
+
+  .ms-resource-pending-row--error
+  {
+      box-shadow: 0 0 0 2px rgba(145, 45, 45, 0.28), 0 1px 2px rgba(35, 54, 51, 0.12);
+  }
+
+  .ms-resource-pending-file
+  {
+      font-size: 0.82rem;
+      color: #3f2c16;
+      word-break: break-word;
+  }
+
+  .ms-resource-pending-row label
+  {
+      margin: 0;
+      font-size: 0.78rem;
+      color: #4a3924;
+  }
+
+  .ms-resources-page button
+  {
+      margin-top: 10px;
+      border: 1px solid rgba(72, 57, 37, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      padding: 6px 11px;
+      color: #4a3924;
+      cursor: pointer;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+  }
+
+  .ms-resources-status
+  {
+      display: inline-block;
+      margin-left: 8px;
+      color: #31534f;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+  }
+
+  .ms-resources-status--error
+  {
+      color: #9b1c1c;
+  }
+
+  .ms-resources-list
+  {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+      gap: 10px;
+      max-height: min(58vh, 560px);
+      overflow-y: auto;
+      padding-right: 4px;
+  }
+
+  .ms-resources-gallery-controls
+  {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      color: #4a3924;
+      font-weight: 700;
+  }
+
+  .ms-resources-gallery-controls select
+  {
+      width: auto;
+      min-width: 9rem;
+      margin: 0;
+      padding: 5px 24px 5px 8px;
+      border: 1px solid rgba(86, 67, 38, 0.32);
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: none;
+      color: #4a3924;
+      font: inherit;
+  }
+
+  .ms-resource-group-heading
+  {
+      grid-column: 1 / -1;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      margin: 4px 0 0;
+      padding: 4px 7px;
+      border-bottom: 1px dashed rgba(86, 67, 38, 0.28);
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+          url("../images/tex-teal.png"),
+          #cdebe6;
+      box-shadow: 0 2px 3px rgba(35, 54, 51, 0.12);
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 700;
+      color: #31534f;
+  }
+
+  .ms-resources-page .ms-resource-tile
+  {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 0;
+      padding: 8px;
+      border-radius: 2px;
+      background:
+          linear-gradient(rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.48)),
+          url("../images/tex-white.png"),
+          #fffdf0;
+      box-shadow: 0 1px 2px rgba(35, 54, 51, 0.16);
+      text-align: left;
+      transform: rotate(-0.35deg);
+  }
+
+  .ms-resource-tile:nth-child(2n)
+  {
+      transform: rotate(0.45deg);
+  }
+
+  .ms-resources-page .ms-resource-tile--selected
+  {
+      box-shadow: 0 0 0 3px rgba(49, 83, 79, 0.28), 0 1px 2px rgba(35, 54, 51, 0.16);
+  }
+
+  .ms-resource-tile-img
+  {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 0;
+  }
+
+  .ms-resource-tile-img img,
+  .ms-resources-preview img
+  {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+  }
+
+  .ms-resource-tile-name
+  {
+      font-size: 0.82rem;
+      color: #2d2a24;
+  }
+
+  .ms-resource-tile-cat
+  {
+      font-size: 0.72rem;
+      color: #31534f;
+  }
+
+  .ms-resource-tile-date
+  {
+      font-size: 0.68rem;
+      color: #6f5b39;
+      font-family: Consolas, "Courier New", Courier, monospace;
+  }
+
+  .ms-resources-preview
+  {
+      width: min(100%, 280px);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto 12px;
+      border: 6px solid rgba(255, 255, 255, 0.86);
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 1px 4px rgba(56, 39, 17, 0.28);
+      overflow: hidden;
+      box-sizing: border-box;
+  }
+
+  .ms-resources-readonly
+  {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px dashed rgba(48, 83, 79, 0.28);
+      color: #31534f;
+  }
+
+  .ms-resources-actions
+  {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+  }
+
+  #ms_resource_delete:hover
+  {
+      background: rgba(255, 210, 210, 0.95);
+      border-color: rgba(145, 45, 45, 0.42);
+      color: #7f1d1d;
+  }
+
+  .ms-resources-empty
+  {
+      margin: 0;
+      color: #6f5b39;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+  }
+
+  @media (max-width: 900px)
+  {
+      .ms-resources-layout
+      {
+          grid-template-columns: 1fr;
+      }
   }
   
   .ms_ne_newform

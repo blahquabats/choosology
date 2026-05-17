@@ -108,6 +108,7 @@
                 if(boxgroups["box_"+i] || currinfo['screens'][i]["deleted"] == 1) continue;
                 buildFrom(i);
             }
+            refreshAllConnectionDots();
             $("#visedloader").hide();
             if (typeof window.__konvaPatternImagesRedraw === 'function') {
                 window.__konvaPatternImagesRedraw();
@@ -170,6 +171,8 @@
                 }
                     connto[box1][box2] = [box2, linktext];
                     connfrom[box2][box1] = [box1, linktext];
+                    updateConnectionDots(box1);
+                    updateConnectionDots(box2);
                     lineOrPath(box1,box2);
             }
         }
@@ -186,6 +189,54 @@
             c++;
         }
         return c;
+    }
+
+    function countMapItems(map)
+    {
+        var c = 0;
+        if (!map) return c;
+        for (var key in map) {
+            if (map.hasOwnProperty(key)) c++;
+        }
+        return c;
+    }
+
+    function redrawDotColumn(group, count, x, color)
+    {
+        var yStart = 27 - ((Math.max(count, 1) - 1) * 4);
+        group.destroyChildren();
+        for (var i = 0; i < count; i++) {
+            group.add(new Konva.Circle({
+                x: x,
+                y: yStart + (i * 8),
+                radius: 2.3,
+                fill: color,
+                stroke: "rgba(32, 23, 15, 0.42)",
+                strokeWidth: 1,
+                listening: false
+            }));
+        }
+    }
+
+    function updateConnectionDots(box)
+    {
+        if (!boxgroups[box]) return;
+        if (boxgroups[box].inDots) {
+            redrawDotColumn(boxgroups[box].inDots, countMapItems(connfrom[box]), 8, config.from_color);
+        }
+        if (boxgroups[box].outDots) {
+            redrawDotColumn(boxgroups[box].outDots, countMapItems(connto[box]), 176, config.to_color);
+        }
+    }
+
+    function refreshAllConnectionDots()
+    {
+        for (var box in boxgroups) {
+            if (boxgroups.hasOwnProperty(box)) {
+                updateConnectionDots(box);
+            }
+        }
+        if (layers['boxes']) layers['boxes'].draw();
     }
     
     function nextSlot(box)
@@ -232,9 +283,38 @@
         x = parseInt(x);
         y = parseInt(y);
 
+        if(!title) title = "New Screen";
+        var cardShadow = new Konva.Rect({
+            x: 5,
+            y: 6,
+            width: 184,
+            height: 54,
+            cornerRadius: 8,
+            fill: "rgba(29, 37, 24, 0.14)",
+            listening: false
+        });
+        var cardStripe = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 184,
+            height: 10,
+            cornerRadius: 6,
+            fill: config.box_stripe,
+            opacity: 0.82,
+            listening: false
+        });
+        var inDots = new Konva.Group({ listening: false });
+        var outDots = new Konva.Group({ listening: false });
+        var cardRule = new Konva.Line({
+            points: [14, 45, 170, 45],
+            stroke: "rgba(75, 86, 63, 0.35)",
+            strokeWidth: 1,
+            dash: [3, 3],
+            listening: false
+        });
         var text = prototext.clone({
             id: name+"_text",
-            text: title,
+            text: title
         });
        // var bgh = text.height()+10 > 34 ? text.height()+10 : 34; 
         boxes[name] = protobox.clone({
@@ -243,7 +323,6 @@
             //height: bgh
             
         });
-        if(!title) title = "New Screen";
         boxgroups[name] = protoboxgroup.clone({
            id: name+"_group",    
            name: name,
@@ -252,6 +331,8 @@
           // height:boxes[name].height()
         });
         boxgroups[name].title = title;
+        boxgroups[name].inDots = inDots;
+        boxgroups[name].outDots = outDots;
 /*
         boxgroups[name].dragBoundFunc(function(pos) {
             x = pos.x;
@@ -281,8 +362,13 @@
         //cs[name] = nc;
         //$("#visedcontainer").append(nc);
         //nc.drawLayers();
+        boxgroups[name].add(cardShadow);
         boxgroups[name].add(boxes[name]);
+        boxgroups[name].add(cardStripe);
         boxgroups[name].add(text);
+        boxgroups[name].add(cardRule);
+        boxgroups[name].add(inDots);
+        boxgroups[name].add(outDots);
         layers['boxes'].add(boxgroups[name]);
         /*boxgroups[name].cache({
   x: 0,
@@ -324,6 +410,9 @@
             onFinish: function(){
                 connto[box1][box2] = [box2, linktext];
                 connfrom[box2][box1] = [box1, linktext];
+                updateConnectionDots(box1);
+                updateConnectionDots(box2);
+                layers['boxes'].draw();
                         saveAdventure();
                 //layers['lines'].draw();
                 
@@ -441,6 +530,7 @@
         //for(var a in lines[bn])
 //        layers['lines'].remove
         delete lines[bn];
+        refreshAllConnectionDots();
         saveAdventure();
         
         //layers['lines'].draw();
@@ -524,8 +614,11 @@
         
         connto[b1][b2] = [b2, boxgroups[b2].title];
         connfrom[b2][b1] = [b1, boxgroups[b2].title];
+        updateConnectionDots(b1);
+        updateConnectionDots(b2);
         lineOrPath(b1, b2);
         layers['lines'].draw();
+        layers['boxes'].draw();
         return false;
         // add to connto/connfrom
         
@@ -550,7 +643,10 @@
         }
         updateConnections(b1);
         updateConnections(b2);
+        updateConnectionDots(b1);
+        updateConnectionDots(b2);
         layers['lines'].draw();
+        layers['boxes'].draw();
         return true;
         // add to connto/connfrom
         
@@ -569,6 +665,8 @@
             
         }
         if (connfrom[b2] && connfrom[b2][b1]) delete connfrom[b2][b1];
+        updateConnectionDots(b1);
+        updateConnectionDots(b2);
         if(!update) return true;
         updateConnections(b1);
         updateConnections(b2);
@@ -769,7 +867,7 @@
         //$(bg).css('cursor', 'default');
         boxes[boxid].stroke(config.box_border);
         //boxes[boxid].fill(config.box_color);
-        boxes[boxid].fillPatternImage(texPurple);
+        boxes[boxid].fillPatternImage(config.box_bg);
         boxgroups[boxid].draw();
 
             layers['labels'].destroyChildren();
@@ -1140,6 +1238,16 @@ function drawPath(box1, box2)
     $(document).on("click", "#vised_opensettings", function () {
         openAdvSettings();
     });
+    if (window.sessionStorage) {
+        try {
+            if (window.sessionStorage.getItem("choosologyOpenSettingsForAdvid") === String(advid)) {
+                window.sessionStorage.removeItem("choosologyOpenSettingsForAdvid");
+                openAdvSettings();
+            }
+        } catch (err) {
+            /* Storage can be unavailable; manual settings button remains available. */
+        }
+    }
    // doStuff();
     // c.drawLayers();
     

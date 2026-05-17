@@ -59,6 +59,8 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
         $rating = assembleRating($r['aid'], 1, 1);
         
         $title = decode($r['advtitle'], 1);
+        $descText = trim(decode($r['description'] ?? '', 1));
+        $descHtml = $descText !== '' ? htmlspecialchars($descText, ENT_QUOTES, 'UTF-8') : '';
         if($avail !=='public')
         {
             if ($avail == "private") $title .= " (private)";
@@ -143,6 +145,9 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
         $out .= "</div>\n";
         $out .= "<hr class='miniflag-rule' />\n";
         $out .= "<div class='tinyrating'>$rating</div>\n";
+        if ($descHtml !== '') {
+            $out .= "<div class='miniflag-description'>$descHtml</div>\n";
+        }
         if ($tags !== '') {
             $out .= "<div class='miniflag-tagsrow'><span class='miniflag-tags-label'>Tagged</span>: $tags</div>\n";
         }

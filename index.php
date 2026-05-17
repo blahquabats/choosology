@@ -10,9 +10,8 @@
         }
     }
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 	<?php
     
@@ -79,7 +78,7 @@
     <?php echo icon("world", "64px"); ?><br />
     Home
 </div>
-<div class='navbutton green navdisabled' id="news_nav" onclick="location.href='#/news/2'">
+<div class='navbutton green navdisabled' id="news_nav" onclick="location.href='#/news'">
     <?php echo icon("news", "64px"); ?><br />
     News
 </div>

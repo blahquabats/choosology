@@ -6,13 +6,17 @@ Konva.legacyTextRendering = true;
 
         var prototext = new Konva.Text({
             fill: config.std_color,
-            x: 5,
-            y: 5,
+            x: 14,
+            y: 21,
             fontSize: 12,
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: 'Consolas, "Courier New", monospace',
             fontStyle: 'bold',
-            width: 150,
-            align: 'center',
+            width: 154,
+            height: 24,
+            align: 'left',
+            verticalAlign: 'middle',
+            wrap: 'none',
+            ellipsis: true,
             listening: false
         });
         var protobox = new Konva.Rect({
@@ -20,11 +24,15 @@ Konva.legacyTextRendering = true;
             strokeWidth: 2,
             fill: config.box_color,
             fillPatternImage: config.box_bg,
-            cornerRadius: 4,
+            cornerRadius: 7,
             x: 0,
             y: 0,
-            width: 160,
-            height: 34,
+            width: 184,
+            height: 54,
+            shadowColor: '#263124',
+            shadowBlur: 5,
+            shadowOffset: { x: 2, y: 3 },
+            shadowOpacity: 0.18,
             padding: 5
         });
         protobox.transformsEnabled = 'position';
@@ -46,11 +54,11 @@ Konva.legacyTextRendering = true;
             return false;
         });
         protobox.on("dblclick", function (e){
-            editScreen(menubox);
+            editScreen(boxgroups[this.name()] || menubox);
         });
         var protoboxgroup = new Konva.Group({
-           width: 160,
-           height:34,
+           width: 184,
+           height:54,
            draggable:true
            
         });
@@ -58,10 +66,10 @@ Konva.legacyTextRendering = true;
         protoboxgroup.transformsEnabled = 'position';
         
         protoboxgroup.on('mouseenter', function(e){
-            boxMouseover(e.target);
+            boxMouseover(this);
             });
         protoboxgroup.on('mouseleave', function(e){
-            boxMouseout(e.target);
+            boxMouseout(this);
             });
         protoboxgroup.on('dragmove', function(e){
             updateConnections(this.name());

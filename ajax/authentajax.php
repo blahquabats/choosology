@@ -38,7 +38,7 @@ if (isset($_POST['loginsubmit']))
     else
     {
 
-        $error = "<br /><span style='color:red; font-weight:bold'>Wrong username or password.</style><br />";
+        $error = "<br /><span style='color:red; font-weight:bold'>Wrong username or password.</span><br />";
         echo "2";
         $_SESSION['user'] = false;
         $_SESSION['usertype'] = false;
