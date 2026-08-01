@@ -803,9 +803,22 @@ label.sel:before {
 .lab-feed-list--home
 {
     margin-left: 42px;
-    max-height: min(38vh, 280px);
+    max-height: 9.75rem; /* ~3 compact feed rows */
     overflow-y: auto;
     padding-right: 4px;
+    gap: 4px;
+}
+
+.lab-feed-list--home .lab-feed-item
+{
+    gap: 3px 6px;
+    padding: 4px 7px;
+}
+
+.lab-feed-list--home .lab-feed-text
+{
+    font-size: 0.74rem;
+    line-height: 1.25;
 }
 
 .lab-feed-list--updates
