@@ -344,6 +344,24 @@ $(function() {
                 });
             });
 
+            $(document).on("click", "#newswindow .updates-pager-btn[data-updates-page]", function() {
+                var page = parseInt($(this).attr("data-updates-page"), 10);
+                if (!page || page < 1) {
+                    return;
+                }
+                var $mount = $("#newswindow #news-updates-mount");
+                if (!$mount.length) {
+                    return;
+                }
+                $mount.css("opacity", 0.55);
+                $mount.load("news.php?fragment=updates&updates_page=" + page, function(responseText, status) {
+                    $mount.css("opacity", 1);
+                    if (status === "error") {
+                        $mount.html("<p class='news-empty'>Could not load updates.</p>");
+                    }
+                });
+            });
+
         });
 
 function loadTab(loc, retryAfterShow)

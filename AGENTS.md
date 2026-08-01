@@ -17,7 +17,7 @@ Both services are long-running: start each in its own tmux session (e.g. `mariad
 
 - Connection config resolves in `db-config.php` as: defaults → `connect.local.php` (git-ignored) → `CHOOSOLOGY_DB_*` env vars. Local dev uses `connect.local.php` pointing at `127.0.0.1` with user/password `choosology`/`choosology`. If `connect.local.php` is missing, recreate it from `connect.local.php.example` (host `127.0.0.1`, user/pass `choosology`).
 - `connect.php` dies with HTTP 503 if the DB is unreachable — if pages 503, MariaDB is not running.
-- Schema lives in `choosology-schema.sql` but it is **UTF-16 LE**; import it converted, e.g. `iconv -f UTF-16LE -t UTF-8 choosology-schema.sql | sudo mariadb choosology`. The optional seed `sql/news_setup.sql` is stale (references a non-existent `news.body` column; the column is `news.text`) and will error — skip it.
+- Schema lives in `choosology-schema.sql` but it is **UTF-16 LE**; import it converted, e.g. `iconv -f UTF-16LE -t UTF-8 choosology-schema.sql | sudo mariadb choosology`. Optional seeds: `sql/news_setup.sql` (news articles) and `sql/updates_setup.sql` (one-line patch notes for the Home/News feeds).
 - Uploaded pictures/resources are written to the filesystem under `storage/pics` (configured via `pics_root` in `connect.local.php`); this dir is git-ignored.
 
 ### App behavior gotchas

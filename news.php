@@ -1,6 +1,18 @@
 <?php
 require_once __DIR__ . '/connect.php';
 require_once __DIR__ . '/auxfuncs.php';
+require_once __DIR__ . '/labfeed.php';
+
+/* Paginated updates fragment — exit before news queries. */
+if (!empty($_GET['fragment']) && $_GET['fragment'] === 'updates') {
+	header('Content-Type: text/html; charset=UTF-8');
+	$page = isset($_GET['updates_page']) ? (int) $_GET['updates_page'] : 1;
+	if ($page < 1) {
+		$page = 1;
+	}
+	choosology_echo_updates_feed($db, $page);
+	exit;
+}
 
 /**
  * @return array{0:bool,1?:string} [ ok, error message ]
@@ -104,7 +116,7 @@ function choosology_news_detail_select(array $schema): string
 	return implode(', ', $parts);
 }
 
-function choosology_news_excerpt(string $html, int $maxLen = 180): string
+function choosology_news_excerpt(string $html, int $maxLen = 90): string
 {
 	$plain = trim(preg_replace('/\s+/', ' ', strip_tags($html)));
 	$lenFn = function_exists('mb_strlen') ? 'mb_strlen' : 'strlen';
@@ -232,6 +244,10 @@ if ($tableOk[0]) {
 }
 
 $latestId = ($tableOk[0] && count($rows) > 0) ? (int) ($rows[0]['id'] ?? 0) : 0;
+$updatesPage = isset($_GET['updates_page']) ? (int) $_GET['updates_page'] : 1;
+if ($updatesPage < 1) {
+	$updatesPage = 1;
+}
 
 if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 	header('Content-Type: text/html; charset=UTF-8');
@@ -245,6 +261,7 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 	);
 	exit;
 }
+
 ?>
 <div id="wholepage" class="browse-program browse-program--news">
 	<div class="browse-program-head">
@@ -318,9 +335,15 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 						?>
 					</div>
 				</section>
+				<section class="browse-section browse-section--intro news-updates-section" aria-labelledby="news-updates-heading">
+					<h3 class="browse-section-heading" id="news-updates-heading"><span class="browse-section-num" aria-hidden="true">02</span> Recent updates</h3>
+					<div id="news-updates-mount" class="news-updates-mount">
+						<?php choosology_echo_updates_feed($db, $updatesPage); ?>
+					</div>
+				</section>
 				<?php if ($canManageNews && $tableOk[0]) { ?>
 				<section class="browse-section browse-section--intro news-admin-section" aria-labelledby="news-admin-heading">
-					<h3 class="browse-section-heading" id="news-admin-heading"><span class="browse-section-num" aria-hidden="true">02</span> Admin</h3>
+					<h3 class="browse-section-heading" id="news-admin-heading"><span class="browse-section-num" aria-hidden="true">03</span> Admin</h3>
 					<form id="news-add-form" class="news-admin-form" action="ajax/addnews.php" method="post">
 						<input type="hidden" id="news-edit-id" name="id" value="">
 
