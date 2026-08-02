@@ -2,7 +2,9 @@
 
 ## Cursor Cloud specific instructions
 
-Choosology is a legacy flat-file PHP web application (interactive "choose your own adventure" authoring site). Files are served directly (e.g. `index.php`, `home.php`, `view.php`); there is no build step, no framework, and no dependency manager (JS libraries are vendored under `scripts/`). Stack: PHP 8.3 CLI + `mysqli` extension, MariaDB 10.11 (MySQL 8 compatible), served in dev via PHP's built-in server.
+Choosology is a legacy flat-file PHP web application (interactive "choose your own adventure" authoring site). Files are served directly (e.g. `index.php`, `home.php`, `view.php`); there is no build step, no framework, and no dependency manager (JS libraries are vendored under `scripts/`). Stack: PHP 8.3 CLI + `mysqli` + **GD** extensions, MariaDB 10.11 (MySQL 8 compatible), served in dev via PHP's built-in server.
+
+**PHP GD (`php8.3-gd`) is required for image uploads.** Without it, `ajax/uploadresource.php` refuses uploads (older builds fell back to copying the full image into `thumbs/`, which made UI icons enormous). If thumbs were already created without GD, rebuild them with `php scripts/regenerate_thumbs.php` (optional `--user=SomeName`).
 
 ### Services
 
