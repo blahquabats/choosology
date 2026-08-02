@@ -42,61 +42,15 @@ function choosology_resource_ext_for_mime(string $mime): string
 	return $map[$mime] ?? '';
 }
 
-function choosology_resource_make_thumb(string $src, string $dest, string $mime): void
-{
-	if (!function_exists('imagecreatetruecolor')) {
-		@copy($src, $dest);
-		return;
-	}
-	$info = @getimagesize($src);
-	if (!$info || empty($info[0]) || empty($info[1])) {
-		@copy($src, $dest);
-		return;
-	}
-	$w = (int) $info[0];
-	$h = (int) $info[1];
-	$max = 240;
-	$scale = min(1, $max / max($w, $h));
-	$tw = max(1, (int) round($w * $scale));
-	$th = max(1, (int) round($h * $scale));
-
-	if ($mime === 'image/jpeg' && function_exists('imagecreatefromjpeg')) {
-		$im = @imagecreatefromjpeg($src);
-	} elseif ($mime === 'image/png' && function_exists('imagecreatefrompng')) {
-		$im = @imagecreatefrompng($src);
-	} elseif ($mime === 'image/gif' && function_exists('imagecreatefromgif')) {
-		$im = @imagecreatefromgif($src);
-	} elseif ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) {
-		$im = @imagecreatefromwebp($src);
-	} else {
-		$im = false;
-	}
-	if (!$im) {
-		@copy($src, $dest);
-		return;
-	}
-
-	$thumb = imagecreatetruecolor($tw, $th);
-	if ($mime === 'image/png' || $mime === 'image/gif' || $mime === 'image/webp') {
-		imagealphablending($thumb, false);
-		imagesavealpha($thumb, true);
-	}
-	imagecopyresampled($thumb, $im, 0, 0, 0, 0, $tw, $th, $w, $h);
-	if ($mime === 'image/png' && function_exists('imagepng')) {
-		imagepng($thumb, $dest);
-	} elseif ($mime === 'image/gif' && function_exists('imagegif')) {
-		imagegif($thumb, $dest);
-	} elseif ($mime === 'image/webp' && function_exists('imagewebp')) {
-		imagewebp($thumb, $dest, 82);
-	} else {
-		imagejpeg($thumb, $dest, 84);
-	}
-	imagedestroy($im);
-	imagedestroy($thumb);
-}
-
 if (empty($_SESSION['user'])) {
 	choosology_resource_upload_json(array('ok' => 0, 'error' => 'Not signed in.'));
+}
+
+if (!choosology_gd_available()) {
+	choosology_resource_upload_json(array(
+		'ok' => 0,
+		'error' => 'Image uploads require the PHP GD extension (install php-gd / php8.3-gd). Without it, thumbnails become full-size and break the UI.',
+	));
 }
 
 $user = (string) $_SESSION['user'];
@@ -171,7 +125,14 @@ foreach ($files as $idx => $file) {
 	if (!move_uploaded_file($tmp, $dest)) {
 		choosology_resource_upload_json(array('ok' => 0, 'error' => 'Could not save uploaded image.'));
 	}
-	choosology_resource_make_thumb($dest, $thumbDest, $mime);
+	if (!choosology_make_image_thumb($dest, $thumbDest, $mime)) {
+		@unlink($dest);
+		@unlink($thumbDest);
+		choosology_resource_upload_json(array(
+			'ok' => 0,
+			'error' => 'Could not create image thumbnail. Ensure PHP GD supports this image type.',
+		));
+	}
 
 	$name = isset($names[$idx]) ? trim((string) $names[$idx]) : '';
 	if ($name === '') {

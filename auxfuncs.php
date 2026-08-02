@@ -197,6 +197,87 @@ function getUserPics(string $username): array
 }
 
 /**
+ * Whether PHP GD is available for thumbnail generation.
+ */
+function choosology_gd_available(): bool
+{
+	return function_exists('imagecreatetruecolor')
+		&& (function_exists('imagecreatefromjpeg') || function_exists('imagecreatefrompng'));
+}
+
+/**
+ * Write a max-240px thumbnail of $src to $dest.
+ * Requires the PHP GD extension for real resizing; without GD it copies the full file
+ * (which makes UI thumbs enormous — install php-gd / php8.3-gd).
+ *
+ * @return bool true when a resized thumb was written; false when it fell back to a full copy / failed
+ */
+function choosology_make_image_thumb(string $src, string $dest, string $mime = '', int $max = 240): bool
+{
+	if ($mime === '') {
+		$info0 = @getimagesize($src);
+		$mime = is_array($info0) && !empty($info0['mime']) ? (string) $info0['mime'] : '';
+	}
+	if (!choosology_gd_available()) {
+		@copy($src, $dest);
+		return false;
+	}
+	$info = @getimagesize($src);
+	if (!$info || empty($info[0]) || empty($info[1])) {
+		@copy($src, $dest);
+		return false;
+	}
+	$w = (int) $info[0];
+	$h = (int) $info[1];
+	$max = max(16, $max);
+	$scale = min(1, $max / max($w, $h));
+	$tw = max(1, (int) round($w * $scale));
+	$th = max(1, (int) round($h * $scale));
+
+	if ($mime === 'image/jpeg' && function_exists('imagecreatefromjpeg')) {
+		$im = @imagecreatefromjpeg($src);
+	} elseif ($mime === 'image/png' && function_exists('imagecreatefrompng')) {
+		$im = @imagecreatefrompng($src);
+	} elseif ($mime === 'image/gif' && function_exists('imagecreatefromgif')) {
+		$im = @imagecreatefromgif($src);
+	} elseif ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) {
+		$im = @imagecreatefromwebp($src);
+	} else {
+		$im = false;
+	}
+	if (!$im) {
+		@copy($src, $dest);
+		return false;
+	}
+
+	$thumb = imagecreatetruecolor($tw, $th);
+	if ($mime === 'image/png' || $mime === 'image/gif' || $mime === 'image/webp') {
+		imagealphablending($thumb, false);
+		imagesavealpha($thumb, true);
+		$transparent = imagecolorallocatealpha($thumb, 0, 0, 0, 127);
+		imagefilledrectangle($thumb, 0, 0, $tw, $th, $transparent);
+	}
+	imagecopyresampled($thumb, $im, 0, 0, 0, 0, $tw, $th, $w, $h);
+	$ok = false;
+	if ($mime === 'image/png' && function_exists('imagepng')) {
+		$ok = imagepng($thumb, $dest);
+	} elseif ($mime === 'image/gif' && function_exists('imagegif')) {
+		$ok = imagegif($thumb, $dest);
+	} elseif ($mime === 'image/webp' && function_exists('imagewebp')) {
+		$ok = imagewebp($thumb, $dest, 82);
+	} elseif (function_exists('imagejpeg')) {
+		$ok = imagejpeg($thumb, $dest, 84);
+	}
+	imagedestroy($im);
+	imagedestroy($thumb);
+	if (!$ok) {
+		@copy($src, $dest);
+		return false;
+	}
+	return true;
+}
+
+/**
  * Filesystem path for a pics row (full image or thumb); prefers requested variant, falls back if missing.
  */
 function choosology_pic_filesystem_path(array $row, bool $wantThumb): ?string
