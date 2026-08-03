@@ -105,11 +105,11 @@
     <?php
     if (empty($_SESSION['user']))
     {
-    
-        echo "User Name: <input type='text' name = 'logname' id='loginuser' /><br />
-        Password: <input type='password' name = 'logpass' id = 'loginpass' /><br />
-        <div class='rememberme'><input type ='checkbox' name = 'rememberlogin' id = 'rememberlogin'> <label for='rememberlogin'>Remember me?</label></div><button id = 'loginsubmit'>Submit</button>";
-
+        echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";
+        echo "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />\n";
+        echo "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>";
+        echo "<button type='button' id='loginsubmit'>Submit</button>";
+        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
     }
     else
     {
@@ -154,6 +154,63 @@
     <div id = 'editscreenwindowcontents'></div>
 </div>
 
+</div>
+
+<?php /* Signup intake modal: kept in DOM even when logged in so logout → apply still works. */ ?>
+<div id="signupmodal" class="signup-modal signup-modal--hidden" aria-hidden="true">
+	<div class="signup-modal-backdrop" tabindex="-1"></div>
+	<div class="signup-modal-panel" role="dialog" aria-modal="true" aria-labelledby="signupmodal_title">
+		<div class="signup-modal-header">
+			<div class="signup-modal-heading">
+				<p class="signup-modal-eyebrow">Personnel intake <span class="signup-modal-eyebrow-tag">new researcher</span></p>
+				<h2 class="signup-modal-title" id="signupmodal_title">Lab application</h2>
+			</div>
+			<button type="button" class="signup-modal-x" id="signupmodal_close" aria-label="Close">&times;</button>
+		</div>
+		<form id="signup-form" class="signup-form" action="ajax/signup.php" method="post" novalidate>
+			<p class="signup-lede">Submit an application for Choosology Lab access. Approved applicants receive credentials immediately.</p>
+			<p class="signup-privacy"><strong>Email policy:</strong> we will never send mail you do not ask for.</p>
+
+			<label class="signup-label" for="signup-name">Lab handle</label>
+			<input type="text" id="signup-name" name="name" class="signup-input" maxlength="45" autocomplete="username" required>
+
+			<label class="signup-label" for="signup-email">Contact address</label>
+			<input type="email" id="signup-email" name="email" class="signup-input" maxlength="45" autocomplete="email" required>
+
+			<label class="signup-label" for="signup-pass1">Access credentials</label>
+			<input type="password" id="signup-pass1" name="pass1" class="signup-input" maxlength="72" autocomplete="new-password" required>
+
+			<label class="signup-label" for="signup-pass2">Confirm credentials</label>
+			<input type="password" id="signup-pass2" name="pass2" class="signup-input" maxlength="72" autocomplete="new-password" required>
+
+			<label class="signup-label" for="signup-human" id="signup-human-label">Human verification</label>
+			<input type="text" id="signup-human" name="human_check" class="signup-input" inputmode="numeric" autocomplete="off" required>
+
+			<!-- Honeypot: leave blank -->
+			<div class="signup-honeypot" aria-hidden="true">
+				<label for="signup-fax">Lab fax</label>
+				<input type="text" id="signup-fax" name="lab_fax" tabindex="-1" autocomplete="off">
+			</div>
+
+			<input type="hidden" id="signup-nonce" name="nonce" value="">
+
+			<label class="signup-check">
+				<input type="checkbox" id="signup-welcome" name="welcome_email" checked>
+				<span>Send a single confirmation to this address. It will (eventually) include first-step / tutorial material for new researchers.</span>
+			</label>
+
+			<label class="signup-check">
+				<input type="checkbox" id="signup-newsletter" name="newsletter">
+				<span>Send periodic Lab bulletins (about 1–3 per month) with application updates and recent adventures I might like.</span>
+			</label>
+
+			<div class="signup-actions">
+				<button type="submit" id="signup-submit">File application</button>
+				<button type="button" id="signup-cancel" class="signup-cancel">Cancel</button>
+				<span id="signup-status" class="signup-status" aria-live="polite"></span>
+			</div>
+		</form>
+	</div>
 </div>
 
 <div class='footer' id='footer'>

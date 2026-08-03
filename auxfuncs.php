@@ -761,4 +761,72 @@ function nicedatetime($date, $mode="datetime")
             return date('g:ia \o\n m/d/Y', $phptime);
     }
 }
+
+/**
+ * Basic email validation for signup / legacy registerCheck.
+ */
+function checkEmail($email): bool
+{
+	$email = trim((string) $email);
+	if ($email === '' || strlen($email) > 45) {
+		return false;
+	}
+	return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+/**
+ * Ensure signup preference columns exist (newsletter, welcome_pending).
+ */
+function choosology_users_ensure_signup_columns(mysqli $db): void
+{
+	static $done = false;
+	if ($done) {
+		return;
+	}
+	$done = true;
+	$have = array();
+	$r = @mysqli_query($db, 'SHOW COLUMNS FROM users');
+	if ($r) {
+		while ($row = mysqli_fetch_assoc($r)) {
+			$have[(string) ($row['Field'] ?? '')] = true;
+		}
+	}
+	if (empty($have['newsletter'])) {
+		@mysqli_query($db, 'ALTER TABLE users ADD COLUMN newsletter tinyint(1) NOT NULL DEFAULT 0');
+	}
+	if (empty($have['welcome_pending'])) {
+		@mysqli_query($db, 'ALTER TABLE users ADD COLUMN welcome_pending tinyint(1) NOT NULL DEFAULT 0');
+	}
+}
+
+/**
+ * Attempt a plain-text welcome / confirmation email. Returns true if mail() accepted it.
+ */
+function choosology_send_welcome_email(string $name, string $email): bool
+{
+	if (!function_exists('mail')) {
+		return false;
+	}
+	$name = trim($name);
+	$email = trim($email);
+	if ($name === '' || $email === '' || !checkEmail($email)) {
+		return false;
+	}
+	$subject = 'Choosology Lab — application received';
+	$body = "Hello {$name},\n\n"
+		. "Your application to the Choosology Lab has been filed. You are cleared for access.\n\n"
+		. "Next steps (more tutorial material will land here later):\n"
+		. "  1. Sign in with your lab handle.\n"
+		. "  2. Open My Stuff → Experiments to begin your first experiment.\n"
+		. "  3. Browse the catalog when you want inspiration.\n\n"
+		. "We only email what you asked for on your application.\n\n"
+		. "— The Choosology Lab\n";
+	$from = 'Choosology Lab <noreply@choosology.com>';
+	$headers = 'MIME-Version: 1.0' . "\r\n"
+		. 'Content-Type: text/plain; charset=UTF-8' . "\r\n"
+		. 'From: ' . $from . "\r\n"
+		. 'Reply-To: ' . $from . "\r\n"
+		. 'X-Mailer: Choosology';
+	return (bool) @mail($email, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+}
 ?>

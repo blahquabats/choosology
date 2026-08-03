@@ -24,7 +24,7 @@ Both services are long-running: start each in its own tmux session (e.g. `mariad
 
 ### App behavior gotchas
 
-- There is no registration form wired into the current UI (login-only header). The `regsub` registration path in `authent.php` is also broken by include ordering (`checkEmail()` is called before it is defined), so it 500s. To create a test account, insert directly into `users` using the app's password hashing: `pass = md5("cYo" . <password>)` (the salt `$sel` is `"cYo"`). Then log in through the UI.
+- Signup is available from the login box via **Apply for lab access** (modal → `ajax/signupchallenge.php` + `ajax/signup.php`). Successful signup logs the user in immediately. Optional columns `newsletter` / `welcome_pending` are added automatically (or via `sql/signup_setup.sql`). Welcome mail uses PHP `mail()` when available; otherwise `welcome_pending` stays set for a later send.
 - Passwords are stored as `md5("cYo" . password)` — legacy/insecure, but that is the current scheme.
 - Core end-to-end flow to sanity-check the app: log in (posts to `ajax/authentajax.php`) → My Stuff → Experiments → create a new experiment (posts JSON to `ajax/newadventure.php`, which inserts an `advs` row + first `advscreens` row) → graph editor opens at `#/edit/<id>`.
 - The editor and some UI pull JS/CSS from public CDNs (jQuery UI, jQuery Cycle, Konva, minicolors) at runtime; the page shell works offline but the editor needs outbound internet.
