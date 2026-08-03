@@ -151,6 +151,8 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 						<button type="button" class="adv-preview-clear" id="as_pic_clear" title="Clear icon" aria-label="Clear icon">&times;</button>
 					</div>
 					<p class="adv-preview-tap-hint" id="as_pic_hint">Click image to change</p>
+					<p class="adv-hint adv-icon-square-hint" id="as_pic_square_hint">Experiment icons should be square. Non-square images are scaled to fit.</p>
+					<p class="adv-icon-aspect-warn" id="as_pic_aspect_warn" hidden role="status"></p>
 				</div>
 			</div>
 			<div class="advsettings-media-block">
@@ -442,6 +444,8 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 						var $tile = $("<div/>", {
 							class: "adv-picbrowser-tile",
 							"data-pic-id": String(it.id),
+							"data-pic-w": String(it.width || 0),
+							"data-pic-h": String(it.height || 0),
 							title: cap,
 							role: "button",
 							tabindex: 0
@@ -680,6 +684,9 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				$el.replaceWith($("<img/>", { "class": "adv-preview-img", id: id, src: url, alt: "" }));
 			}
 			$("#" + slotId).removeClass("adv-preview-slot--empty");
+			if (which === "pic") {
+				refreshIconAspectWarnFromUrl(url);
+			}
 		} else {
 			if ($el.is("img")) {
 				$el.replaceWith($("<span/>", { "class": "adv-preview-empty", id: id, text: emptyLabel }));
@@ -687,9 +694,82 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				$el.text(emptyLabel);
 			}
 			$("#" + slotId).addClass("adv-preview-slot--empty");
+			if (which === "pic") {
+				clearIconAspectWarn();
+			}
 		}
 		applyAdvSettingsLivePreview();
 		refreshAdvPicBrowserSelection();
+	}
+
+	function isNearlySquare(w, h) {
+		w = parseInt(w, 10) || 0;
+		h = parseInt(h, 10) || 0;
+		if (w < 1 || h < 1) {
+			return true; // unknown — don't warn
+		}
+		var max = Math.max(w, h);
+		var min = Math.min(w, h);
+		return ((max - min) / max) <= 0.05;
+	}
+
+	function clearIconAspectWarn() {
+		$("#as_pic_aspect_warn").attr("hidden", true).text("");
+	}
+
+	function showIconAspectWarn(w, h) {
+		var $w = $("#as_pic_aspect_warn");
+		if (!$w.length) {
+			return;
+		}
+		$w.text("This image is " + w + "×" + h + " (not square). It will be scaled to fit the icon slot; a square crop looks best.").removeAttr("hidden");
+	}
+
+	function refreshIconAspectWarnFromDims(w, h) {
+		if (isNearlySquare(w, h)) {
+			clearIconAspectWarn();
+			return;
+		}
+		showIconAspectWarn(w, h);
+	}
+
+	function refreshIconAspectWarnFromUrl(url) {
+		if (!url) {
+			clearIconAspectWarn();
+			return;
+		}
+		var img = new Image();
+		img.onload = function () {
+			refreshIconAspectWarnFromDims(img.naturalWidth, img.naturalHeight);
+		};
+		img.onerror = function () {
+			clearIconAspectWarn();
+		};
+		img.src = url;
+	}
+
+	function warnIfNonSquareIcon(w, h) {
+		if (isNearlySquare(w, h)) {
+			return true;
+		}
+		return window.confirm(
+			"This image is " + w + "×" + h + " — experiment icons look best as squares.\n\n" +
+			"It will be scaled to fit the square slot. Use it anyway?"
+		);
+	}
+
+	function applyIconPick(pid, url, w, h) {
+		if (!warnIfNonSquareIcon(w, h)) {
+			return;
+		}
+		$("#as_pic").val(pid);
+		setPicPreview("pic", url);
+		if (!isNearlySquare(w, h)) {
+			showIconAspectWarn(w, h);
+		} else {
+			clearIconAspectWarn();
+		}
+		closeAdvPicModal();
 	}
 
 	function applyAdvSettingsLivePreview() {
@@ -792,11 +872,24 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		if (target === "bgpic") {
 			$("#as_bgpic").val(pid);
 			setPicPreview("bgpic", url);
-		} else {
-			$("#as_pic").val(pid);
-			setPicPreview("pic", url);
+			closeAdvPicModal();
+			return;
 		}
-		closeAdvPicModal();
+		var w = parseInt($t.attr("data-pic-w"), 10) || 0;
+		var h = parseInt($t.attr("data-pic-h"), 10) || 0;
+		if (w > 0 && h > 0) {
+			applyIconPick(pid, url, w, h);
+			return;
+		}
+		// Fallback if library didn't include dimensions: measure the thumb.
+		var probe = new Image();
+		probe.onload = function () {
+			applyIconPick(pid, url, probe.naturalWidth, probe.naturalHeight);
+		};
+		probe.onerror = function () {
+			applyIconPick(pid, url, 0, 0);
+		};
+		probe.src = url;
 	});
 
 	$("#as_picmodal").off("keydown.advPicPick").on("keydown.advPicPick", ".adv-picbrowser-tile", function (e) {
@@ -814,6 +907,14 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		$("#as_bgpic").val("0");
 		setPicPreview("bgpic", "");
 	});
+
+	// Warn if the experiment already has a non-square icon.
+	(function () {
+		var $img = $("#as_pic_preview");
+		if ($img.is("img") && $img.attr("src")) {
+			refreshIconAspectWarnFromUrl($img.attr("src"));
+		}
+	})();
 
 	if (typeof $.fn.minicolors === "function") {
 		$("#advsettingsform .adv-color").minicolors({
