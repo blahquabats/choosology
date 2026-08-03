@@ -748,27 +748,9 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		img.src = url;
 	}
 
-	function warnIfNonSquareIcon(w, h) {
-		if (isNearlySquare(w, h)) {
-			return true;
-		}
-		return window.confirm(
-			"This image is " + w + "×" + h + " — experiment icons look best as squares.\n\n" +
-			"It will be scaled to fit the square slot. Use it anyway?"
-		);
-	}
-
-	function applyIconPick(pid, url, w, h) {
-		if (!warnIfNonSquareIcon(w, h)) {
-			return;
-		}
+	function applyIconPick(pid, url) {
 		$("#as_pic").val(pid);
 		setPicPreview("pic", url);
-		if (!isNearlySquare(w, h)) {
-			showIconAspectWarn(w, h);
-		} else {
-			clearIconAspectWarn();
-		}
 		closeAdvPicModal();
 	}
 
@@ -875,21 +857,7 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			closeAdvPicModal();
 			return;
 		}
-		var w = parseInt($t.attr("data-pic-w"), 10) || 0;
-		var h = parseInt($t.attr("data-pic-h"), 10) || 0;
-		if (w > 0 && h > 0) {
-			applyIconPick(pid, url, w, h);
-			return;
-		}
-		// Fallback if library didn't include dimensions: measure the thumb.
-		var probe = new Image();
-		probe.onload = function () {
-			applyIconPick(pid, url, probe.naturalWidth, probe.naturalHeight);
-		};
-		probe.onerror = function () {
-			applyIconPick(pid, url, 0, 0);
-		};
-		probe.src = url;
+		applyIconPick(pid, url);
 	});
 
 	$("#as_picmodal").off("keydown.advPicPick").on("keydown.advPicPick", ".adv-picbrowser-tile", function (e) {
