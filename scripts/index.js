@@ -208,13 +208,90 @@ $(function() {
                 });
             });
 
+            function choosologyAdminKind() {
+                return ($("#news-kind-update").is(":checked")) ? "update" : "news";
+            }
+
+            function choosologyApplyAdminKind(kind) {
+                kind = (kind === "news") ? "news" : "update";
+                if (kind === "update") {
+                    $("#news-kind-update").prop("checked", true);
+                } else {
+                    $("#news-kind-news").prop("checked", true);
+                }
+                var isUpdate = kind === "update";
+                $("#news-add-headline-label").text(isUpdate ? "Update text" : "Headline");
+                $("#news-add-headline").attr("maxlength", isUpdate ? 225 : 255);
+                $("#news-add-by").prop("disabled", isUpdate);
+                $("#news-add-body").prop("disabled", isUpdate);
+                if (isUpdate) {
+                    $("#news-add-body").removeAttr("required");
+                } else {
+                    $("#news-add-body").attr("required", "required");
+                }
+                $("#news-admin-byline-wrap, #news-admin-body-wrap").toggleClass("news-admin-field--disabled", isUpdate);
+                var editing = $.trim($("#news-edit-id").val()) !== "";
+                if (editing) {
+                    $("#news-add-submit").text(isUpdate ? "Save update" : "Save news item");
+                } else {
+                    $("#news-add-submit").text(isUpdate ? "Add update" : "Add news item");
+                }
+            }
+
+            function choosologyResetAdminForm() {
+                $("#news-edit-id").val("");
+                $("#news-edit-kind").val("");
+                $("#news-add-headline").val("");
+                $("#news-add-body").val("");
+                $("#news-add-by").val("The Grasssmith");
+                $("#news-kind-update").prop("disabled", false);
+                $("#news-kind-news").prop("disabled", false);
+                choosologyApplyAdminKind("update");
+                $("#news-edit-cancel").hide();
+                $("#news-add-status").removeClass("news-admin-status--error").text("");
+            }
+
+            function choosologyReloadUpdatesFeed(page) {
+                var $mount = $("#newswindow #news-updates-mount");
+                if (!$mount.length) {
+                    return;
+                }
+                if (!page) {
+                    page = parseInt($mount.find(".updates-feed").attr("data-page"), 10) || 1;
+                }
+                $mount.css("opacity", 0.55);
+                $mount.load("news.php?fragment=updates&updates_page=" + page, function(responseText, status) {
+                    $mount.css("opacity", 1);
+                    if (status === "error") {
+                        $mount.html("<p class='news-empty'>Could not load updates.</p>");
+                    }
+                });
+            }
+
+            $(document).on("change", "#news-add-form input[name='kind']", function() {
+                // Don't allow switching kind while editing an existing row.
+                if ($.trim($("#news-edit-id").val()) !== "") {
+                    var locked = $("#news-edit-kind").val() || "news";
+                    choosologyApplyAdminKind(locked);
+                    return;
+                }
+                choosologyApplyAdminKind(choosologyAdminKind());
+            });
+
+            // Initial state when News tab loads with the form present.
+            if ($("#news-add-form").length) {
+                choosologyApplyAdminKind(choosologyAdminKind());
+            }
+
             $(document).on("submit", "#news-add-form", function(e) {
                 e.preventDefault();
                 var $form = $(this);
                 var $submit = $("#news-add-submit");
                 var $status = $("#news-add-status");
                 var editId = $.trim($("#news-edit-id").val());
+                var kind = ($.trim($("#news-edit-kind").val()) || choosologyAdminKind());
                 var payload = {
+                    kind: kind,
                     headline: $.trim($("#news-add-headline").val()),
                     by: $.trim($("#news-add-by").val()),
                     body: $.trim($("#news-add-body").val())
@@ -236,7 +313,14 @@ $(function() {
                     dataType: "json"
                 }).done(function(response) {
                     if (!response || !response.ok) {
-                        $status.addClass("news-admin-status--error").text((response && response.error) ? response.error : "Could not add news item.");
+                        $status.addClass("news-admin-status--error").text((response && response.error) ? response.error : "Could not save item.");
+                        return;
+                    }
+
+                    if ((response.kind || kind) === "update") {
+                        choosologyReloadUpdatesFeed(isEdit ? null : 1);
+                        choosologyResetAdminForm();
+                        $status.text(isEdit ? "Update saved." : "Update added.");
                         return;
                     }
 
@@ -267,11 +351,7 @@ $(function() {
                         location.hash = "#/news/" + response.id;
                     }
 
-                    $("#news-add-headline").val("");
-                    $("#news-add-body").val("");
-                    $("#news-edit-id").val("");
-                    $("#news-add-submit").text("Add news item");
-                    $("#news-edit-cancel").hide();
+                    choosologyResetAdminForm();
                     $status.text(isEdit ? "Saved." : "Added.");
                 }).fail(function(xhr, status, err) {
                     var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
@@ -286,23 +366,35 @@ $(function() {
                 var $article = $(this).closest(".news-article");
                 var byline = $.trim($article.find(".news-byline").text()).replace(/^By\s+/i, "");
                 $("#news-edit-id").val(id);
+                $("#news-edit-kind").val("news");
+                $("#news-kind-update").prop("disabled", true);
+                $("#news-kind-news").prop("disabled", true);
+                choosologyApplyAdminKind("news");
                 $("#news-add-headline").val($.trim($article.find(".news-article-title").text()));
                 $("#news-add-by").val(byline || "The Grasssmith");
                 $("#news-add-body").val($.trim($article.find(".news-article-body").html()));
-                $("#news-add-submit").text("Save news item");
                 $("#news-edit-cancel").show();
-                $("#news-add-status").removeClass("news-admin-status--error").text("Editing item #" + id + ".");
+                $("#news-add-status").removeClass("news-admin-status--error").text("Editing news #" + id + ".");
+                $("#news-add-headline").focus();
+            });
+
+            $(document).on("click", ".news-admin-edit-update", function() {
+                var id = $(this).attr("data-id") || "";
+                var text = $(this).attr("data-text") || "";
+                $("#news-edit-id").val(id);
+                $("#news-edit-kind").val("update");
+                $("#news-kind-update").prop("disabled", true);
+                $("#news-kind-news").prop("disabled", true);
+                choosologyApplyAdminKind("update");
+                $("#news-add-headline").val(text);
+                $("#news-add-body").val("");
+                $("#news-edit-cancel").show();
+                $("#news-add-status").removeClass("news-admin-status--error").text("Editing update #" + id + ".");
                 $("#news-add-headline").focus();
             });
 
             $(document).on("click", "#news-edit-cancel", function() {
-                $("#news-edit-id").val("");
-                $("#news-add-headline").val("");
-                $("#news-add-body").val("");
-                $("#news-add-by").val("The Grasssmith");
-                $("#news-add-submit").text("Add news item");
-                $("#news-edit-cancel").hide();
-                $("#news-add-status").removeClass("news-admin-status--error").text("");
+                choosologyResetAdminForm();
             });
 
             $(document).on("click", ".news-admin-delete-current", function() {
@@ -315,7 +407,7 @@ $(function() {
                 $.ajax({
                     type: "POST",
                     url: "ajax/managenews.php",
-                    data: JSON.stringify({ action: "delete", id: id }),
+                    data: JSON.stringify({ action: "delete", id: id, kind: "news" }),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json"
                 }).done(function(response) {
@@ -324,7 +416,7 @@ $(function() {
                         return;
                     }
                     $("#newswindow a.news-card[href='#/news/" + id + "']").remove();
-                    $("#news-edit-cancel").trigger("click");
+                    choosologyResetAdminForm();
                     $status.text("Deleted.");
                     if (window.location.hash === "#/news" || window.location.hash === "#/news/") {
                         $("#newswindow #news-article-mount")
@@ -344,22 +436,41 @@ $(function() {
                 });
             });
 
+            $(document).on("click", ".news-admin-delete-update", function() {
+                var id = $(this).attr("data-id") || "";
+                if (!id || !window.confirm("Delete this minor update?")) {
+                    return;
+                }
+                var $status = $("#news-add-status");
+                $status.removeClass("news-admin-status--error").text("Deleting...");
+                $.ajax({
+                    type: "POST",
+                    url: "ajax/managenews.php",
+                    data: JSON.stringify({ action: "delete", id: id, kind: "update" }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                }).done(function(response) {
+                    if (!response || !response.ok) {
+                        $status.addClass("news-admin-status--error").text((response && response.error) ? response.error : "Could not delete update.");
+                        return;
+                    }
+                    if ($.trim($("#news-edit-id").val()) === String(id) && $("#news-edit-kind").val() === "update") {
+                        choosologyResetAdminForm();
+                    }
+                    choosologyReloadUpdatesFeed();
+                    $status.text("Update deleted.");
+                }).fail(function(xhr, status, err) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
+                    $status.addClass("news-admin-status--error").text(msg);
+                });
+            });
+
             $(document).on("click", "#newswindow .updates-pager-btn[data-updates-page]", function() {
                 var page = parseInt($(this).attr("data-updates-page"), 10);
                 if (!page || page < 1) {
                     return;
                 }
-                var $mount = $("#newswindow #news-updates-mount");
-                if (!$mount.length) {
-                    return;
-                }
-                $mount.css("opacity", 0.55);
-                $mount.load("news.php?fragment=updates&updates_page=" + page, function(responseText, status) {
-                    $mount.css("opacity", 1);
-                    if (status === "error") {
-                        $mount.html("<p class='news-empty'>Could not load updates.</p>");
-                    }
-                });
+                choosologyReloadUpdatesFeed(page);
             });
 
         });
@@ -510,7 +621,11 @@ function showMenuOption(which, param)
                         {
                             var url = conf.load;
                             if(param) url = url+"?"+param;
-                            toshow.load(url);
+                            toshow.load(url, function () {
+                                if (which === "news" && $("#news-add-form").length) {
+                                    choosologyApplyAdminKind(choosologyAdminKind());
+                                }
+                            });
                         }
                     if (which === "mystuff") {
                         try { $("#tabswindow").tabs("refresh"); } catch (err) { /* ignore */ }

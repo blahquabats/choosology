@@ -10,7 +10,8 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'updates') {
 	if ($page < 1) {
 		$page = 1;
 	}
-	choosology_echo_updates_feed($db, $page);
+	$canManageFragment = !empty($_SESSION['user']) && (string) $_SESSION['user'] === 'The Grasssmith';
+	choosology_echo_updates_feed($db, $page, $canManageFragment);
 	exit;
 }
 
@@ -338,7 +339,7 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 				<section class="browse-section browse-section--intro news-updates-section" aria-labelledby="news-updates-heading">
 					<h3 class="browse-section-heading" id="news-updates-heading"><span class="browse-section-num" aria-hidden="true">02</span> Recent updates</h3>
 					<div id="news-updates-mount" class="news-updates-mount">
-						<?php choosology_echo_updates_feed($db, $updatesPage); ?>
+						<?php choosology_echo_updates_feed($db, $updatesPage, $canManageNews); ?>
 					</div>
 				</section>
 				<?php if ($canManageNews && $tableOk[0]) { ?>
@@ -346,18 +347,35 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 					<h3 class="browse-section-heading" id="news-admin-heading"><span class="browse-section-num" aria-hidden="true">03</span> Admin</h3>
 					<form id="news-add-form" class="news-admin-form" action="ajax/addnews.php" method="post">
 						<input type="hidden" id="news-edit-id" name="id" value="">
+						<input type="hidden" id="news-edit-kind" name="edit_kind" value="">
 
-						<label class="news-admin-label" for="news-add-headline">Headline</label>
-						<input type="text" id="news-add-headline" name="headline" maxlength="255" required>
+						<fieldset class="news-admin-kind">
+							<legend class="news-admin-label">Type</legend>
+							<label class="news-admin-radio">
+								<input type="radio" name="kind" id="news-kind-update" value="update" checked>
+								Minor Update
+							</label>
+							<label class="news-admin-radio">
+								<input type="radio" name="kind" id="news-kind-news" value="news">
+								News Post
+							</label>
+						</fieldset>
 
-						<label class="news-admin-label" for="news-add-by">Byline</label>
-						<input type="text" id="news-add-by" name="by" maxlength="45" value="The Grasssmith">
+						<label class="news-admin-label" for="news-add-headline" id="news-add-headline-label">Update text</label>
+						<input type="text" id="news-add-headline" name="headline" maxlength="225" required>
 
-						<label class="news-admin-label" for="news-add-body">Body</label>
-						<textarea id="news-add-body" name="body" rows="7" required></textarea>
+						<div id="news-admin-byline-wrap">
+							<label class="news-admin-label" for="news-add-by">Byline</label>
+							<input type="text" id="news-add-by" name="by" maxlength="45" value="The Grasssmith" disabled>
+						</div>
+
+						<div id="news-admin-body-wrap">
+							<label class="news-admin-label" for="news-add-body">Body</label>
+							<textarea id="news-add-body" name="body" rows="7" disabled></textarea>
+						</div>
 
 						<div class="news-admin-actions">
-							<button type="submit" id="news-add-submit">Add news item</button>
+							<button type="submit" id="news-add-submit">Add update</button>
 							<button type="button" id="news-edit-cancel" style="display:none;">Cancel edit</button>
 							<span id="news-add-status" class="news-admin-status" aria-live="polite"></span>
 						</div>

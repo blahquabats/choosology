@@ -1,6 +1,6 @@
 <?php
 /**
- * Add a news item. Temporarily limited to the site owner account.
+ * Add a news post or minor update. Temporarily limited to the site owner account.
  */
 ob_start();
 require_once __DIR__ . '/../connect.php';
@@ -32,13 +32,47 @@ if (!is_array($data)) {
 	choosology_news_add_json(array('ok' => 0, 'error' => 'Invalid JSON.'));
 }
 
+$kind = isset($data['kind']) ? trim((string) $data['kind']) : 'news';
+if ($kind !== 'update' && $kind !== 'news') {
+	$kind = 'news';
+}
+
 $headline = isset($data['headline']) ? trim((string) $data['headline']) : '';
+if ($headline === '') {
+	choosology_news_add_json(array(
+		'ok' => 0,
+		'error' => $kind === 'update' ? 'Update text is required.' : 'Headline is required.',
+	));
+}
+
+/* ---------- Minor update ---------- */
+if ($kind === 'update') {
+	if (strlen($headline) > 225) {
+		$headline = substr($headline, 0, 225);
+	}
+	$chk = @mysqli_query($db, "SHOW TABLES LIKE 'updates'");
+	if (!$chk || mysqli_num_rows($chk) === 0) {
+		choosology_news_add_json(array('ok' => 0, 'error' => 'The updates table was not found.'));
+	}
+	$esc = mysqli_real_escape_string($db, $headline);
+	$sql = "INSERT INTO updates (`text`, whenposted) VALUES ('$esc', NOW())";
+	if (!mysqli_query($db, $sql)) {
+		choosology_news_add_json(array('ok' => 0, 'error' => 'Could not add update.'));
+	}
+	$id = (int) mysqli_insert_id($db);
+	choosology_news_add_json(array(
+		'ok' => 1,
+		'kind' => 'update',
+		'id' => $id,
+		'text' => $headline,
+		'date' => date('M j, Y'),
+	));
+}
+
+/* ---------- News post ---------- */
 $body = isset($data['body']) ? trim((string) $data['body']) : '';
 $by = isset($data['by']) ? trim((string) $data['by']) : 'The Grasssmith';
 
-if ($headline === '') {
-	choosology_news_add_json(array('ok' => 0, 'error' => 'Headline is required.'));
-}
 if ($body === '') {
 	choosology_news_add_json(array('ok' => 0, 'error' => 'Body is required.'));
 }
@@ -125,6 +159,7 @@ if (strlen($plain) > strlen($excerpt)) {
 
 choosology_news_add_json(array(
 	'ok' => 1,
+	'kind' => 'news',
 	'id' => $id,
 	'headline' => $headline,
 	'excerpt' => $excerpt,

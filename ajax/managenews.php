@@ -1,6 +1,6 @@
 <?php
 /**
- * Edit or delete a news item. Temporarily limited to the site owner account.
+ * Edit or delete a news post or minor update. Temporarily limited to the site owner account.
  */
 ob_start();
 require_once __DIR__ . '/../connect.php';
@@ -34,10 +34,61 @@ if (!is_array($data)) {
 
 $action = isset($data['action']) ? trim((string) $data['action']) : '';
 $id = isset($data['id']) ? (int) $data['id'] : 0;
+$kind = isset($data['kind']) ? trim((string) $data['kind']) : 'news';
+if ($kind !== 'update' && $kind !== 'news') {
+	$kind = 'news';
+}
 if ($id < 1) {
-	choosology_news_manage_json(array('ok' => 0, 'error' => 'Invalid news item.'));
+	choosology_news_manage_json(array('ok' => 0, 'error' => 'Invalid item id.'));
 }
 
+/* ---------- Minor updates ---------- */
+if ($kind === 'update') {
+	$chk = @mysqli_query($db, "SHOW TABLES LIKE 'updates'");
+	if (!$chk || mysqli_num_rows($chk) === 0) {
+		choosology_news_manage_json(array('ok' => 0, 'error' => 'The updates table was not found.'));
+	}
+	$escId = mysqli_real_escape_string($db, (string) $id);
+	$exists = mysqli_query($db, "SELECT id FROM updates WHERE id = '$escId' LIMIT 1");
+	if (!$exists || mysqli_num_rows($exists) === 0) {
+		choosology_news_manage_json(array('ok' => 0, 'error' => 'Update not found.'));
+	}
+
+	if ($action === 'delete') {
+		if (!mysqli_query($db, "DELETE FROM updates WHERE id = '$escId' LIMIT 1")) {
+			choosology_news_manage_json(array('ok' => 0, 'error' => 'Could not delete update.'));
+		}
+		choosology_news_manage_json(array('ok' => 1, 'kind' => 'update', 'id' => $id));
+	}
+
+	if ($action !== 'update') {
+		choosology_news_manage_json(array('ok' => 0, 'error' => 'Unknown action.'));
+	}
+
+	$text = isset($data['headline']) ? trim((string) $data['headline']) : '';
+	if ($text === '' && isset($data['text'])) {
+		$text = trim((string) $data['text']);
+	}
+	if ($text === '') {
+		choosology_news_manage_json(array('ok' => 0, 'error' => 'Update text is required.'));
+	}
+	if (strlen($text) > 225) {
+		$text = substr($text, 0, 225);
+	}
+	$esc = mysqli_real_escape_string($db, $text);
+	$sql = "UPDATE updates SET `text` = '$esc' WHERE id = '$escId' LIMIT 1";
+	if (!mysqli_query($db, $sql)) {
+		choosology_news_manage_json(array('ok' => 0, 'error' => 'Could not update item.'));
+	}
+	choosology_news_manage_json(array(
+		'ok' => 1,
+		'kind' => 'update',
+		'id' => $id,
+		'text' => $text,
+	));
+}
+
+/* ---------- News posts ---------- */
 $chk = @mysqli_query($db, "SHOW TABLES LIKE 'news'");
 if (!$chk || mysqli_num_rows($chk) === 0) {
 	choosology_news_manage_json(array('ok' => 0, 'error' => 'The news table was not found.'));
@@ -75,7 +126,7 @@ if ($action === 'delete') {
 	if (!mysqli_query($db, "DELETE FROM news WHERE id = '$escId' LIMIT 1")) {
 		choosology_news_manage_json(array('ok' => 0, 'error' => 'Could not delete news item.'));
 	}
-	choosology_news_manage_json(array('ok' => 1, 'id' => $id));
+	choosology_news_manage_json(array('ok' => 1, 'kind' => 'news', 'id' => $id));
 }
 
 if ($action !== 'update') {
@@ -133,6 +184,7 @@ if (strlen($plain) > strlen($excerpt)) {
 
 choosology_news_manage_json(array(
 	'ok' => 1,
+	'kind' => 'news',
 	'id' => $id,
 	'headline' => $headline,
 	'excerpt' => $excerpt,

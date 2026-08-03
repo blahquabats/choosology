@@ -3289,6 +3289,82 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     gap: 7px;
 }
 
+.news-admin-kind
+{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+
+.news-admin-kind .news-admin-label,
+.news-admin-kind legend.news-admin-label
+{
+    float: none;
+    width: 100%;
+    padding: 0;
+}
+
+.news-admin-radio
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: #263747;
+    cursor: pointer;
+}
+
+.news-admin-radio input
+{
+    margin: 0;
+}
+
+.news-admin-field--disabled
+{
+    opacity: 0.55;
+}
+
+.lab-feed-item-row
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lab-feed-item-admin
+{
+    display: flex;
+    gap: 6px;
+    margin-left: 2px;
+}
+
+.lab-feed-item-admin button
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border: 1px solid #2d8a5e;
+    border-left: 3px solid #1b5c3d;
+    border-radius: 0 3px 3px 0;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1b5c3d;
+    cursor: pointer;
+}
+
+.lab-feed-item-admin .news-admin-delete-update
+{
+    border-color: #b91c1c;
+    border-left-color: #7f1d1d;
+    color: #7f1d1d;
+}
+
 .news-admin-label
 {
     font-family: Consolas, "Courier New", Courier, monospace;
