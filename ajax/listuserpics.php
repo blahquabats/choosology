@@ -129,12 +129,24 @@ foreach ($pics as $pic) {
 	$title = (string) ($pic['imagename'] ?? $pic['filename'] ?? ('#' . $pid));
 	$cat = trim((string) ($pic['cat'] ?? ''));
 	$tags = choosology_listuserpics_tags_from_cat($cat);
+	$width = 0;
+	$height = 0;
+	$path = choosology_pic_filesystem_path($pic, true);
+	if ($path !== '' && is_file($path)) {
+		$sz = @getimagesize($path);
+		if (is_array($sz) && isset($sz[0], $sz[1])) {
+			$width = (int) $sz[0];
+			$height = (int) $sz[1];
+		}
+	}
 	$items[] = array(
 		'id' => $pid,
 		'title' => $title,
 		'filename' => (string) ($pic['filename'] ?? ''),
 		'cat' => $cat,
 		'tags' => $tags,
+		'width' => $width,
+		'height' => $height,
 		'thumbUrl' => choosology_site_url('ajax/pic.php?id=' . $pid . '&thumb=1'),
 		'imageUrl' => choosology_site_url('ajax/pic.php?id=' . $pid),
 	);
