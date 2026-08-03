@@ -128,6 +128,126 @@ $(function() {
                 timeout: 0,
                 fx: 'fadeout'
             });
+            function choosologyLoginBoxHtml() {
+                return "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />"
+                    + "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />"
+                    + "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>"
+                    + "<button type='button' id='loginsubmit'>Submit</button>"
+                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
+            }
+
+            function choosologyCloseSignupModal() {
+                var $m = $("#signupmodal");
+                if (!$m.length) {
+                    return;
+                }
+                $m.addClass("signup-modal--hidden").attr("aria-hidden", "true");
+                $("body").removeClass("signup-modal-open");
+                $("#signup-status").removeClass("signup-status--error").text("");
+            }
+
+            function choosologyOpenSignupModal() {
+                var $m = $("#signupmodal");
+                if (!$m.length) {
+                    return;
+                }
+                $("#signup-form")[0].reset();
+                $("#signup-welcome").prop("checked", true);
+                $("#signup-newsletter").prop("checked", false);
+                $("#signup-nonce").val("");
+                $("#signup-human-label").text("Human verification");
+                $("#signup-status").removeClass("signup-status--error").text("Preparing intake form…");
+                $m.removeClass("signup-modal--hidden").attr("aria-hidden", "false");
+                $("body").addClass("signup-modal-open");
+                $.ajax({
+                    type: "GET",
+                    url: "ajax/signupchallenge.php",
+                    dataType: "json",
+                    cache: false
+                }).done(function(res) {
+                    if (!res || !res.ok) {
+                        $("#signup-status").addClass("signup-status--error").text((res && res.error) ? res.error : "Could not open intake form.");
+                        return;
+                    }
+                    $("#signup-nonce").val(res.nonce || "");
+                    $("#signup-human-label").text(res.prompt || "Human verification");
+                    $("#signup-status").removeClass("signup-status--error").text("");
+                    $("#signup-name").trigger("focus");
+                }).fail(function() {
+                    $("#signup-status").addClass("signup-status--error").text("Could not open intake form.");
+                });
+            }
+
+            $(document).on("click", "#opensignup", function(e) {
+                e.preventDefault();
+                choosologyOpenSignupModal();
+            });
+            $(document).on("click", "#signupmodal_close, #signup-cancel, #signupmodal .signup-modal-backdrop", function() {
+                choosologyCloseSignupModal();
+            });
+            $(document).on("keydown", function(e) {
+                if (e.key === "Escape" && $("#signupmodal").length && !$("#signupmodal").hasClass("signup-modal--hidden")) {
+                    choosologyCloseSignupModal();
+                }
+            });
+            $(document).on("submit", "#signup-form", function(e) {
+                e.preventDefault();
+                var $submit = $("#signup-submit");
+                var $status = $("#signup-status");
+                var payload = {
+                    name: $.trim($("#signup-name").val()),
+                    email: $.trim($("#signup-email").val()),
+                    pass1: $("#signup-pass1").val(),
+                    pass2: $("#signup-pass2").val(),
+                    human_check: $.trim($("#signup-human").val()),
+                    nonce: $("#signup-nonce").val(),
+                    lab_fax: $("#signup-fax").val(),
+                    welcome_email: $("#signup-welcome").is(":checked") ? 1 : 0,
+                    newsletter: $("#signup-newsletter").is(":checked") ? 1 : 0
+                };
+                $submit.prop("disabled", true);
+                $status.removeClass("signup-status--error").text("Filing application…");
+                $.ajax({
+                    type: "POST",
+                    url: "ajax/signup.php",
+                    data: JSON.stringify(payload),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                }).done(function(res) {
+                    if (!res || !res.ok) {
+                        $status.addClass("signup-status--error").text((res && res.error) ? res.error : "Application rejected.");
+                        $.ajax({
+                            type: "GET",
+                            url: "ajax/signupchallenge.php",
+                            dataType: "json",
+                            cache: false
+                        }).done(function(ch) {
+                            if (ch && ch.ok) {
+                                $("#signup-nonce").val(ch.nonce || "");
+                                $("#signup-human-label").text(ch.prompt || "Human verification");
+                                $("#signup-human").val("");
+                            }
+                        });
+                        return;
+                    }
+                    choosologyCloseSignupModal();
+                    var newtext = "Logged in as " + (res.name || "researcher");
+                    newtext += "<br><span id='logoutsubmit'><a href='#'>log out</a></span>";
+                    var box = $("#topbox");
+                    box.slideUp("slow", "swing", function() {
+                        box.html(newtext);
+                        box.slideDown("slow", "swing", function() {
+                            location.reload();
+                        });
+                    });
+                }).fail(function(xhr, status, err) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
+                    $status.addClass("signup-status--error").text(msg);
+                }).always(function() {
+                    $submit.prop("disabled", false);
+                });
+            });
+
             $(document).on("keypress", "#loginpass", function(e){
             		if (e.which == 13) {
             	    $('#loginsubmit').trigger("click");
@@ -195,9 +315,7 @@ $(function() {
                             if (window.location.hash.indexOf("mystuff") !== -1) {
                                 window.location.hash = "#/home";
                             }
-                            var newtext = "User Name: <input type='text' name = 'logname' id='loginuser' /><br />"
-                                            + "Password: <input type='password' name = 'logpass' id = 'loginpass' /><br />"
-                                            + "<div class='rememberme'><input type ='checkbox' name = 'rememberlogin' id = 'rememberlogin'> <label for='rememberlogin'>Remember me?</label></div><button id = 'loginsubmit'>Submit</button>";
+                            var newtext = choosologyLoginBoxHtml();
                             var box = $("#topbox");
                             box.slideUp("slow","swing", function(){
                                 box.html(newtext);
