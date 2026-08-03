@@ -588,12 +588,17 @@ label.sel:before {
     background: rgba(255, 255, 255, 0.78);
 }
 
+.home-copy-full
+{
+    margin-top: 16px;
+}
+
 .home-copy-grid
 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
-    margin-top: 16px;
+    margin-top: 14px;
 }
 
 .home-copy-card
@@ -606,6 +611,62 @@ label.sel:before {
     background: linear-gradient(165deg, rgba(255, 255, 255, 0.94) 0%, rgba(240, 244, 250, 0.94) 100%);
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.09);
     box-sizing: border-box;
+}
+
+.home-copy-card--full
+{
+    border-left-color: #604b91;
+}
+
+.home-copy-card--full .home-copy-code
+{
+    border-color: #604b91;
+    color: #4b3b77;
+}
+
+.home-copy-card--feed
+{
+    border-left-color: #2d8a5e;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.home-copy-card--feed .home-copy-code
+{
+    border-color: #2d8a5e;
+    color: #1b5c3d;
+}
+
+.home-copy-heading
+{
+    margin: 0 0 10px 42px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #0d2137;
+}
+
+.home-visually-hidden
+{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.home-feed-empty
+{
+    margin: 0 0 0 42px;
+    font-size: 0.88rem;
+    color: #4a5f73;
 }
 
 .home-copy-card p
@@ -728,6 +789,192 @@ label.sel:before {
     {
         align-items: center;
     }
+}
+
+/* Mixed news + updates feed (Home + News tab) */
+.lab-feed-list
+{
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.lab-feed-list--home
+{
+    margin-left: 42px;
+    max-height: 9.75rem; /* ~3 compact feed rows */
+    overflow-y: auto;
+    padding-right: 4px;
+    gap: 4px;
+}
+
+.lab-feed-list--home .lab-feed-item
+{
+    gap: 3px 6px;
+    padding: 4px 7px;
+}
+
+.lab-feed-list--home .lab-feed-text
+{
+    font-size: 0.74rem;
+    line-height: 1.25;
+}
+
+.lab-feed-list--updates
+{
+    max-height: min(28vh, 200px);
+    overflow-y: auto;
+    padding: 2px 4px 4px 0;
+}
+
+.lab-feed-item
+{
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 6px 8px;
+    align-items: baseline;
+    padding: 7px 9px;
+    border: 1px solid #c5d0e0;
+    border-left: 4px solid #5a6b7d;
+    border-radius: 0 7px 7px 0;
+    background: linear-gradient(165deg, #fafbfd 0%, #f0f4fa 100%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+}
+
+a.lab-feed-item:hover
+{
+    border-color: #7aa7c2;
+    box-shadow: 0 3px 10px rgba(40, 116, 166, 0.12);
+    transform: translateY(-1px);
+}
+
+.lab-feed-item--news
+{
+    border-left-color: #2874a6;
+}
+
+.lab-feed-item--update
+{
+    border-left-color: #2d8a5e;
+}
+
+.lab-feed-badge
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 5px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    line-height: 1.2;
+}
+
+.lab-feed-badge--news
+{
+    color: #134056;
+    border-color: #2874a6;
+    background: rgba(40, 116, 166, 0.12);
+}
+
+.lab-feed-badge--update
+{
+    color: #1b5c3d;
+    border-color: #2d8a5e;
+    background: rgba(45, 138, 94, 0.12);
+}
+
+.lab-feed-date
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.54rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5a6b7d;
+    white-space: nowrap;
+}
+
+.lab-feed-text
+{
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    color: #2a3d4d;
+}
+
+.news-updates-section
+{
+    margin-top: 14px;
+}
+
+.news-updates-mount
+{
+    min-height: 3rem;
+}
+
+.updates-feed
+{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.updates-pager
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.updates-pager-btn
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid #2d8a5e;
+    border-left: 3px solid #1b5c3d;
+    border-radius: 0 4px 4px 0;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1b5c3d;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.updates-pager-btn:hover
+{
+    background: #eef8f2;
+}
+
+.updates-pager-btn--disabled
+{
+    opacity: 0.4;
+    cursor: default;
+    border-color: #9aaebb;
+    border-left-color: #7a8b9a;
+    color: #5a6b7d;
+}
+
+.updates-pager-status
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.54rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5a6b7d;
 }
 
 #browsewindow
@@ -2983,7 +3230,7 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: min(70vh, 520px);
+    max-height: min(42vh, 320px);
     overflow-y: auto;
     padding: 2px 4px 4px 0;
     box-sizing: border-box;

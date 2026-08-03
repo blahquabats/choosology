@@ -123,9 +123,9 @@ if (!mysqli_query($db, $sql)) {
 
 $plain = trim(preg_replace('/\s+/', ' ', strip_tags($body)));
 if (function_exists('mb_substr')) {
-	$excerpt = mb_substr($plain, 0, 180, 'UTF-8');
+	$excerpt = mb_substr($plain, 0, 90, 'UTF-8');
 } else {
-	$excerpt = substr($plain, 0, 180);
+	$excerpt = substr($plain, 0, 90);
 }
 if (strlen($plain) > strlen($excerpt)) {
 	$excerpt .= '...';
