@@ -94,11 +94,16 @@ for ($i=1; $i <= 8; $i++)
     {
         $c = explode("|Q-D-|", $screen['choice'.$i]);
         if(!$c[1] || !$c[0]) continue;
+        if ($c[1] == $adv['begin']) continue;
         $choicetext = htmlspecialchars_decode(htmlspecialchars_decode($c[0]));
         $choices .= "<div class='choice' onclick = \"goToScreen('".$c[1]."', '$sid', 0)\">$choicetext</div>";
     }
 }
-if($choices == "") $choices = "";
+if ($choices === '') {
+	$choices = choosology_build_ending_panel_html($db, (int) $id, (int) $sid);
+	$choices .= "<input type='hidden' name='advid' id='advid' value='" . (int) $id . "'>";
+	$choices .= "<input type='hidden' name='screenid' id='screenid' value='" . (int) $sid . "'>";
+}
 
 $offset = "top: -".$adv['borderwidth']."px; left: -".$adv['borderwidth']."px";
 //$choices = "hey look choices";
