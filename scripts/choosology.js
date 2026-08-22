@@ -209,7 +209,7 @@ function submitCAComment(name, screen)
    var post='text='+desc;
    
    $.ajax({
-        url: 'ajax/fetchcomments.php?name='+name+'&screen='+screen,
+        url: 'ajax/fetchcomments.php?name='+name+'&screen='+screen+'&page=1',
         type: "post",
         dataType: 'xml',
         data: {

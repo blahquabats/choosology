@@ -9,21 +9,22 @@ if (isset($_SESSION['user']))
 	$user = $_SESSION['user'];
 }
 
+$error = '0';
 
-  $board=mysqli_real_escape_string($db, $_GET['name']);
-  $screen=mysqli_real_escape_string($db, $_GET['screen']);
+  $board = isset($_GET['name']) ? mysqli_real_escape_string($db, $_GET['name']) : '';
+  $screen = isset($_GET['screen']) ? mysqli_real_escape_string($db, $_GET['screen']) : '0';
   if(!$screen) $screen=0;
   if(isset($_GET['delete']) && $_GET['delete']==1) $delete = mysqli_real_escape_string($db, $_GET['cid']);
   else $delete = 0;
-  $page=abs(mysqli_real_escape_string($db, $_GET['page']));
-  if(!is_numeric($page) || !$page) $page=1;
+  $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+  if($page < 1) $page=1;
   if(!$board) exit;
   if(substr($board, 0, 6) == "byuser") $pagesize = 5;
   else $pagesize = 20;
   echo "<response>";
   $comments="";
    // first any inserting
-   if($_POST['text'] && $user)
+   if(!empty($_POST['text']) && $user)
    {
        if($_POST['text'] == "Enter your comment here...") 
        {
