@@ -91,6 +91,18 @@ var configmenu = {
     // tabs setup
         
 
+
+function initNewsComments($root) {
+    $root = $root || $(document);
+    $root.find(".CAcomments[data-ca-board]").each(function(){
+        var board = $(this).attr("data-ca-board");
+        var screen = $(this).attr("data-screen") || 0;
+        if (board && typeof loadComments === "function") {
+            loadComments(board, 1, screen);
+        }
+    });
+}
+
 $(function() {
             /* View experiment: Map → graph editor (button only exists for owner, multi-screen advs). */
             $(document).on("click", "#mapbutton", function (e) {
@@ -454,6 +466,7 @@ $(function() {
                             .hide("blind", { direction: "up" }, 220, function () {
                                 $(this).load("news.php?id=" + response.id + "&fragment=article", function () {
                                     $(this).show("blind", { direction: "down" }, 260);
+                                    initNewsComments($(this));
                                 });
                             });
                     } else {
@@ -542,6 +555,7 @@ $(function() {
                             .hide("blind", { direction: "up" }, 220, function () {
                                 $(this).load("news.php?id=&fragment=article", function () {
                                     $(this).show("blind", { direction: "down" }, 260);
+                                    initNewsComments($(this));
                                     $("#newswindow .news-card").removeClass("news-card--active").first().addClass("news-card--active");
                                 });
                             });
@@ -643,6 +657,7 @@ function showMenuOption(which, param)
                     return;
                 }
                 $mount.show("blind", { direction: "down" }, 260);
+                initNewsComments($mount);
                 $("#newswindow .news-card").removeClass("news-card--active");
                 if (rid !== "") {
                     $("#newswindow a.news-card[href='#/news/" + rid + "']").addClass("news-card--active");
@@ -742,6 +757,9 @@ function showMenuOption(which, param)
                             toshow.load(url, function () {
                                 if (which === "news" && $("#news-add-form").length) {
                                     choosologyApplyAdminKind(choosologyAdminKind());
+                                }
+                                if (which === "news") {
+                                    initNewsComments(toshow);
                                 }
                             });
                         }

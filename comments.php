@@ -11,7 +11,7 @@
       
       */
       
-      function commentArea($which, $public=true,$readonly=false, $screenid=0, $style="", $commentstext="Comments")
+      function __construct($which, $public=true,$readonly=false, $screenid=0, $style="", $commentstext="Comments")
       {
           $this->commentstext = $commentstext;
           $this->which=$which;
@@ -19,8 +19,8 @@
           $this->readonly=$readonly;
           $this->screenid=$screenid;
           $this->style=$style;
-          if (!$_SESSION['user'] && !$public) return false;
-          if($_SESSION['user'] && !$readonly) $this->buildCommenter();
+          if (empty($_SESSION['user']) && !$public) return false;
+          if(!empty($_SESSION['user']) && !$readonly) $this->buildCommenter();
           if($public) $this->buildComments();
           
       }
@@ -45,7 +45,7 @@
       function buildComments()
       {
           
-           $html="<br><div class='CAcomments' ";
+           $html="<br><div class='CAcomments' data-ca-board='{$this->which}' data-screen='".(int)$this->screenid."' ";
            if($this->style) $html .= "style='{$this->style}'";
            $html.=">
            <h4>
@@ -63,8 +63,7 @@
            </div>
            ";
            $this->html.=$html;
-           $this->script.="window.onload=loadComments('{$this->which}',1);
-           ";
+           $this->script.="if(typeof loadComments==='function'){loadComments('{$this->which}',1,".(int)$this->screenid.");}";
       }
       
       function display($return=false)
@@ -72,11 +71,13 @@
       if(!$return)
        {
        echo $this->html;
-       echo "<script>".$this->script."</script>";
+       if($this->script !== '') echo "<script>".$this->script."</script>";
        }
        else 
        {
-       return $this->html;
+       $out = $this->html;
+       if($this->script !== '') $out .= "<script>".$this->script."</script>";
+       return $out;
       }
       }
       function displayScript()

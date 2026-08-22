@@ -187,6 +187,12 @@ function choosology_news_echo_main_article_html(
 			echo '<button type="button" class="news-admin-delete-current" data-id="' . $id . '">Delete item</button>';
 			echo '</div>';
 		}
+		if ($id > 0) {
+			echo '<div class="news-comments" id="news-comments-' . $id . '">';
+			$comments = new commentArea('news' . $id, true, false, 0, '', 'Discussion');
+			echo $comments->display(true);
+			echo '</div>';
+		}
 		echo '</article>';
 		return;
 	}

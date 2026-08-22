@@ -6957,3 +6957,53 @@ body.signup-modal-open
 {
     color: #a11;
 }
+
+
+/* Comment author avatars / byline */
+.CAbyline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.CAbyline-main {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.CAavatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  flex: 0 0 auto;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: #ddd;
+}
+.CAavatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #444;
+  line-height: 1;
+}
+.CAusername {
+  font-weight: 700;
+}
+.CAdate {
+  font-weight: 600;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.news-comments {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0,0,0,0.12);
+}
+.news-comments .CAcomments {
+  width: 100%;
+}

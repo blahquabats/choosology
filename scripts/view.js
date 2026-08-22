@@ -8,12 +8,7 @@ function goToScreen(screenid, fromscreen, reverse)
         complete: function()
         {
             $(".choicecover").show();
-            $(".choicecontainer").hover(function(){
-                $(".commentsdiv").removeClass("hidecomments");
-                $(".choicecover").fadeOut("fast");
-                },function(){
-                $(".choicecover").fadeIn("fast");
-                });
+            bindEndingReveal($(".choicecontainer"));
             replaceScreen(screenid, fromscreen, reverse);
         }
     });
@@ -30,7 +25,7 @@ function reloadScreen(screenid)
     {
         var response = $.parseJSON(text);
         $("#choicemeat").html(response.choices);
-        $(".commentsdiv").removeClass("hidecomments");
+        bindEndingReveal($(".choicecontainer"));
         checkComments();
     });
 }
@@ -114,14 +109,23 @@ function checkComments()
     }
 }
 
-    $(".choicecontainer").hover(function(){
-        $(".commentsdiv").removeClass("hidecomments");
-        $(".choicecover").fadeOut("fast");
-        },function(){
-        $(".choicecover").fadeIn("fast");
+    function bindEndingReveal($box) {
+        $box.off("mouseenter.ending mouseleave.ending click.ending");
+        $box.on("mouseenter.ending", function(){
+            $(".commentsdiv").removeClass("hidecomments");
+            $(".choicecover").fadeOut("fast");
         });
-    $(".choicecontainer").click(function(){
-        $(".commentsdiv").removeClass("hidecomments");
-        $(".choicecover").fadeOut("fast");
-        $(".choicecontainer").off("mouseenter mouseleave");
+        $box.on("mouseleave.ending", function(){
+            if (!$box.data("commentsPinned")) {
+                $(".commentsdiv").addClass("hidecomments");
+            }
+            $(".choicecover").fadeIn("fast");
         });
+        $box.on("click.ending", function(){
+            $box.data("commentsPinned", true);
+            $(".commentsdiv").removeClass("hidecomments");
+            $(".choicecover").fadeOut("fast");
+            $box.off("mouseenter.ending mouseleave.ending");
+        });
+    }
+    bindEndingReveal($(".choicecontainer"));
