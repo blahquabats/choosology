@@ -78,13 +78,13 @@ if (!checkEmail($email)) {
 	choosology_signup_json(array('ok' => 0, 'error' => 'Enter a valid contact address.'));
 }
 if ($pass1 !== $pass2) {
-	choosology_signup_json(array('ok' => 0, 'error' => 'Access credentials do not match.'));
+	choosology_signup_json(array('ok' => 0, 'error' => 'Passwords do not match.'));
 }
 if (strlen($pass1) < 5) {
-	choosology_signup_json(array('ok' => 0, 'error' => 'Credentials must be at least 5 characters.'));
+	choosology_signup_json(array('ok' => 0, 'error' => 'Password must be at least 5 characters.'));
 }
 if (strlen($pass1) > 72) {
-	choosology_signup_json(array('ok' => 0, 'error' => 'Credentials are too long.'));
+	choosology_signup_json(array('ok' => 0, 'error' => 'Password is too long.'));
 }
 
 choosology_users_ensure_signup_columns($db);
