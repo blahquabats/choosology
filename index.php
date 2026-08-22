@@ -168,7 +168,7 @@
 			<button type="button" class="signup-modal-x" id="signupmodal_close" aria-label="Close">&times;</button>
 		</div>
 		<form id="signup-form" class="signup-form" action="ajax/signup.php" method="post" novalidate>
-			<p class="signup-lede">Submit an application for Choosology Lab access. Approved applicants receive credentials immediately.</p>
+			<p class="signup-lede">Submit an application for Choosology Lab access. Approved applicants receive access immediately.</p>
 			<p class="signup-privacy"><strong>Email policy:</strong> we will never send mail you do not ask for.</p>
 
 			<label class="signup-label" for="signup-name">Lab handle</label>
@@ -177,10 +177,10 @@
 			<label class="signup-label" for="signup-email">Contact address</label>
 			<input type="email" id="signup-email" name="email" class="signup-input" maxlength="45" autocomplete="email" required>
 
-			<label class="signup-label" for="signup-pass1">Access credentials</label>
+			<label class="signup-label" for="signup-pass1">Password</label>
 			<input type="password" id="signup-pass1" name="pass1" class="signup-input" maxlength="72" autocomplete="new-password" required>
 
-			<label class="signup-label" for="signup-pass2">Confirm credentials</label>
+			<label class="signup-label" for="signup-pass2">Confirm password</label>
 			<input type="password" id="signup-pass2" name="pass2" class="signup-input" maxlength="72" autocomplete="new-password" required>
 
 			<label class="signup-label" for="signup-human" id="signup-human-label">Human verification</label>
@@ -196,7 +196,7 @@
 
 			<label class="signup-check">
 				<input type="checkbox" id="signup-welcome" name="welcome_email" checked>
-				<span>Send a single confirmation to this address. It will (eventually) include first-step / tutorial material for new researchers.</span>
+				<span>Send a single confirmation to this address.</span>
 			</label>
 
 			<label class="signup-check">
