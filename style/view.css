@@ -291,6 +291,7 @@
 .ending-panel-rate .tinystarsholder
 {
     clear: both;
+    overflow: hidden; /* contain floated .star children */
     margin-left: auto;
     margin-right: auto;
 }
