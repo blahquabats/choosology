@@ -65,14 +65,14 @@ $screen = getScreenInfo($sid);
 //16345 for lots of choices
 if ($adv['pic'] && choosology_adv_pic_usable_for_display($adv['pic'])) {
 	$pu = getPicUrl($adv['pic'], true);
-	$image = $pu !== '' ? "<img class='advpic' src=\"" . htmlspecialchars($pu, ENT_QUOTES, 'UTF-8') . "\" />" : "";
+	$image = $pu !== '' ? "<img class='advpic' alt='' src=\"" . htmlspecialchars($pu, ENT_QUOTES, 'UTF-8') . "\" />" : "";
 } else {
 	$image = "";
 }
 
 // foreground/background should be screen pic->screencolor->advpic->advcolor
 if ($screen['screenbgcolor']) $bg = "background-color: ".$screen['screenbgcolor'];
-else if ($adv['bgpic']) {
+else if ($adv['bgpic'] && choosology_adv_pic_usable_for_display($adv['bgpic'])) {
 	$bgu = getPicUrl($adv['bgpic'], false);
 	$bg = $bgu !== '' ? "background-image: url(\"" . htmlspecialchars($bgu, ENT_QUOTES, 'UTF-8') . "\")" : "background-color: ".$adv['bg'];
 } else $bg = "background-color: ".$adv['bg'];
@@ -107,7 +107,9 @@ if ($choices === '') {
 
 $offset = "top: -".$adv['borderwidth']."px; left: -".$adv['borderwidth']."px";
 //$choices = "hey look choices";
-$text = htmlspecialchars_decode(htmlspecialchars_decode($screen['text']));
+$text = choosology_omit_unreachable_pic_images(
+	htmlspecialchars_decode(htmlspecialchars_decode($screen['text']))
+);
 /*$text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.";
 */

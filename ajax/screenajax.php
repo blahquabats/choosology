@@ -13,7 +13,9 @@ if (isset($_POST['screen']))
     $screen = $res[0];
     if(!$screen) die(json_encode($response)); // just fail
     $advused = $screen['advused'];
-    $text = htmlspecialchars_decode(htmlspecialchars_decode($screen['text']));
+    $text = choosology_omit_unreachable_pic_images(
+        htmlspecialchars_decode(htmlspecialchars_decode($screen['text']))
+    );
     $response['text'] = nl2br($text)."<br/><div class='spacebox'>&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; 
     &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; --</div>";
     
@@ -39,7 +41,7 @@ if (isset($_POST['screen']))
     
     // foreground/background should be screen pic->screencolor->advpic->advcolor
     if ($screen['screenbgcolor']) $bg = "background-color: ".$screen['screenbgcolor'];
-    else if ($screen['bgpic']) {
+    else if ($screen['bgpic'] && choosology_adv_pic_usable_for_display($screen['bgpic'])) {
         $bgu = getPicUrl($screen['bgpic'], false);
         $bg = $bgu !== '' ? "background-image: url(\"" . htmlspecialchars($bgu, ENT_QUOTES, 'UTF-8') . "\")" : "background-color: ".$screen['bg'];
     }

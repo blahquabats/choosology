@@ -345,6 +345,40 @@ function choosology_adv_pic_usable_for_display($picId): bool
 }
 
 /**
+ * Remove &lt;img&gt; tags that point at ajax/pic.php ids whose files are missing on disk.
+ * Used when rendering play/view HTML so missing library files leave no broken-image chrome or alt text.
+ * Non-library images are left alone (the play UI hides those on load error).
+ */
+function choosology_omit_unreachable_pic_images(string $html): string
+{
+	if ($html === '' || stripos($html, '<img') === false) {
+		return $html;
+	}
+	return (string) preg_replace_callback('/<img\b[^>]*>/i', function (array $m): string {
+		$tag = $m[0];
+		if (preg_match('/\bsrc\s*=\s*"([^"]*)"/i', $tag, $sm)) {
+			$src = html_entity_decode($sm[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		} elseif (preg_match("/\bsrc\s*=\s*'([^']*)'/i", $tag, $sm)) {
+			$src = html_entity_decode($sm[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		} else {
+			return '';
+		}
+		$src = trim($src);
+		$parts = parse_url($src);
+		$path = isset($parts['path']) ? str_replace('\\', '/', (string) $parts['path']) : '';
+		$query = isset($parts['query']) ? (string) $parts['query'] : '';
+		if (preg_match('#(?:.*/)?ajax/pic\.php$#i', $path)) {
+			parse_str($query, $qp);
+			$id = isset($qp['id']) ? (int) $qp['id'] : 0;
+			if ($id < 1 || !choosology_adv_pic_usable_for_display($id)) {
+				return '';
+			}
+		}
+		return $tag;
+	}, $html);
+}
+
+/**
  * Whether an <img src> is allowed in saved screen HTML: Choosology library URLs or http(s)// URLs whose path ends in a common raster/vector image extension.
  */
 function choosology_screen_html_img_src_allowed(string $src): bool
