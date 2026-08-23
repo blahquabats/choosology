@@ -31,17 +31,7 @@ if (isset($_POST['screen']))
     }
     if($choices == "") 
     {
-        $choices = "<br />You have reached an end to the experiment!<br /><br />";
-        if($name) $choices .= "Please rate your experience:<br />";
-        else $choices .= "Log in to rate this experiment!<br/>";
-        $choices .= assembleRating($advused, false);
-        $choices .= "<br /><hr />
-        <div class ='commentsdiv hidecomments commentsdiv-$screenid'>
-        ";
-        $comments=new commentArea("adv".$advused, true, false);
-        $choices .= $comments->display(true);
-        $choices .= "</div>
-        <input type='hidden' name='commentsexist' id='commentsexist' value='1'>";
+        $choices = choosology_build_ending_panel_html($db, (int) $advused, (int) $screenid);
     }
     $choices .= "<input type='hidden' name='advid' id='advid' value='$advused'>";
     $choices .= "<input type='hidden' name='screenid' id='screenid' value='$screenid'>";

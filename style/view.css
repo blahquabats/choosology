@@ -158,6 +158,178 @@
     display:none;
 }
 
+/* ---- End-of-experiment panel (light structure; inherits adventure styling) ---- */
+.ending-panel
+{
+    display: block;
+    box-sizing: border-box;
+    margin: 6px 0 10px;
+    padding: 10px 4px 8px;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    /* Leave color/font to the adventure’s .choices / box styling */
+    font-size: inherit;
+    line-height: 1.4;
+}
+
+.ending-panel-eyebrow
+{
+    margin: 0 0 6px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.ending-panel-eyebrow-tag
+{
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 5px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    opacity: 0.9;
+}
+
+.ending-panel-title
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 8px;
+    padding: 6px 10px 6px 8px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: 0 6px 6px 0;
+    border-left: 4px solid currentColor;
+    background: transparent;
+    box-shadow: none;
+}
+
+.ending-panel-title::before
+{
+    content: "END";
+    flex-shrink: 0;
+    padding: 2px 6px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+}
+
+.ending-panel-lede
+{
+    margin: 0 0 10px;
+    font-size: inherit;
+    opacity: 0.95;
+}
+
+.ending-panel-progress
+{
+    margin: 0 0 12px;
+    padding: 8px 10px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    background: transparent;
+    opacity: 0.95;
+}
+
+.ending-panel-progress-count
+{
+    margin: 0 0 6px;
+    font-size: inherit;
+}
+
+.ending-panel-progress-count:last-child
+{
+    margin-bottom: 0;
+}
+
+.ending-panel-progress-more,
+.ending-panel-progress-done
+{
+    margin: 0;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+    opacity: 0.85;
+}
+
+.ending-panel-rate
+{
+    clear: both;
+    margin: 0 0 8px;
+    text-align: center;
+}
+
+.ending-panel-rate-label
+{
+    margin: 0 0 6px;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.75;
+}
+
+/* Stars float; keep average / “you haven’t rated” lines full-width + centered */
+.ending-panel-rate .starsholder,
+.ending-panel-rate .tinystarsholder
+{
+    clear: both;
+    overflow: hidden; /* contain floated .star children */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ending-panel-rate [class^="rateresponse"],
+.ending-panel-rate [class^="rateyours"]
+{
+    display: block;
+    clear: both;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    text-align: center !important;
+    white-space: normal !important;
+}
+
+.ending-panel-rule
+{
+    border: 0;
+    border-top: 1px solid currentColor;
+    margin: 12px 0 8px;
+    opacity: 0.35;
+}
+
+.ending-panel .commentsdiv
+{
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: 0;
+    bottom: auto;
+    right: auto;
+}
+
+
 .spacebox
 {
     visibility:hidden;
