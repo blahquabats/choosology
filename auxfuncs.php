@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'paths-config.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'font-options.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'messagesfunc.php';
 require_once("authent.php");
 require_once("comments.php");
 require_once("buildadvflag.php");
@@ -94,13 +95,24 @@ function getAdv($advid)
 
 function getNewMessages()
 {
-    $checkuser = $_SESSION['user'];
-    $q = "select count(*) from messages where to_user = '$checkuser' and seen=0";
-    $res = runquery($q);
-    $r = mysqli_fetch_array($res);
-    $number = $r[0];
-    if (!$number) $number = "0";
-    return $number;
+	if (empty($_SESSION['user'])) {
+		return '0';
+	}
+	if (function_exists('choosology_unread_message_count')) {
+		return (string) choosology_unread_message_count((string) $_SESSION['user']);
+	}
+	$checkuser = mysqli_real_escape_string($GLOBALS['db'], (string) $_SESSION['user']);
+	$q = "select count(*) from messages where to_user = '$checkuser' and seen=0 and IFNULL(to_deleted,0)=0";
+	$res = runquery($q);
+	if (!$res) {
+		return '0';
+	}
+	$r = mysqli_fetch_array($res);
+	$number = $r[0];
+	if (!$number) {
+		$number = '0';
+	}
+	return $number;
 }
 
 function playerDir($who = "")

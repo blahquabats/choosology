@@ -58,6 +58,7 @@
     <script src="scripts/sammy.js"></script>
     
     <script src='scripts/index.js'></script>
+    <script src='scripts/messages.js'></script>
     <script src='scripts/routes.js'></script>
 
 
@@ -113,7 +114,16 @@
     }
     else
     {
-        echo "Logged in as ".$_SESSION['user'];
+        $unreadMsg = (int) getNewMessages();
+        $unreadAttr = $unreadMsg > 0 ? (string) $unreadMsg : '0';
+        $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
+        echo "<div class='msg-login-row'>";
+        echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='Messages' aria-label='Messages'>";
+        echo "<span class='msg-login-notify-label'>Msg</span>";
+        echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "</button>";
+        echo "</div>";
         echo "<br/> <span id='logoutsubmit'> <a href='#'> log out </a> </span>";
     }
     ?>
@@ -125,7 +135,10 @@
         
         <li><a href="mystuff/experiments.php" id='mystuff-experiments' class='tabsa' data-loc='experiments'>Experiments</a></li>
         <li><a href="mystuff/office.php" id='mystuff-office' class='tabsa' data-loc='office'>My Office</a></li>
-        <li><a href="mystuff/messages.php" id='mystuff-messages' class='tabsa' data-loc='messages'>Messages (1)</a></li>
+        <li><a href="mystuff/messages.php" id='mystuff-messages' class='tabsa' data-loc='messages'>Messages<?php
+            $tabUnread = (int) getNewMessages();
+            echo $tabUnread > 0 ? (' (' . $tabUnread . ')') : '';
+        ?></a></li>
         <li><a href="mystuff/resources.php" id='mystuff-resources' class='tabsa' data-loc='resources'>Resources</a></li>
         <li><a href="mystuff/degrees.php" id='mystuff-degrees' class='tabsa' data-loc='degrees'>Degrees</a></li>
         <li><a href="mystuff/account.php" id='mystuff-account' class='tabsa' data-loc='account'>My Information</a></li>
