@@ -47,7 +47,7 @@ $linkcolor = htmlspecialchars((string) ($adv['linkcolor'] ?? ''), ENT_QUOTES, 'U
 $useAutoText = trim((string) ($adv['textcolor'] ?? '')) === '';
 $useAutoLink = trim((string) ($adv['linkcolor'] ?? '')) === '';
 $defaultFontKey = choosology_adv_default_font_key($adv);
-$fontCatalog = choosology_font_catalog();
+$fontCatalogGrouped = choosology_font_catalog_grouped();
 
 $iconPreviewUrl = ($picVal !== '' && ctype_digit($picVal)) ? getPicUrl((int) $picVal, true) : '';
 $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
@@ -258,11 +258,18 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				</div>
 				<div class="adv-lf-slot-control">
 					<select id="as_font" class="advsettings-input">
-						<?php foreach ($fontCatalog as $fkey => $fmeta) {
-							$flabel = htmlspecialchars($fmeta['label'], ENT_QUOTES, 'UTF-8');
-							$fstack = htmlspecialchars($fmeta['stack'], ENT_QUOTES, 'UTF-8');
-							$sel = ($fkey === $defaultFontKey) ? ' selected' : '';
-							echo "<option value=\"" . htmlspecialchars($fkey, ENT_QUOTES, 'UTF-8') . "\" data-stack=\"{$fstack}\"{$sel}>{$flabel}</option>";
+						<?php foreach ($fontCatalogGrouped as $groupLabel => $groupFonts) {
+							if ($groupFonts === array()) {
+								continue;
+							}
+							echo '<optgroup label="' . htmlspecialchars($groupLabel, ENT_QUOTES, 'UTF-8') . '">';
+							foreach ($groupFonts as $fkey => $fmeta) {
+								$flabel = htmlspecialchars($fmeta['label'], ENT_QUOTES, 'UTF-8');
+								$fstack = htmlspecialchars($fmeta['stack'], ENT_QUOTES, 'UTF-8');
+								$sel = ($fkey === $defaultFontKey) ? ' selected' : '';
+								echo "<option value=\"" . htmlspecialchars($fkey, ENT_QUOTES, 'UTF-8') . "\" data-stack=\"{$fstack}\"{$sel}>{$flabel}</option>";
+							}
+							echo '</optgroup>';
 						} ?>
 					</select>
 				</div>

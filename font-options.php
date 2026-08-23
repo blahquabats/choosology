@@ -1,60 +1,197 @@
 <?php
 /**
- * Shared adventure / editor font catalog (site GUI faces + common reader fonts).
+ * Shared adventure / editor font catalog.
+ * Merges Choosology site GUI faces with TinyMCE's default font list so nothing
+ * disappears when font_family_formats is set explicitly.
  */
 declare(strict_types=1);
 
 /**
- * @return array<string, array{label: string, stack: string}>
+ * Choosology site / lab UI faces (webfonts + shell stacks from choosology.css).
+ *
+ * @return array<string, array{label: string, stack: string, group: string}>
  */
-function choosology_font_catalog(): array
+function choosology_font_site_catalog(): array
 {
 	return array(
 		'trebuchet' => array(
 			'label' => 'Trebuchet MS',
 			'stack' => '"Trebuchet MS", Verdana, Arial, sans-serif',
-		),
-		'verdana' => array(
-			'label' => 'Verdana',
-			'stack' => 'Verdana, Geneva, sans-serif',
-		),
-		'arial' => array(
-			'label' => 'Arial',
-			'stack' => 'Arial, Helvetica, sans-serif',
+			'group' => 'site',
 		),
 		'consolas' => array(
 			'label' => 'Consolas',
 			'stack' => 'Consolas, "Courier New", Courier, monospace',
-		),
-		'georgia' => array(
-			'label' => 'Georgia',
-			'stack' => 'Georgia, "Times New Roman", Times, serif',
-		),
-		'times' => array(
-			'label' => 'Times New Roman',
-			'stack' => '"Times New Roman", Times, serif',
-		),
-		'courier' => array(
-			'label' => 'Courier New',
-			'stack' => '"Courier New", Courier, monospace',
-		),
-		'comic' => array(
-			'label' => 'Comic Sans MS',
-			'stack' => '"Comic Sans MS", "Segoe Print", cursive, sans-serif',
+			'group' => 'site',
 		),
 		'segoe_print' => array(
 			'label' => 'Segoe Print',
 			'stack' => '"Segoe Print", "Comic Sans MS", cursive, sans-serif',
+			'group' => 'site',
 		),
 		'eraser' => array(
 			'label' => 'Eraser',
 			'stack' => '"Eraser", "Trebuchet MS", sans-serif',
+			'group' => 'site',
 		),
 		'zx_spectrum' => array(
 			'label' => 'ZX Spectrum',
 			'stack' => '"ZX Spectrum", monospace',
+			'group' => 'site',
+		),
+		'bradley_hand' => array(
+			'label' => 'Bradley Hand ITC',
+			'stack' => '"Bradley Hand ITC", "Segoe Print", cursive, sans-serif',
+			'group' => 'site',
 		),
 	);
+}
+
+/**
+ * TinyMCE 7 default font_family_formats entries (standard + symbol faces).
+ *
+ * @return array<string, array{label: string, stack: string, group: string}>
+ */
+function choosology_font_tinymce_builtin_catalog(): array
+{
+	return array(
+		'andale_mono' => array(
+			'label' => 'Andale Mono',
+			'stack' => '"Andale Mono", Times, monospace',
+			'group' => 'standard',
+		),
+		'arial' => array(
+			'label' => 'Arial',
+			'stack' => 'Arial, Helvetica, sans-serif',
+			'group' => 'standard',
+		),
+		'arial_black' => array(
+			'label' => 'Arial Black',
+			'stack' => '"Arial Black", "Avant Garde", sans-serif',
+			'group' => 'standard',
+		),
+		'book_antiqua' => array(
+			'label' => 'Book Antiqua',
+			'stack' => '"Book Antiqua", Palatino, serif',
+			'group' => 'standard',
+		),
+		'comic' => array(
+			'label' => 'Comic Sans MS',
+			'stack' => '"Comic Sans MS", sans-serif',
+			'group' => 'standard',
+		),
+		'courier' => array(
+			'label' => 'Courier New',
+			'stack' => '"Courier New", Courier, monospace',
+			'group' => 'standard',
+		),
+		'georgia' => array(
+			'label' => 'Georgia',
+			'stack' => 'Georgia, Palatino, serif',
+			'group' => 'standard',
+		),
+		'helvetica' => array(
+			'label' => 'Helvetica',
+			'stack' => 'Helvetica, Arial, sans-serif',
+			'group' => 'standard',
+		),
+		'impact' => array(
+			'label' => 'Impact',
+			'stack' => 'Impact, Chicago, sans-serif',
+			'group' => 'standard',
+		),
+		'tahoma' => array(
+			'label' => 'Tahoma',
+			'stack' => 'Tahoma, Arial, Helvetica, sans-serif',
+			'group' => 'standard',
+		),
+		'terminal' => array(
+			'label' => 'Terminal',
+			'stack' => 'Terminal, Monaco, monospace',
+			'group' => 'standard',
+		),
+		'times' => array(
+			'label' => 'Times New Roman',
+			'stack' => '"Times New Roman", Times, serif',
+			'group' => 'standard',
+		),
+		'verdana' => array(
+			'label' => 'Verdana',
+			'stack' => 'Verdana, Geneva, sans-serif',
+			'group' => 'standard',
+		),
+		'symbol' => array(
+			'label' => 'Symbol',
+			'stack' => 'Symbol',
+			'group' => 'symbol',
+		),
+		'webdings' => array(
+			'label' => 'Webdings',
+			'stack' => 'Webdings',
+			'group' => 'symbol',
+		),
+		'wingdings' => array(
+			'label' => 'Wingdings',
+			'stack' => 'Wingdings, "Zapf Dingbats"',
+			'group' => 'symbol',
+		),
+	);
+}
+
+/**
+ * Full merged catalog: site faces first, then TinyMCE defaults not already listed.
+ *
+ * @return array<string, array{label: string, stack: string, group: string}>
+ */
+function choosology_font_catalog(): array
+{
+	static $merged = null;
+	if (is_array($merged)) {
+		return $merged;
+	}
+	$merged = choosology_font_site_catalog();
+	$seenLabels = array();
+	foreach ($merged as $meta) {
+		$seenLabels[strtolower($meta['label'])] = true;
+	}
+	foreach (choosology_font_tinymce_builtin_catalog() as $key => $meta) {
+		$labelKey = strtolower($meta['label']);
+		if (isset($seenLabels[$labelKey])) {
+			continue;
+		}
+		$merged[$key] = $meta;
+		$seenLabels[$labelKey] = true;
+	}
+	return $merged;
+}
+
+/**
+ * Catalog grouped for HTML &lt;optgroup&gt; selects.
+ *
+ * @return array<string, array<string, array{label: string, stack: string, group: string}>>
+ */
+function choosology_font_catalog_grouped(): array
+{
+	$groups = array(
+		'site' => array(),
+		'standard' => array(),
+		'symbol' => array(),
+	);
+	$labels = array(
+		'site' => 'Choosology & site UI',
+		'standard' => 'Standard web fonts',
+		'symbol' => 'Symbol & decorative',
+	);
+	$out = array();
+	foreach ($labels as $gid => $title) {
+		$out[$title] = array();
+	}
+	foreach (choosology_font_catalog() as $key => $meta) {
+		$gid = $meta['group'] ?? 'standard';
+		$title = $labels[$gid] ?? $labels['standard'];
+		$out[$title][$key] = $meta;
+	}
+	return $out;
 }
 
 /**
@@ -76,38 +213,34 @@ function choosology_font_normalize_key(?string $raw): string
 			return $key;
 		}
 	}
-	if (stripos($raw, 'trebuchet') !== false) {
-		return 'trebuchet';
-	}
-	if (stripos($raw, 'verdana') !== false) {
-		return 'verdana';
-	}
-	if (stripos($raw, 'consolas') !== false) {
-		return 'consolas';
-	}
-	if (stripos($raw, 'comic sans') !== false) {
-		return 'comic';
-	}
-	if (stripos($raw, 'segoe print') !== false) {
-		return 'segoe_print';
-	}
-	if (stripos($raw, 'eraser') !== false) {
-		return 'eraser';
-	}
-	if (stripos($raw, 'zx spectrum') !== false) {
-		return 'zx_spectrum';
-	}
-	if (stripos($raw, 'georgia') !== false) {
-		return 'georgia';
-	}
-	if (stripos($raw, 'times') !== false) {
-		return 'times';
-	}
-	if (stripos($raw, 'courier') !== false) {
-		return 'courier';
-	}
-	if (stripos($raw, 'arial') !== false) {
-		return 'arial';
+	$needles = array(
+		'andale' => 'andale_mono',
+		'arial black' => 'arial_black',
+		'book antiqua' => 'book_antiqua',
+		'bradley' => 'bradley_hand',
+		'comic sans' => 'comic',
+		'consolas' => 'consolas',
+		'courier' => 'courier',
+		'eraser' => 'eraser',
+		'georgia' => 'georgia',
+		'helvetica' => 'helvetica',
+		'impact' => 'impact',
+		'segoe print' => 'segoe_print',
+		'symbol' => 'symbol',
+		'tahoma' => 'tahoma',
+		'terminal' => 'terminal',
+		'times' => 'times',
+		'trebuchet' => 'trebuchet',
+		'verdana' => 'verdana',
+		'webdings' => 'webdings',
+		'wingdings' => 'wingdings',
+		'zx spectrum' => 'zx_spectrum',
+		'arial' => 'arial',
+	);
+	foreach ($needles as $frag => $key) {
+		if (stripos($lower, $frag) !== false && isset($catalog[$key])) {
+			return $key;
+		}
 	}
 	return 'trebuchet';
 }
