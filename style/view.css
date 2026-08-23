@@ -478,3 +478,132 @@
 .ending-panel .commentsdiv:not(.hidecomments) {
   margin-top: 8px;
 }
+
+/* ===== Theater mode (off by default; toggled via #theater_toggle) ===== */
+.view-sidebar .view-sidebar-action#theater_toggle
+{
+    margin-top: 4px;
+}
+
+body.choosology-theater
+{
+    overflow: hidden;
+}
+
+body.choosology-theater .navbutton,
+body.choosology-theater .header,
+body.choosology-theater .footer,
+body.choosology-theater #tabswindow,
+body.choosology-theater #backgrounddark,
+body.choosology-theater .fakebackground
+{
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body.choosology-theater .contentcontainer
+{
+    margin-left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 5000;
+}
+
+body.choosology-theater #viewwindow
+{
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    z-index: 5001 !important;
+    background-color: #000;
+}
+
+body.choosology-theater #viewwindow .advcanvas
+{
+    height: 100% !important;
+    width: 100% !important;
+    min-height: 100%;
+}
+
+body.choosology-theater #viewwindow .viewcol2
+{
+    height: 100%;
+}
+
+body.choosology-theater #viewwindow .text
+{
+    top: 24px;
+    margin-left: 230px;
+    padding-right: 48px;
+    max-width: none;
+}
+
+body.choosology-theater #viewwindow .text #innards
+{
+    max-width: min(1100px, 92vw);
+}
+
+.theater-exit
+{
+    display: none;
+    position: fixed;
+    top: 12px;
+    right: 14px;
+    z-index: 5100;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #f8fafc;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.theater-exit:hover
+{
+    background: rgba(15, 23, 42, 0.95);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+body.choosology-theater .theater-exit
+{
+    display: inline-block;
+}
+
+body.choosology-theater .theater-exit[hidden]
+{
+    display: inline-block !important;
+}
+
+@media (max-width: 720px)
+{
+    body.choosology-theater #viewwindow .text
+    {
+        margin-left: 12px;
+        padding-right: 16px;
+        top: 56px;
+    }
+    body.choosology-theater #viewwindow .view-sidebar
+    {
+        width: 160px;
+        max-width: 42vw;
+    }
+}
+
