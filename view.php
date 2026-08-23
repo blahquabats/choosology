@@ -121,25 +121,25 @@ $out = "
         </style>
 <div class='advcanvas' style='display:block;
 $bg;'>
-<div class='viewcol1' style='$box;$border;' >
-<div style='text-align:center'>
-<br/>
-$image
-<br/>
-<br/>
-".
+<div class='viewcol1 view-sidebar' style='$box;$border;' >
+<div class='view-sidebar-meta'>
+<p class='view-sidebar-eyebrow'>Experiment <span class='view-sidebar-eyebrow-tag'>lab node</span></p>
+".($image !== '' ? "<div class='view-sidebar-icon'>".$image."</div>" : "")."
+<h2 class='view-sidebar-title'".($titlestyling !== '' ? " style='".$titlestyling."'" : "").">".
 htmlspecialchars_decode($adv['title']).
-"<br />
-by ".$adv['user']."
+"</h2>
+<p class='view-sidebar-byline'>by <span class='view-sidebar-author'>".htmlspecialchars((string) $adv['user'], ENT_QUOTES, 'UTF-8')."</span></p>
 </div>
-<div class='choice' id='firstscreen' onclick=\"goToScreen('".$adv['begin']."', $sid,1)\">
+<div class='view-sidebar-nav' role='navigation' aria-label='Experiment navigation'>
+<div class='choice view-sidebar-action' id='firstscreen' onclick=\"goToScreen('".$adv['begin']."', $sid,1)\">
     &larr; Start over
 </div>
-".($showExpMap ? "<div class='choice' id='mapbutton' data-advid='".htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8')."'>
+".($showExpMap ? "<div class='choice view-sidebar-action' id='mapbutton' data-advid='".htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8')."'>
     Map
 </div>" : "")."
-<div class='choice' id='lastscreen'>
+<div class='choice view-sidebar-action' id='lastscreen'>
     &larr; Return to previous screen
+</div>
 </div>
 </div>
 <div class='viewcol2'>
