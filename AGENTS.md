@@ -28,6 +28,7 @@ Both services are long-running: start each in its own tmux session (e.g. `mariad
 - End screens (no valid outgoing choices) render a lab-styled **ending panel** (`choosology_build_ending_panel_html`) with rating + comments, a count of end screens catalogued this visit/account, and a yes/no note on whether more endings exist (total count is never shown). Logged-in finds persist in `ending_finds` (`sql/ending_finds_setup.sql`); anonymous finds use the PHP session.
 - Passwords are stored as `md5("cYo" . password)` — legacy/insecure, but that is the current scheme.
 - Core end-to-end flow to sanity-check the app: log in (posts to `ajax/authentajax.php`) → My Stuff → Experiments → create a new experiment (posts JSON to `ajax/newadventure.php`, which inserts an `advs` row + first `advscreens` row) → graph editor opens at `#/edit/<id>`.
+- **Messages** use the existing `messages` table. Inbox UI: My Stuff → Messages (`mystuff/messages.php` + `ajax/messages.php`). Header **Msg** badge opens a slim recent-messages modal. Comment notifications fire for public adventures via `checkSendMessage()`. Optional per-adventure digests (`advs.digest_notify` = `off|daily|weekly`, migration `sql/messages_digest_setup.sql`) are sent opportunistically on inbox load and via `php scripts/run_digests.php`. Reports go to users with `usertype >= 1`.
 - The editor and some UI pull JS/CSS from public CDNs (jQuery UI, jQuery Cycle, Konva, minicolors) at runtime; the page shell works offline but the editor needs outbound internet.
 
 ### Lint / test / build

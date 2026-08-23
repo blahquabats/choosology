@@ -48,6 +48,13 @@ $useAutoText = trim((string) ($adv['textcolor'] ?? '')) === '';
 $useAutoLink = trim((string) ($adv['linkcolor'] ?? '')) === '';
 $defaultFontKey = choosology_adv_default_font_key($adv);
 $fontCatalogGrouped = choosology_font_catalog_grouped();
+if (function_exists('choosology_ensure_digest_columns')) {
+	choosology_ensure_digest_columns();
+}
+$digestNotify = strtolower(trim((string) ($adv['digest_notify'] ?? 'off')));
+if (!in_array($digestNotify, array('off', 'daily', 'weekly'), true)) {
+	$digestNotify = 'off';
+}
 
 $iconPreviewUrl = ($picVal !== '' && ctype_digit($picVal)) ? getPicUrl((int) $picVal, true) : '';
 $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
@@ -131,6 +138,14 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				</span>
 			</label>
 		</div>
+
+		<label class="advsettings-label" for="as_digest_notify" style="margin-top:12px;">Activity digest</label>
+		<select id="as_digest_notify" class="advsettings-input">
+			<option value="off"<?php echo $digestNotify === 'off' ? ' selected' : ''; ?>>Off — no periodic summaries</option>
+			<option value="daily"<?php echo $digestNotify === 'daily' ? ' selected' : ''; ?>>Daily — comments &amp; play activity</option>
+			<option value="weekly"<?php echo $digestNotify === 'weekly' ? ' selected' : ''; ?>>Weekly — comments &amp; play activity</option>
+		</select>
+		<p class="adv-hint">When this experiment is public, Choosology can message you a digest of new comments, ending finds, and rating totals. Immediate comment alerts still send separately.</p>
 	</div>
 
 	<div class="advsettings-section advsettings-section--look">
@@ -1106,7 +1121,8 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			})(),
 			textcolor: $("#as_use_auto_text").is(":checked") ? "" : String($("#as_textcolor").val() || "").trim(),
 			linkcolor: $("#as_use_auto_link").is(":checked") ? "" : String($("#as_linkcolor").val() || "").trim(),
-			font: String($("#as_font").val() || "trebuchet")
+			font: String($("#as_font").val() || "trebuchet"),
+			digest_notify: String($("#as_digest_notify").val() || "off")
 		};
 		$.ajax({
 			type: "POST",

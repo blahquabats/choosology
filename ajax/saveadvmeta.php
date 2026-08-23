@@ -177,6 +177,15 @@ $linkstyleMerged = choosology_style_set_font_family(htmlspecialchars_decode($lin
 $textstyleEsc = mysqli_real_escape_string($db, $textstyleMerged);
 $linkstyleEsc = mysqli_real_escape_string($db, $linkstyleMerged);
 
+$digestNotify = isset($data['digest_notify']) ? strtolower(trim((string) $data['digest_notify'])) : 'off';
+if (!in_array($digestNotify, array('off', 'daily', 'weekly'), true)) {
+	$digestNotify = 'off';
+}
+if (function_exists('choosology_ensure_digest_columns')) {
+	choosology_ensure_digest_columns();
+}
+$digestEsc = mysqli_real_escape_string($db, $digestNotify);
+
 $tEsc = mysqli_real_escape_string($db, $title);
 $dEsc = mysqli_real_escape_string($db, $description);
 $tagsEsc = mysqli_real_escape_string($db, $tags);
@@ -210,6 +219,7 @@ $q = "UPDATE advs SET
 	font = '$fontEsc',
 	textstyle = '$textstyleEsc',
 	linkstyle = '$linkstyleEsc',
+	digest_notify = '$digestEsc',
 	edited = NOW()
 	$publishedSet
 	WHERE id = '$escAdvid' AND user = '$escUser' LIMIT 1";
