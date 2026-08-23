@@ -475,7 +475,7 @@ function assembleRating($which, $readonly=true, $smallrat = 0)
     //return $noratingsoutput;
     if(!$avg) $avg="Not enough ratings";
     $id=$which;
-    $output= "<div class='rateresponse$id' style='margin-left:auto;margin-right:auto;width:auto;text-align:center;white-space:nowrap;font-size:8pt;'>$avg</div>";
+    $output= "<div class='ratecaption rateresponse$id'>$avg</div>";
     $output.= "<div class='starsholder' id='starsholder$id'>
 	<input type='hidden' value='$rat' class='starsrating$id'>
 		<div class='loading starsloading$id'>&nbsp;</div>
@@ -490,7 +490,7 @@ function assembleRating($which, $readonly=true, $smallrat = 0)
         $output.= "></div>";
     }
     $output.= "</div>";
-    $output.= "<div class='rateyours$id' style='margin-left:auto;margin-right:auto;width:auto;text-align:center;white-space:nowrap;font-size:8pt;'>$ratdesc</div>
+    $output.= "<div class='ratecaption rateyours$id'>$ratdesc</div>
       <script>
           showAvgStars($id);
       </script>
