@@ -380,6 +380,14 @@ function choosology_omit_unreachable_pic_images(string $html): string
 }
 
 /**
+ * Undo connect.php's htmlspecialchars(mysqli_real_escape_string(...)) mutation of POST/GET strings.
+ */
+function choosology_undo_connect_string_mutation(string $value): string
+{
+	return stripslashes(htmlspecialchars_decode($value, ENT_QUOTES | ENT_HTML5));
+}
+
+/**
  * Whether an <img src> is allowed in saved screen HTML: Choosology library URLs or http(s)// URLs whose path ends in a common raster/vector image extension.
  */
 function choosology_screen_html_img_src_allowed(string $src): bool
