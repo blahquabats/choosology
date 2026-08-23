@@ -373,18 +373,19 @@ var advBg = <?php echo json_encode(preg_replace('/\s+/', ' ', (string)($adv['adv
 var editorDefaultFont = <?php echo json_encode($editorFontStack, JSON_UNESCAPED_UNICODE); ?>;
 var editorFontFormats = <?php echo json_encode(choosology_font_tinymce_formats(), JSON_UNESCAPED_UNICODE); ?>;
 var editorContentCss = (typeof choosologyUrlSafe === "function")
-    ? choosologyUrlSafe("style/choosology.css")
-    : "style/choosology.css";
-var contentStyle = (advBg ? ("body { background-color: " + advBg + "; margin: 0; }") : "body { margin: 0; }")
-    + " body { font-family: " + editorDefaultFont + "; }";
+    ? choosologyUrlSafe("style/editor-fonts.css")
+    : "style/editor-fonts.css";
+var contentStyle = (advBg ? ("body { background-color: " + advBg + "; }") : "")
+    + " body { margin: 8px; font-family: " + editorDefaultFont + "; font-size: 16px; line-height: 1.45; }";
 
 var baseInit = {
     license_key: "gpl",
     promotion: false,
     branding: false,
     content_style: contentStyle,
-    content_css: editorContentCss,
+    font_css: editorContentCss,
     font_family_formats: editorFontFormats,
+    font_size_formats: "12px 14px 16px 18px 20px 24px 28px 32px 36px 48px",
     base_url: (typeof window.__choosologyTinyMceBaseUrl === "string" && window.__choosologyTinyMceBaseUrl)
         ? window.__choosologyTinyMceBaseUrl
         : "https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.6.1",

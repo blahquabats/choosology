@@ -40,9 +40,11 @@ $sid = isset($_POST['sid']) ? preg_replace('/\D/', '', (string) $_POST['sid']) :
 if ($sid === '') {
 	exit;
 }
-$content = choosology_sanitize_screen_html_images((string) ($_POST['content'] ?? ''));
+$content = choosology_undo_connect_string_mutation((string) ($_POST['content'] ?? ''));
+$content = choosology_sanitize_screen_html_images($content);
 $content = mysqli_real_escape_string($db, $content);
-$screenlabel = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", (string) ($_POST['screenlabel'] ?? ''))));
+$screenlabel = choosology_undo_connect_string_mutation((string) ($_POST['screenlabel'] ?? ''));
+$screenlabel = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", $screenlabel)));
 $screenlabel = mysqli_real_escape_string($db, $screenlabel);
 
 $screeninfo = runquery_assoc("select * from advscreens where id = '$sid'");
@@ -58,9 +60,10 @@ for ($c = 1; $c <= 8; $c++)
 	if (empty($_POST['choice'.$c])) {
 		continue;
 	}
-	$choicetext = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", (string) $_POST["choice$c"])));
+	$choicetext = choosology_undo_connect_string_mutation((string) $_POST["choice$c"]);
+	$choicetext = trim(preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, str_replace("\\n", "", $choicetext)));
 	$choicetext = choosology_sanitize_screen_html_images($choicetext);
-	$cpid = mysqli_real_escape_string($db, (string) ($_POST['choice'.$c.'id'] ?? ''));
+	$cpid = mysqli_real_escape_string($db, choosology_undo_connect_string_mutation((string) ($_POST['choice'.$c.'id'] ?? '')));
 	$choice = mysqli_real_escape_string($db, html_entity_decode($choicetext . '|Q-D-|' . $cpid));
 	$q .= ", choice$c = \"$choice\"";
 }

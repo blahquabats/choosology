@@ -1,0 +1,21 @@
+/**
+ * Webfonts only — safe to load inside TinyMCE (no body/layout rules).
+ * Eraser + ZX Spectrum for adventure typography; Linecons not needed in the editor.
+ */
+@font-face {
+	font-family: 'Eraser';
+	src: url('webfonts/EraserRegular-webfont.eot');
+	src: url('webfonts/EraserRegular-webfont.eot?#iefix') format('embedded-opentype'),
+		url('webfonts/EraserRegular-webfont.woff') format('woff'),
+		url('webfonts/EraserRegular-webfont.ttf') format('truetype'),
+		url('webfonts/EraserRegular-webfont.svg#EraserRegular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'ZX Spectrum';
+	src: url('webfonts/zxspectr.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
