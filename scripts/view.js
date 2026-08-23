@@ -1,3 +1,32 @@
+/**
+ * Hide images that fail to load so play/view never shows broken-image chrome or alt text.
+ * (img error does not bubble, so each img is bound directly.)
+ */
+function silenceBrokenImages(root)
+{
+    var $root = root ? $(root) : $(".advcanvas");
+    $root.find("img").each(function () {
+        var img = this;
+        if (img.getAttribute("data-choosology-img-bound") === "1") {
+            return;
+        }
+        img.setAttribute("data-choosology-img-bound", "1");
+        function hideBroken() {
+            img.removeAttribute("alt");
+            img.removeAttribute("title");
+            img.setAttribute("aria-hidden", "true");
+            img.style.display = "none";
+        }
+        if (img.complete) {
+            if (img.naturalWidth === 0) {
+                hideBroken();
+            }
+            return;
+        }
+        img.addEventListener("error", hideBroken);
+    });
+}
+
 function goToScreen(screenid, fromscreen, reverse)
 {
     if(reverse) direction = "right";
@@ -49,6 +78,7 @@ function replaceScreen(screenid, fromscreen, reverse)
             goToScreen(fromscreen,screenid,1);
         });
         $("#innards div").html(response.text);
+        silenceBrokenImages(".advcanvas");
         $(".advcanvas").prop("style", response.bg);
         $(".realinnards,.viewcol1,.choices").prop("style", response.box+";"+response.border);
         $(".choicecover").prop("style", response.box+";"+response.border+";"+response.offset);
@@ -128,4 +158,5 @@ function checkComments()
             $box.off("mouseenter.ending mouseleave.ending");
         });
     }
+    silenceBrokenImages(".advcanvas");
     bindEndingReveal($(".choicecontainer"));
