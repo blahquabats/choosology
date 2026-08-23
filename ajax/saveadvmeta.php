@@ -162,6 +162,21 @@ if ($linkcolor !== '' && strlen($linkcolor) > 10) {
 }
 $linkcolorSql = ($linkcolor === '') ? 'NULL' : "'" . mysqli_real_escape_string($db, $linkcolor) . "'";
 
+$fontKey = isset($data['font']) ? choosology_font_normalize_key((string) $data['font']) : '';
+if ($fontKey === '') {
+	$fontKey = 'trebuchet';
+}
+$fontLabel = choosology_font_label_for_key($fontKey);
+$fontEsc = mysqli_real_escape_string($db, $fontLabel);
+
+$styleRow = runquery_assoc("SELECT textstyle, linkstyle FROM advs WHERE id = '$escAdvid' AND user = '$escUser' LIMIT 1");
+$textstyleRaw = is_array($styleRow) && isset($styleRow[0]['textstyle']) ? (string) $styleRow[0]['textstyle'] : '';
+$linkstyleRaw = is_array($styleRow) && isset($styleRow[0]['linkstyle']) ? (string) $styleRow[0]['linkstyle'] : '';
+$textstyleMerged = choosology_style_set_font_family(htmlspecialchars_decode($textstyleRaw), $fontKey);
+$linkstyleMerged = choosology_style_set_font_family(htmlspecialchars_decode($linkstyleRaw), $fontKey);
+$textstyleEsc = mysqli_real_escape_string($db, $textstyleMerged);
+$linkstyleEsc = mysqli_real_escape_string($db, $linkstyleMerged);
+
 $tEsc = mysqli_real_escape_string($db, $title);
 $dEsc = mysqli_real_escape_string($db, $description);
 $tagsEsc = mysqli_real_escape_string($db, $tags);
@@ -192,6 +207,9 @@ $q = "UPDATE advs SET
 	borderwidth = '$borderwidth',
 	textcolor = $textcolorSql,
 	linkcolor = $linkcolorSql,
+	font = '$fontEsc',
+	textstyle = '$textstyleEsc',
+	linkstyle = '$linkstyleEsc',
 	edited = NOW()
 	$publishedSet
 	WHERE id = '$escAdvid' AND user = '$escUser' LIMIT 1";

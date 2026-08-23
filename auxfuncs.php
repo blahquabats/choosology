@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'paths-config.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'font-options.php';
 require_once("authent.php");
 require_once("comments.php");
 require_once("buildadvflag.php");
