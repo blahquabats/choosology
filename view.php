@@ -63,7 +63,7 @@ if (!$sid) die ("Can't find page information!");
 $screen = getScreenInfo($sid);
 
 //16345 for lots of choices
-if ($adv['pic']) {
+if ($adv['pic'] && choosology_adv_pic_usable_for_display($adv['pic'])) {
 	$pu = getPicUrl($adv['pic'], true);
 	$image = $pu !== '' ? "<img class='advpic' src=\"" . htmlspecialchars($pu, ENT_QUOTES, 'UTF-8') . "\" />" : "";
 } else {
