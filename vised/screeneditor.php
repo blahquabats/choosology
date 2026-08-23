@@ -6,7 +6,7 @@ $res = runquery_assoc("Select * from advscreens where id = '$sid'");
 if(!$res) echo "<div class='error'>Screen could not be found!</div>";
 $screen = $res[0];
 $advid = $screen['advused'];
-$advres = runquery_assoc("Select advs.bg as advbg, advscreens.id as screenid, advscreens.name as screenname from advs join advscreens on advscreens.advused=advs.id where advs.id = '$advid'");
+$advres = runquery_assoc("Select advs.bg as advbg, advs.font as advfont, advs.textstyle as advtextstyle, advscreens.id as screenid, advscreens.name as screenname from advs join advscreens on advscreens.advused=advs.id where advs.id = '$advid'");
 $allscreens = array();
 foreach ($advres as $v)
 {
@@ -361,14 +361,30 @@ if (typeof tinymce === "undefined") {
     return;
 }
 
+<?php
+$advFontRow = array(
+	'font' => (string) ($adv['advfont'] ?? ''),
+	'textstyle' => (string) ($adv['advtextstyle'] ?? ''),
+);
+$editorFontStack = choosology_font_stack_for_key(choosology_adv_default_font_key($advFontRow));
+?>
+
 var advBg = <?php echo json_encode(preg_replace('/\s+/', ' ', (string)($adv['advbg'] ?? '')), JSON_UNESCAPED_UNICODE); ?>;
-var contentStyle = advBg ? ("body { background-color: " + advBg + "; margin: 0; }") : "body { margin: 0; }";
+var editorDefaultFont = <?php echo json_encode($editorFontStack, JSON_UNESCAPED_UNICODE); ?>;
+var editorFontFormats = <?php echo json_encode(choosology_font_tinymce_formats(), JSON_UNESCAPED_UNICODE); ?>;
+var editorContentCss = (typeof choosologyUrlSafe === "function")
+    ? choosologyUrlSafe("style/choosology.css")
+    : "style/choosology.css";
+var contentStyle = (advBg ? ("body { background-color: " + advBg + "; margin: 0; }") : "body { margin: 0; }")
+    + " body { font-family: " + editorDefaultFont + "; }";
 
 var baseInit = {
     license_key: "gpl",
     promotion: false,
     branding: false,
     content_style: contentStyle,
+    content_css: editorContentCss,
+    font_family_formats: editorFontFormats,
     base_url: (typeof window.__choosologyTinyMceBaseUrl === "string" && window.__choosologyTinyMceBaseUrl)
         ? window.__choosologyTinyMceBaseUrl
         : "https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.6.1",
@@ -381,8 +397,8 @@ var bodyPromise = tinymce.init(Object.assign({}, baseInit, {
     max_height: 520,
     resize: false,
     plugins: "lists link image table code wordcount",
-    toolbar: "undo redo | styles | bold italic underline forecolor backcolor | alignleft aligncenter alignright | bullist numlist | outdent indent | link image table | removeformat code",
-    menubar: "edit view insert format tools table help",
+    toolbar: "undo redo | blocks fontfamily fontsize | bold italic underline forecolor backcolor | alignleft aligncenter alignright | bullist numlist | outdent indent | link image table | removeformat code",
+    menubar: "edit view insert tools table help",
     file_picker_callback: function (cb, value, meta) {
         if (meta.filetype === "image") {
             choosologyOpenImageLibrary(cb);
@@ -394,7 +410,7 @@ var choicePromise = tinymce.init(Object.assign({}, baseInit, {
     selector: ".choicetext",
     inline: true,
     plugins: "lists link wordcount",
-    toolbar: "bold italic underline forecolor backcolor | removeformat",
+    toolbar: "fontfamily | bold italic underline forecolor backcolor | removeformat",
     menubar: false,
     setup: function (editor) {
         editor.on("keydown", function (e) {

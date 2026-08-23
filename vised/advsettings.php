@@ -46,6 +46,8 @@ $textcolor = htmlspecialchars((string) ($adv['textcolor'] ?? ''), ENT_QUOTES, 'U
 $linkcolor = htmlspecialchars((string) ($adv['linkcolor'] ?? ''), ENT_QUOTES, 'UTF-8');
 $useAutoText = trim((string) ($adv['textcolor'] ?? '')) === '';
 $useAutoLink = trim((string) ($adv['linkcolor'] ?? '')) === '';
+$defaultFontKey = choosology_adv_default_font_key($adv);
+$fontCatalog = choosology_font_catalog();
 
 $iconPreviewUrl = ($picVal !== '' && ctype_digit($picVal)) ? getPicUrl((int) $picVal, true) : '';
 $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
@@ -248,6 +250,23 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				<div class="adv-lf-slot-control">
 					<input type="text" id="as_linkcolor" class="advsettings-input adv-color" value="<?php echo $linkcolor; ?>" placeholder="#3333ff" />
 				</div>
+			</div>
+			<div class="adv-lf-slot adv-lf-slot--font">
+				<div class="adv-lf-slot-head">
+					<span class="adv-lf-code" aria-hidden="true">L7</span>
+					<label class="advsettings-label adv-lf-label" for="as_font">Default font</label>
+				</div>
+				<div class="adv-lf-slot-control">
+					<select id="as_font" class="advsettings-input">
+						<?php foreach ($fontCatalog as $fkey => $fmeta) {
+							$flabel = htmlspecialchars($fmeta['label'], ENT_QUOTES, 'UTF-8');
+							$fstack = htmlspecialchars($fmeta['stack'], ENT_QUOTES, 'UTF-8');
+							$sel = ($fkey === $defaultFontKey) ? ' selected' : '';
+							echo "<option value=\"" . htmlspecialchars($fkey, ENT_QUOTES, 'UTF-8') . "\" data-stack=\"{$fstack}\"{$sel}>{$flabel}</option>";
+						} ?>
+					</select>
+				</div>
+				<p class="adv-hint adv-lf-font-hint">Body text and branch labels in play mode. Screen editor font picker uses the same list.</p>
 			</div>
 		</div>
 	</div>
@@ -775,8 +794,15 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 		}
 		var tc = resolveLiveTextColor(box);
 		var lc = resolveLiveLinkColor(box, tc);
+		var fontStack = "";
+		var $fontSel = $("#as_font");
+		if ($fontSel.length) {
+			var opt = $fontSel.find("option:selected");
+			fontStack = String(opt.attr("data-stack") || "").trim();
+		}
 		var $chrome = $("#as_livepreview_chrome");
 		var $panel = $("#as_livepreview_panel");
+		var $text = $("#as_livepreview_text");
 		var $link = $("#as_livepreview_link");
 		if (!$chrome.length || !$panel.length) {
 			return;
@@ -810,7 +836,13 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			border: bw + "px solid " + border,
 			color: tc
 		});
-		$link.css("color", lc);
+		if ($text.length && fontStack) {
+			$text.css("fontFamily", fontStack);
+		}
+		$link.css({
+			color: lc,
+			fontFamily: fontStack || undefined
+		});
 		if ($("#as_use_auto_text").is(":checked") || $("#as_use_auto_link").is(":checked")) {
 			syncAutoTlMinicolorsSwatches();
 		}
@@ -901,7 +933,7 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 	});
 	refreshAutoTlLockUI();
 	$("#as_borderwidth").on("input change", applyAdvSettingsLivePreview);
-	$("#advsettingsform").on("input change", "#as_bg, #as_box, #as_border, #as_textcolor, #as_linkcolor", applyAdvSettingsLivePreview);
+	$("#advsettingsform").on("input change", "#as_bg, #as_box, #as_border, #as_textcolor, #as_linkcolor, #as_font", applyAdvSettingsLivePreview);
 	setTimeout(function () {
 		applyAdvSettingsLivePreview();
 	}, 0);
@@ -1066,7 +1098,8 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				return isNaN(n) ? 2 : n;
 			})(),
 			textcolor: $("#as_use_auto_text").is(":checked") ? "" : String($("#as_textcolor").val() || "").trim(),
-			linkcolor: $("#as_use_auto_link").is(":checked") ? "" : String($("#as_linkcolor").val() || "").trim()
+			linkcolor: $("#as_use_auto_link").is(":checked") ? "" : String($("#as_linkcolor").val() || "").trim(),
+			font: String($("#as_font").val() || "trebuchet")
 		};
 		$.ajax({
 			type: "POST",

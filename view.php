@@ -85,6 +85,10 @@ $hex = $adv['border'];
 $textstyling = htmlspecialchars_decode($adv['textstyle']);
 $choicestyling = htmlspecialchars_decode($adv['linkstyle']);
 $titlestyling = htmlspecialchars_decode($adv['titlestyle']);
+$playTextCss = choosology_adv_play_typography_css($adv, 'text');
+$playChoiceCss = choosology_adv_play_typography_css($adv, 'choice');
+$playTextCssSafe = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F<>]/', '', $playTextCss);
+$playChoiceCssSafe = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F<>]/', '', $playChoiceCss);
 list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
 $choiceborder= "border: 2px solid rgb($r, $g, $b);border: 2px solid rgba($r, $g, $b, .5)";
 $choices = "";
@@ -123,6 +127,12 @@ $out = "
         {
             $choiceborder;
         }
+        .adv-play-text {
+            $playTextCssSafe;
+        }
+        .adv-play-choices .choice {
+            $playChoiceCssSafe;
+        }
         </style>
 <div class='advcanvas' style='display:block;
 $bg;'>
@@ -150,12 +160,12 @@ htmlspecialchars_decode($adv['title']).
 <div class='viewcol2'>
 <br/>
 <div class='text'><span id='innards'> 
-<div class='realinnards' style='$box;$border;'>".
+<div class='realinnards adv-play-text' style='$box;$border;'>".
 $text.
 "<br/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</div></span>
 
     <div class='choicecontainer'>
-        <div class='choices'  style='$box;$border;'>
+        <div class='choices adv-play-choices'  style='$box;$border;'>
             <div class='choicecover' style='$box;$border;$offset'><br>
             <br>
             Hover to reveal choices!
