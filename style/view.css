@@ -270,6 +270,9 @@
 .ending-panel-rate
 {
     clear: both;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin: 0 0 8px;
     text-align: center;
 }
@@ -286,12 +289,13 @@
     opacity: 0.75;
 }
 
-/* Stars float; keep average / “you haven’t rated” lines full-width + centered */
+/* Stars are floated globally; contain them and keep captions full-width + centered */
 .ending-panel-rate .starsholder,
 .ending-panel-rate .tinystarsholder
 {
     clear: both;
     overflow: hidden; /* contain floated .star children */
+    float: none;
     margin-left: auto;
     margin-right: auto;
 }
@@ -301,7 +305,10 @@
 {
     display: block;
     clear: both;
-    width: 100%;
+    float: none;
+    /* Beat assembleRating()'s inline width:auto — otherwise the box shrink-wraps
+       and sits left after margin:auto is zeroed out. */
+    width: 100% !important;
     max-width: 100%;
     box-sizing: border-box;
     margin-left: 0 !important;
