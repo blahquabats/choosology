@@ -3,26 +3,28 @@ header('Content-Type: text/xml');
 include ('../connect.php');
 include ('../messagesfunc.php');
 
+$user = '';
 if (isset($_SESSION['user']))
 {
 	$user = $_SESSION['user'];
 }
 
+$error = '0';
 
-  $board=mysqli_real_escape_string($db, $_GET['name']);
-  $screen=mysqli_real_escape_string($db, $_GET['screen']);
+  $board = isset($_GET['name']) ? mysqli_real_escape_string($db, $_GET['name']) : '';
+  $screen = isset($_GET['screen']) ? mysqli_real_escape_string($db, $_GET['screen']) : '0';
   if(!$screen) $screen=0;
   if(isset($_GET['delete']) && $_GET['delete']==1) $delete = mysqli_real_escape_string($db, $_GET['cid']);
   else $delete = 0;
-  $page=abs(mysqli_real_escape_string($db, $_GET['page']));
-  if(!is_numeric($page) || !$page) $page=1;
+  $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+  if($page < 1) $page=1;
   if(!$board) exit;
   if(substr($board, 0, 6) == "byuser") $pagesize = 5;
-  else $pagesize = 10;
+  else $pagesize = 20;
   echo "<response>";
   $comments="";
    // first any inserting
-   if($_POST['text'] && $user)
+   if(!empty($_POST['text']) && $user)
    {
        if($_POST['text'] == "Enter your comment here...") 
        {
@@ -33,7 +35,9 @@ if (isset($_SESSION['user']))
        else 
        {
           $text=mysqli_real_escape_string($db, $_POST['text']);
-          $iq="insert into comments (`author`, `text`, `date`, `whichboard`, `whichscreen`) select '$user',\"$text\",NOW(),\"$board\", \"$screen\" from dual where not exists (select * from comments where author='$user' and whichboard='$board' and (`text`=\"$text\" or TIME_TO_SEC(TIMEDIFF(NOW(), `date`)) < 1))";
+          // Use ABS(TIMESTAMPDIFF) so timezone skew (UTC storage vs session -07:00) cannot
+          // make older rows look "in the future" and trip the 1-second flood guard forever.
+          $iq="insert into comments (`author`, `text`, `date`, `whichboard`, `whichscreen`) select '$user',\"$text\",NOW(),\"$board\", \"$screen\" from dual where not exists (select * from comments where author='$user' and whichboard='$board' and (`text`=\"$text\" or ABS(TIMESTAMPDIFF(SECOND, `date`, NOW())) < 1))";
           if(@mysqli_query($db, $iq))
           {
             $rows=mysqli_affected_rows($db);
@@ -99,12 +103,15 @@ if (isset($_SESSION['user']))
       $res = mysqli_query($db, $q);
       $result = mysqli_fetch_array($res);
       $username = $result['name'];
-      $wheres = "author='$username' and (LEFT(whichboard, 3)!='adv' OR (SELECT avail from advs where advs.id = SUBSTRING(whichboard,4))='public')";
+      $wheres = "c.author='$username' and (LEFT(c.whichboard, 3)!='adv' OR (SELECT avail from advs where advs.id = SUBSTRING(c.whichboard,4))='public')";
 
   }
-  else $wheres="whichboard='$board'";
-  if($board=="review") $wheres="reviewed=0";
-  $q = "select SQL_CALC_FOUND_ROWS u.name as id, u.name as name, c.id as commentid, c.text, DATE_FORMAT(c.date,\"%b %e, %H:%i\") as timestamp, whichboard from comments as c
+  else $wheres="c.whichboard='$board'";
+  if ($screen > 0 && substr($board, 0, 3) === 'adv') {
+      $wheres .= " AND (c.whichscreen = '$screen' OR c.whichscreen = 0)";
+  }
+  if($board=="review") $wheres="c.reviewed=0";
+  $q = "select SQL_CALC_FOUND_ROWS u.name as id, u.name as name, u.pic as pic, c.id as commentid, c.text, DATE_FORMAT(c.date,\"%b %e, %Y\") as timestamp, c.whichboard from comments as c
   left join users as u on u.name=c.author where $wheres order by c.date desc limit $begin,$pagesize";
 echo "<page>$page</page>";
   
@@ -156,25 +163,35 @@ if ($bresult = @mysqli_fetch_array($bres))
             }
             $first=0;
         }
-        $extrainfo = "by &lt;a href='profile.php?user={$bresult['id']}'&gt;{$bresult['name']}&lt;/a&gt; (&lt;div class='mstar'&gt;&lt;/div&gt; $stars)";
+        $nameEsc = htmlspecialchars((string)$bresult['name'], ENT_QUOTES, 'UTF-8');
+        $idEsc = htmlspecialchars((string)$bresult['id'], ENT_QUOTES, 'UTF-8');
+        $dateEsc = htmlspecialchars((string)$bresult['timestamp'], ENT_QUOTES, 'UTF-8');
+        $picId = isset($bresult['pic']) ? (int)$bresult['pic'] : 0;
+        if ($picId > 0) {
+            $avatar = "&lt;img class='CAavatar' src='ajax/pic.php?id={$picId}&amp;thumb=1' alt='' width='24' height='24' /&gt;";
+        } else {
+            $initial = $nameEsc !== '' ? strtoupper(substr($nameEsc, 0, 1)) : '?';
+            $avatar = "&lt;span class='CAavatar CAavatar--fallback' aria-hidden='true'&gt;{$initial}&lt;/span&gt;";
+        }
+        $extrainfo = "{$avatar}&lt;a class='CAusername' href='profile.php?user={$idEsc}'&gt;{$nameEsc}&lt;/a&gt; (&lt;div class='mstar'&gt;&lt;/div&gt; $stars)";
         if(substr($board, 0, 6) == "byuser") $extrainfo = "";
 	  $comments.="&lt;div class='CAbyline'&gt;
-    {$count}. Posted $extrainfo at {$bresult['timestamp']}
-    ";
+    &lt;span class='CAbyline-main'&gt;{$count}. {$extrainfo} &lt;span class='CAdate'&gt;{$dateEsc}&lt;/span&gt;";
     if($board=="review" or substr($board, 0, 6) == "byuser") $comments .= " on ".convertBoardName($bresult['whichboard']);
+    $comments .= "&lt;/span&gt;";
     if($user == $bresult['name'] || $user == "The Grasssmith")
     {
         $comments .= "&lt;div class='CAbylineopts'&gt;";
-        //$comments .= "&lt;a onclick=\"editCAComment('{$bresult['commentid']}')\"&gt;edit&lt;/a&gt; ";
-
         if(substr($board, 0, 6) !== "byuser") $comments .= "&lt;a onclick=\"deleteCAComment('{$bresult['commentid']}', '{$bresult['whichboard']}')\"&gt;delete&lt;/a&gt;";
         $comments .= "&lt;/div&gt;";
     }
     $comments.="
     
     &lt;/div&gt;";
+    $body = htmlspecialchars(stripslashes((string)$bresult['text']), ENT_QUOTES, 'UTF-8');
+    $body = str_replace(array('&lt;br /&gt;', '&lt;br/&gt;', '&lt;br&gt;'), '&lt;br /&gt;', $body);
 	  $comments.="&lt;div class='CAcomment'&gt;
-    ".stripslashes($bresult['text'])."    
+    ".$body."    
     &lt;/div&gt;";
 		$num++;
 		$count++;

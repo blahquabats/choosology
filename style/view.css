@@ -334,3 +334,15 @@
 {
     visibility:hidden;
 }
+
+/* Keep ending comments collapsed until hover/pin so endings stay short under the cover */
+.ending-panel .commentsdiv.hidecomments {
+  display: none !important;
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+.ending-panel .commentsdiv:not(.hidecomments) {
+  margin-top: 8px;
+}

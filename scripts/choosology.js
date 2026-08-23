@@ -209,8 +209,9 @@ function submitCAComment(name, screen)
    var post='text='+desc;
    
    $.ajax({
-        url: 'ajax/fetchcomments.php?name='+name+'&screen='+screen,
+        url: 'ajax/fetchcomments.php?name='+name+'&screen='+screen+'&page=1',
         type: "post",
+        dataType: 'xml',
         data: {
             text: desc,
             project_lazarus:'go'
@@ -227,6 +228,7 @@ function deleteCAComment(cid, which)
     $.ajax({
         url: 'ajax/fetchcomments.php',
         type: 'get',
+        dataType: 'xml',
         data: {
             name: which,
             delete: 1,
@@ -311,7 +313,8 @@ function loadCommentsResponse(response)
          }
          
           if(num !== 0) document.getElementById('CAcommentscountbegin'+id).innerHTML=1+((page-1)*pagesize)+' to ';
-          if(page > 1) document.getElementById('CAcommentslastpage'+id).innerHTML='<small><a onclick="loadComments(\''+id+'\', '+(page-1)+')"><- Newer</a></small>';
+          if(page > 1) var _sc=(document.querySelector(".CAcomments[data-ca-board='"+id+"']")||{getAttribute:function(){return 0;}}).getAttribute('data-screen')||0;
+          document.getElementById('CAcommentslastpage'+id).innerHTML='<small><a onclick="loadComments(\''+id+'\', '+(page-1)+', '+_sc+')"><- Newer</a></small>';
 
      if(num == 0)
       {
@@ -326,14 +329,15 @@ function loadCommentsResponse(response)
       if(page*pagesize<num) // if end of the page is less than the total
       {
          document.getElementById('CAcommentscountend'+id).innerHTML=page*pagesize;
-         document.getElementById('CAcommentsnextpage'+id).innerHTML='<small><a onclick="loadComments(\''+id+'\', '+(page+1)+')">Older -></a></small>';
+         var _sc2=(document.querySelector(".CAcomments[data-ca-board='"+id+"']")||{getAttribute:function(){return 0;}}).getAttribute('data-screen')||0;
+         document.getElementById('CAcommentsnextpage'+id).innerHTML='<small><a onclick="loadComments(\''+id+'\', '+(page+1)+', '+_sc2+')">Older -></a></small>';
       }
       else
       {
          document.getElementById('CAcommentscountend'+id).innerHTML=num;
       }
            }
-         if(num > 10)
+         if(num > pagesize)
          {
       document.getElementById('CAcommentscountfull'+id).innerHTML=' of '+num;
       
@@ -341,15 +345,21 @@ function loadCommentsResponse(response)
    if(document.getElementById('CAloader'+id)) document.getElementById('CAloader'+id).style.display='none';
 }
          
-function loadComments(name, page)
+function loadComments(name, page, screen)
 {
     if(!page) page=1;
+    if(typeof screen === 'undefined' || screen === null || screen === '') {
+        var el = document.querySelector(".CAcomments[data-ca-board='"+name+"']");
+        screen = el ? (el.getAttribute('data-screen') || 0) : 0;
+    }
     $.ajax({
     url: 'ajax/fetchcomments.php',
     type: 'GET',
+    dataType: 'xml',
     data: {
         name: name,
         page: page,
+        screen: screen,
         project_lazarus:'go'
         }
 }).done(loadCommentsResponse);
