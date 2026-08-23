@@ -4570,6 +4570,7 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 .loading {width:100%;height:100%;display:none;position:absolute;top:0px;left:0px;background-color:#666;opacity:.75; z-index:10;text-align:center; font-weight:bold; font-size: 36px}
 .star {position:relative;float:left;top:0px;left:0px;width:auto;}
 .avgstar {position:absolute;width:0%;overflow:hidden;padding:0px;margin:0px;top:0px;left:0px;}
+.ratecaption {display:block;width:100%;margin:0 auto;text-align:center;white-space:normal;font-size:8pt;box-sizing:border-box;}
 
   /* comment area */
   
