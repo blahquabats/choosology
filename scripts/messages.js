@@ -30,9 +30,43 @@
 		return $("<div/>").text(String(s == null ? "" : s)).html();
 	}
 
+	var CLIC_THEMES = ["amber", "violet", "slate"];
+
+	function getClicTheme() {
+		try {
+			var stored = localStorage.getItem("clicTheme");
+			if (stored && CLIC_THEMES.indexOf(stored) >= 0) {
+				return stored;
+			}
+		} catch (ignore) {}
+		return "amber";
+	}
+
+	function applyClicTheme(theme) {
+		theme = CLIC_THEMES.indexOf(theme) >= 0 ? theme : "amber";
+		try {
+			localStorage.setItem("clicTheme", theme);
+		} catch (ignore) {}
+		$("#msg_center, #msg_quick_modal, #msg_login_notify_btn").attr("data-clic-theme", theme);
+		$(".clic-theme-opt").removeClass("is-active").filter('[data-clic-theme="' + theme + '"]').addClass("is-active");
+	}
+
+	function bindClicThemePicker(root) {
+		if (!root) {
+			return;
+		}
+		root.addEventListener("click", function (e) {
+			var btn = e.target.closest(".clic-theme-opt");
+			if (!btn) {
+				return;
+			}
+			applyClicTheme(btn.getAttribute("data-clic-theme"));
+		});
+	}
+
 	function updateBadges(unread) {
 		var n = parseInt(unread, 10) || 0;
-		var label = n > 0 ? ("Messages (" + n + ")") : "Messages";
+		var label = n > 0 ? ("CLIC (" + n + ")") : "CLIC";
 		$("#mystuff-messages").text(label);
 		var $badge = $("#msg_unread_badge");
 		if (!$badge.length) {
@@ -61,6 +95,8 @@
 			return;
 		}
 		root.setAttribute("data-msg-bound", "1");
+		applyClicTheme(getClicTheme());
+		bindClicThemePicker(root);
 		var state = {
 			folder: "inbox",
 			page: 1,
@@ -292,8 +328,8 @@
 			'  <div class="msg-quick-backdrop" tabindex="-1"></div>' +
 			'  <div class="msg-quick-panel" role="dialog" aria-modal="true" aria-labelledby="msg_quick_title">' +
 			'    <div class="msg-quick-header">' +
-			'      <div><p class="msg-center-eyebrow">Comms <span class="msg-center-eyebrow-tag">quick view</span></p>' +
-			'      <h2 class="msg-quick-title" id="msg_quick_title">Recent messages</h2></div>' +
+			'      <div><p class="clic-legend clic-legend--compact">CLIC</p>' +
+			'      <h2 class="msg-quick-title" id="msg_quick_title">Recent</h2></div>' +
 			'      <button type="button" class="msg-compose-x" id="msg_quick_close" aria-label="Close">&times;</button>' +
 			'    </div>' +
 			'    <div class="msg-quick-body" id="msg_quick_body"></div>' +
@@ -313,6 +349,7 @@
 
 	function openModal() {
 		ensureModal();
+		applyClicTheme(getClicTheme());
 		$("#msg_quick_body").html("<p class='msg-hint'>Loading…</p>");
 		$("#msg_quick_modal").removeClass("msg-quick--hidden").attr("aria-hidden", "false");
 		$("body").addClass("msg-quick-open");
@@ -373,6 +410,7 @@
 	};
 
 	$(function () {
+		applyClicTheme(getClicTheme());
 		$(document).on("click", "#msg_unread_badge, #msg_login_notify_btn", function (e) {
 			e.preventDefault();
 			e.stopPropagation();
