@@ -125,11 +125,18 @@ echo "";
                 manualSpeed: 400,
                 timeout: 8000,
                 fx: "fade",
-                pauseOnHover: true,
+                pauseOnHover: false,
                 prev: ".featuredslides .cycle-prev",
                 next: ".featuredslides .cycle-next",
                 containerResize: 0,
                 slideResize: 0
+            });
+            /* pauseOnHover on the cycle root unpauses when the pointer moves to the
+               sibling prev/next buttons; pause the whole slideshow chrome instead. */
+            $(".featuredslides").on("mouseenter", function() {
+                $cyc.cycle("pause");
+            }).on("mouseleave", function() {
+                $cyc.cycle("resume");
             });
         } else if (slideCount === 1) {
             $(".featuredslides .cycle-prev, .featuredslides .cycle-next").hide();
