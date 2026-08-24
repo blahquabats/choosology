@@ -1076,7 +1076,7 @@ function choosology_build_ending_panel_html(mysqli $db, int $advid, int $screeni
 	$html = '<div class="ending-panel" role="status" aria-label="End of experiment">';
 	$html .= '<p class="ending-panel-eyebrow">Terminal outcome <span class="ending-panel-eyebrow-tag">end node</span></p>';
 	$html .= '<h3 class="ending-panel-title">You have reached an end</h3>';
-	$html .= '<p class="ending-panel-lede">This path through the experiment terminates here. Other routes may end differently.</p>';
+	$html .= '<p class="ending-panel-lede">This path through the experiment terminates here.</p>';
 	$html .= '<div class="ending-panel-progress">';
 	$html .= '<p class="ending-panel-progress-count">' . $foundLabel . '</p>';
 	$html .= $moreHtml;
