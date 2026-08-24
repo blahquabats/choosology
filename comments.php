@@ -33,9 +33,10 @@
           </div>
           <span id='CAmessage".$this->which."'></span>
           <textarea id='CAtext".$this->which."' class='CAtextarea empty' onfocus=\"checkCATextArea(this, 'f')\" onblur=\"checkCATextArea(this, 'b')\" maxlength='500'>Enter your comment here...</textarea>
-          <div style='font-size:8pt;color:#666666;float:right;overflow:visible;height:5px;'>(500 characters max)</div>
+          <div class='CAentercomment-actions'>
+          <span class='CAentercomment-hint'>(500 characters max)</span>
           ".makeFakeButton("subcombutton", "submitCAComment('".$this->which."', '".$this->screenid."')",false, "say", "<span id='CAsubmit".$this->which."'>Submit</span>", "green")."
-          <br />
+          </div>
           </div>";                                    
           $this->html.=$html;
       }
