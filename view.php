@@ -122,7 +122,7 @@ $out = "
 
     <meta charset='utf-8' />
 
-        <link rel='stylesheet' href='style/view.css' /><link rel='stylesheet' href='style/choosology.css' />
+        <link rel='stylesheet' href='style/view.css' /><link rel='stylesheet' href='style/choosology.css?v=clic4' />
         <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css' />
       <style>
         .choice
