@@ -122,7 +122,7 @@ $out = "
 
     <meta charset='utf-8' />
 
-        <link rel='stylesheet' href='style/view.css?v=endpanel2' /><link rel='stylesheet' href='style/choosology.css' />
+        <link rel='stylesheet' href='style/view.css?v=endpanel2' /><link rel='stylesheet' href='style/choosology.css?v=clic4' />
         <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css' />
       <style>
         .choice
@@ -140,7 +140,7 @@ $out = "
 $bg;'>
 <div class='viewcol1 view-sidebar' style='$box;$border;' >
 <div class='view-sidebar-meta'>
-<p class='view-sidebar-eyebrow'>Experiment <span class='view-sidebar-eyebrow-tag'>lab node</span></p>
+<p class='view-sidebar-exp-id'>Exp #: ".htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8')."</p>
 ".($image !== '' ? "<div class='view-sidebar-icon'>".$image."</div>" : "")."
 <h2 class='view-sidebar-title'".($titlestyling !== '' ? " style='".$titlestyling."'" : "").">".
 htmlspecialchars_decode($adv['title']).

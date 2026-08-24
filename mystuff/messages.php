@@ -12,11 +12,17 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 ?>
 <div class="msg-center" id="msg_center" data-user="<?php echo $userEsc; ?>">
 	<header class="msg-center-head">
-		<div class="msg-center-heading">
-			<p class="msg-center-eyebrow">Comms bay <span class="msg-center-eyebrow-tag">secure channel</span></p>
-			<h2 class="msg-center-title">Messages</h2>
+		<div class="msg-center-heading clic-brand-block">
+			<p class="clic-legend">Choosology Labs Internal Communications</p>
+			<p class="msg-center-title clic-wordmark" role="heading" aria-level="2">CLIC</p>
 		</div>
 		<div class="msg-center-toolbar">
+			<div class="clic-theme-picker" title="Preview CLIC visual themes">
+				<span class="clic-theme-picker-label">Skin preview</span>
+				<button type="button" class="clic-theme-opt is-active" data-clic-theme="amber">Amber ledger</button>
+				<button type="button" class="clic-theme-opt" data-clic-theme="violet">Violet wire</button>
+				<button type="button" class="clic-theme-opt" data-clic-theme="slate">Slate ticker</button>
+			</div>
 			<label class="msg-search-wrap">
 				<span class="msg-search-label">Search</span>
 				<input type="search" id="msg_search" class="msg-input" placeholder="Title, body, or handle…" autocomplete="off" />
@@ -64,7 +70,7 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 		<div class="msg-compose-panel" role="dialog" aria-modal="true" aria-labelledby="msg_compose_title">
 			<header class="msg-compose-header">
 				<div>
-					<p class="msg-center-eyebrow">Outbound <span class="msg-center-eyebrow-tag">draft</span></p>
+					<p class="clic-legend clic-legend--compact">CLIC · Outbound</p>
 					<h3 class="msg-compose-title" id="msg_compose_title">Compose</h3>
 				</div>
 				<button type="button" class="msg-compose-x" id="msg_compose_close" aria-label="Close">&times;</button>
@@ -91,7 +97,7 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 		<div class="msg-compose-panel msg-compose-panel--narrow" role="dialog" aria-modal="true" aria-labelledby="msg_report_title">
 			<header class="msg-compose-header">
 				<div>
-					<p class="msg-center-eyebrow">Escalation <span class="msg-center-eyebrow-tag">admin</span></p>
+					<p class="clic-legend clic-legend--compact">CLIC · Escalation</p>
 					<h3 class="msg-compose-title" id="msg_report_title">Report message</h3>
 				</div>
 				<button type="button" class="msg-compose-x" id="msg_report_close" aria-label="Close">&times;</button>

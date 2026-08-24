@@ -30,7 +30,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css" />
+    <link rel="stylesheet" href="style/choosology.css?v=clic4" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -58,7 +58,7 @@
     <script src="scripts/sammy.js"></script>
     
     <script src='scripts/index.js'></script>
-    <script src='scripts/messages.js'></script>
+    <script src='scripts/messages.js?v=clic2'></script>
     <script src='scripts/routes.js'></script>
 
 
@@ -119,8 +119,8 @@
         $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
         echo "<div class='msg-login-row'>";
         echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='Messages' aria-label='Messages'>";
-        echo "<span class='msg-login-notify-label'>Msg</span>";
+        echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";
+        echo "<span class='msg-login-notify-label'>CLIC</span>";
         echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
         echo "</button>";
         echo "</div>";
@@ -135,7 +135,7 @@
         
         <li><a href="mystuff/experiments.php" id='mystuff-experiments' class='tabsa' data-loc='experiments'>Experiments</a></li>
         <li><a href="mystuff/office.php" id='mystuff-office' class='tabsa' data-loc='office'>My Office</a></li>
-        <li><a href="mystuff/messages.php" id='mystuff-messages' class='tabsa' data-loc='messages'>Messages<?php
+        <li class="clic-tab"><a href="mystuff/messages.php" id='mystuff-messages' class='tabsa' data-loc='messages'>CLIC<?php
             $tabUnread = (int) getNewMessages();
             echo $tabUnread > 0 ? (' (' . $tabUnread . ')') : '';
         ?></a></li>
