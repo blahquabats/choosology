@@ -114,6 +114,28 @@ h2
     border-width: 1px 0 1px 0;
 }
 
+/* CLIC / play chrome: never inherit the lab-green heading bar */
+.msg-center h2,
+.msg-quick h2,
+.msg-compose h2,
+.clic-wordmark,
+#tabswindow .msg-center h2,
+#tabswindow h2.msg-center-title,
+#tabswindow h2.msg-quick-title
+{
+    display: block;
+    width: auto !important;
+    max-width: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+    background: none !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    border-width: 0 !important;
+    border-style: none !important;
+}
+
 h3
 {
     display: inline-block;
@@ -7042,13 +7064,21 @@ h3.msg-read-title,
     margin-bottom: 2px;
 }
 .clic-wordmark {
+    all: unset;
+    display: block;
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
     font-family: Consolas, "Courier New", Courier, monospace;
     font-size: 1.55rem;
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     line-height: 1.1;
+    color: var(--clic-accent-dark, #92400e);
+    background: none;
+    background-color: transparent;
+    border: 0;
 }
 .clic-theme-picker {
     display: flex;
@@ -7154,7 +7184,9 @@ h3.msg-read-title,
     color: #f8fafc;
 }
 
-#tabswindow .ui-tabs-nav .ui-state-active a#mystuff-messages {
+#tabswindow .ui-tabs-nav .ui-state-active a#mystuff-messages,
+#tabswindow .ui-tabs-nav li.clic-tab.ui-state-active a
+{
     color: #b45309 !important;
 }
 

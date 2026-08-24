@@ -30,7 +30,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=clic1" />
+    <link rel="stylesheet" href="style/choosology.css?v=clic2" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -58,7 +58,7 @@
     <script src="scripts/sammy.js"></script>
     
     <script src='scripts/index.js'></script>
-    <script src='scripts/messages.js'></script>
+    <script src='scripts/messages.js?v=clic2'></script>
     <script src='scripts/routes.js'></script>
 
 
@@ -135,7 +135,7 @@
         
         <li><a href="mystuff/experiments.php" id='mystuff-experiments' class='tabsa' data-loc='experiments'>Experiments</a></li>
         <li><a href="mystuff/office.php" id='mystuff-office' class='tabsa' data-loc='office'>My Office</a></li>
-        <li><a href="mystuff/messages.php" id='mystuff-messages' class='tabsa' data-loc='messages'>CLIC<?php
+        <li class="clic-tab"><a href="mystuff/messages.php" id='mystuff-messages' class='tabsa' data-loc='messages'>CLIC<?php
             $tabUnread = (int) getNewMessages();
             echo $tabUnread > 0 ? (' (' . $tabUnread . ')') : '';
         ?></a></li>

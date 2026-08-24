@@ -329,7 +329,7 @@
 			'  <div class="msg-quick-panel" role="dialog" aria-modal="true" aria-labelledby="msg_quick_title">' +
 			'    <div class="msg-quick-header">' +
 			'      <div><p class="clic-legend clic-legend--compact">CLIC</p>' +
-			'      <h2 class="msg-quick-title" id="msg_quick_title">Recent</h2></div>' +
+			'      <p class="msg-quick-title" id="msg_quick_title" role="heading" aria-level="2">Recent</p></div>' +
 			'      <button type="button" class="msg-compose-x" id="msg_quick_close" aria-label="Close">&times;</button>' +
 			'    </div>' +
 			'    <div class="msg-quick-body" id="msg_quick_body"></div>' +

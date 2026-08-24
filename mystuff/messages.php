@@ -14,7 +14,7 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 	<header class="msg-center-head">
 		<div class="msg-center-heading clic-brand-block">
 			<p class="clic-legend">Choosology Labs Internal Communications</p>
-			<h2 class="msg-center-title clic-wordmark">CLIC</h2>
+			<p class="msg-center-title clic-wordmark" role="heading" aria-level="2">CLIC</p>
 		</div>
 		<div class="msg-center-toolbar">
 			<div class="clic-theme-picker" title="Preview CLIC visual themes">
