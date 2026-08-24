@@ -4172,11 +4172,12 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 }
 
 /* Only .slidefolder nodes cycle here; arrows stay siblings on .featuredslides.
-   Fixed pixel height keeps every slide the same size (Cycle's containerResize otherwise varies by first paint). */
+   Inner width leaves gutters for the CSS nav buttons so scrollHorz stays clipped. */
 .featuredslides-cycle
 {
     position: relative;
-    width: 100%;
+    width: calc(100% - 112px);
+    margin: 0 56px;
     height: 300px;
     min-height: 300px;
     max-height: 300px;
@@ -4220,7 +4221,6 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     align-items: stretch;
     justify-content: flex-start;
     gap: 6px;
-    /* Overlay CSS nav buttons replace the old 50px image gutters. */
     margin-left: 0;
     width: 100%;
 }
