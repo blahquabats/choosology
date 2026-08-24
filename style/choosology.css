@@ -4380,7 +4380,7 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     z-index: 3;
 }
 
-/* Featured slideshow prev/next: CSS chevrons, no image assets. */
+/* Featured slideshow prev/next: full-height CSS rails (match 300px cards). */
 .featuredslides .slidenav
 {
     -webkit-appearance: none;
@@ -4390,54 +4390,55 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     justify-content: center;
     box-sizing: border-box;
     position: absolute;
-    top: 50%;
-    width: 44px;
-    height: 44px;
-    margin: -22px 0 0;
+    top: 0;
+    width: 48px;
+    height: 300px;
+    margin: 0;
     padding: 0;
     border: 1px solid #604b91;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.92);
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.16);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 240, 251, 0.94) 48%, rgba(255, 255, 255, 0.98) 100%);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
     color: #4b3b77;
     cursor: pointer;
     z-index: 110;
     line-height: 0;
     user-select: none;
-    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .featuredslides .slidenav-left
 {
-    left: 10px;
+    left: 4px;
 }
 
 .featuredslides .slidenav-right
 {
-    right: 10px;
+    right: 4px;
 }
 
 .featuredslides .slidenav::before
 {
     content: "";
     display: block;
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     border-style: solid;
     border-color: currentColor;
-    border-width: 0 0 2.5px 2.5px;
+    border-width: 0 0 3px 3px;
 }
 
 .featuredslides .slidenav-left::before
 {
     transform: rotate(45deg);
-    margin-left: 3px;
+    margin-left: 4px;
 }
 
 .featuredslides .slidenav-right::before
 {
     transform: rotate(-135deg);
-    margin-right: 3px;
+    margin-right: 4px;
 }
 
 .featuredslides .slidenav:hover
@@ -4445,17 +4446,18 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     background: #f4f0fb;
     color: #1f1f2d;
     border-color: #4b3b77;
+    box-shadow: 0 2px 12px rgba(75, 59, 119, 0.18);
 }
 
 .featuredslides .slidenav:focus-visible
 {
     outline: none;
-    box-shadow: 0 0 0 2px #edf3ff, 0 0 0 4px #604b91, 0 2px 10px rgba(15, 23, 42, 0.16);
+    box-shadow: 0 0 0 2px #edf3ff, 0 0 0 4px #604b91, 0 2px 10px rgba(15, 23, 42, 0.12);
 }
 
 .featuredslides .slidenav:active
 {
-    transform: scale(0.96);
+    background: #ebe4f6;
 }
 
 
