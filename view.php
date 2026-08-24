@@ -157,6 +157,9 @@ htmlspecialchars_decode($adv['title']).
 <div class='choice view-sidebar-action' id='lastscreen'>
     &larr; Return to previous screen
 </div>
+<button type='button' class='choice view-sidebar-action' id='theater_toggle' aria-pressed='false' title='Expand the adventure to fill the screen'>
+    Theater mode
+</button>
 </div>
 </div>
 <div class='viewcol2'>
@@ -185,6 +188,7 @@ $text.
 
 </div>
 
+<button type='button' class='theater-exit' id='theater_exit' hidden title='Return to normal view'>Exit theater</button>
 
     <script src='scripts/view.js'></script>
 ";

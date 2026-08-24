@@ -160,3 +160,82 @@ function checkComments()
     }
     silenceBrokenImages(".advcanvas");
     bindEndingReveal($(".choicecontainer"));
+    initTheaterMode();
+
+/**
+ * Theater mode: expand the adventure play surface to fill the viewport.
+ * Off by default; session preference only (does not force on for new visits).
+ */
+function initTheaterMode()
+{
+    var STORAGE_KEY = "choosology_theater_mode";
+    var $toggle = $("#theater_toggle");
+    var $exit = $("#theater_exit");
+    if (!$toggle.length) {
+        return;
+    }
+
+    function isOn()
+    {
+        return document.body.classList.contains("choosology-theater");
+    }
+
+    function setTheater(on)
+    {
+        on = !!on;
+        document.body.classList.toggle("choosology-theater", on);
+        $toggle.attr("aria-pressed", on ? "true" : "false");
+        $toggle.text(on ? "Exit theater" : "Theater mode");
+        if ($exit.length) {
+            if (on) {
+                $exit.removeAttr("hidden");
+            } else {
+                $exit.attr("hidden", "hidden");
+            }
+        }
+        try {
+            if (on) {
+                sessionStorage.setItem(STORAGE_KEY, "1");
+            } else {
+                sessionStorage.removeItem(STORAGE_KEY);
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    function toggleTheater()
+    {
+        setTheater(!isOn());
+    }
+
+    $toggle.off("click.theater").on("click.theater", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTheater();
+    });
+    $exit.off("click.theater").on("click.theater", function (e) {
+        e.preventDefault();
+        setTheater(false);
+    });
+    $(document).off("keydown.theater").on("keydown.theater", function (e) {
+        if (e.key === "Escape" && isOn()) {
+            setTheater(false);
+        }
+    });
+
+    // Default off; only restore if user enabled earlier this session while viewing
+    var preferOn = false;
+    try {
+        preferOn = sessionStorage.getItem(STORAGE_KEY) === "1";
+    } catch (e) { /* ignore */ }
+    setTheater(preferOn);
+}
+
+/** Leave theater when navigating away from the play view. */
+function exitTheaterMode()
+{
+    try {
+        sessionStorage.removeItem("choosology_theater_mode");
+    } catch (e) { /* ignore */ }
+    document.body.classList.remove("choosology-theater");
+    $(document).off("keydown.theater");
+}

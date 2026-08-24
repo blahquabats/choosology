@@ -644,6 +644,10 @@ function showMenuOption(which, param)
     if (activemenu == which && !param) return false;
     var conf = configmenu[which];
 
+    if (activemenu === "viewadv" && which !== "viewadv" && typeof exitTheaterMode === "function") {
+        exitTheaterMode();
+    }
+
     /* News: same tab, different item — swap only the article mount (Browse-style partial update). */
     if (which === "news" && activemenu === "news" && param && $("#newswindow").is(":visible") && $("#newswindow #news-article-mount").length) {
         var loadUrl = conf.load + "?" + param + "&fragment=article";
