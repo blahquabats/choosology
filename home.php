@@ -93,7 +93,7 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
     ?>
     <div class='featuredslides'>
         <?php if (is_array($res) && count($res) > 0) { ?>
-        <div class='slidenav-left cycle-prev'><img src='images/icons/misc/slideleft2.png' alt="" /></div>
+        <button type="button" class="slidenav slidenav-left cycle-prev" aria-label="Previous featured experiment"></button>
         <div class='featuredslides-cycle'>
         <?php
             foreach ($res as $r) {
@@ -101,9 +101,7 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
             }
         ?>
         </div>
-        <div class='slidenav-right cycle-next'>
-            <img src='images/icons/misc/slideright2.png' alt="" />
-        </div>
+        <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
         <?php } elseif (is_array($res)) { ?>
         <p class='home-no-featured'>No public adventures to feature yet.</p>
         <?php } else {
@@ -123,15 +121,23 @@ echo "";
         var slideCount = $cyc.children(".slidefolder").length;
         if ($cyc.length && slideCount >= 2) {
             $cyc.cycle({
-                speed: 1000,
-                manualSpeed: 1000,
+                speed: 400,
+                manualSpeed: 300,
                 timeout: 8000,
-                fx: "scrollHorz",
-                pauseOnHover: true,
+                fx: "fade",
+                sync: 0,
+                pauseOnHover: false,
                 prev: ".featuredslides .cycle-prev",
                 next: ".featuredslides .cycle-next",
                 containerResize: 0,
                 slideResize: 0
+            });
+            /* pauseOnHover on the cycle root unpauses when the pointer moves to the
+               sibling prev/next buttons; pause the whole slideshow chrome instead. */
+            $(".featuredslides").on("mouseenter", function() {
+                $cyc.cycle("pause");
+            }).on("mouseleave", function() {
+                $cyc.cycle("resume");
             });
         } else if (slideCount === 1) {
             $(".featuredslides .cycle-prev, .featuredslides .cycle-next").hide();
