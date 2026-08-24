@@ -94,9 +94,9 @@ h1
 {
     display: block;
     text-align: center;
-    background-color: #bbffbb;
+    background-color: #ecece6;
     border-style: solid;
-    border-color: black;
+    border-color: #333333;
     border-width: 1px 0 1px 0;
     margin-bottom: 10px;
 }
@@ -108,9 +108,9 @@ h2
     margin-left:25%;
     margin-right:25%;
     text-align: center;
-    background-color: #bbffbb;
+    background-color: #ecece6;
     border-style: solid;
-    border-color: black;
+    border-color: #333333;
     border-width: 1px 0 1px 0;
 }
 
@@ -2853,7 +2853,7 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 }
 #tabswindow .ui-tabs-nav .ui-state-active a
 {
-    color: #459e00;
+    color: #3d3d3d;
 }
 #tabswindow .ui-tabs-nav .ui-state-active img 
 {
@@ -7188,6 +7188,11 @@ h3.msg-read-title,
 #tabswindow .ui-tabs-nav li.clic-tab.ui-state-active a
 {
     color: #b45309 !important;
+}
+#tabswindow .ui-tabs-nav li.clic-tab.ui-state-active
+{
+    background: #fffdf8 !important;
+    background-image: none !important;
 }
 
 /* ===== Messages center + quick modal + login badge ===== */
