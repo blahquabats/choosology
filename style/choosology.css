@@ -7009,6 +7009,10 @@ body.signup-modal-open
 }
 
 /* ===== CLIC (Choosology Labs Internal Communications) ===== */
+h2.msg-center-title,
+h2.msg-quick-title,
+h3.msg-compose-title,
+h3.msg-read-title,
 .msg-center-title,
 .msg-quick-title,
 .msg-compose-title,
@@ -7247,6 +7251,13 @@ body.signup-modal-open
     margin: 0;
     font-size: 1.35rem;
     color: #1a2a3a;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
 }
 .msg-center-toolbar {
     display: flex;
