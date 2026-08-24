@@ -122,11 +122,7 @@ $out = "
 
     <meta charset='utf-8' />
 
-<<<<<<< HEAD
-        <link rel='stylesheet' href='style/view.css' /><link rel='stylesheet' href='style/choosology.css?v=clic4' />
-=======
-        <link rel='stylesheet' href='style/view.css?v=endpanel2' /><link rel='stylesheet' href='style/choosology.css' />
->>>>>>> origin/main
+        <link rel='stylesheet' href='style/view.css?v=endpanel2' /><link rel='stylesheet' href='style/choosology.css?v=clic4' />
         <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css' />
       <style>
         .choice
