@@ -93,7 +93,7 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
     ?>
     <div class='featuredslides'>
         <?php if (is_array($res) && count($res) > 0) { ?>
-        <div class='slidenav-left cycle-prev'><img src='images/icons/misc/slideleft2.png' alt="" /></div>
+        <button type="button" class="slidenav slidenav-left cycle-prev" aria-label="Previous featured experiment"></button>
         <div class='featuredslides-cycle'>
         <?php
             foreach ($res as $r) {
@@ -101,9 +101,7 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
             }
         ?>
         </div>
-        <div class='slidenav-right cycle-next'>
-            <img src='images/icons/misc/slideright2.png' alt="" />
-        </div>
+        <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
         <?php } elseif (is_array($res)) { ?>
         <p class='home-no-featured'>No public adventures to feature yet.</p>
         <?php } else {

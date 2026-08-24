@@ -4157,7 +4157,6 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     position:relative;
     top: 0px;
     padding:0;
-    padding-right: 10px;
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -4221,6 +4220,9 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     align-items: stretch;
     justify-content: flex-start;
     gap: 6px;
+    /* Overlay CSS nav buttons replace the old 50px image gutters. */
+    margin-left: 0;
+    width: 100%;
 }
 .featuredslides .slideinfo
 {
@@ -4378,49 +4380,82 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     z-index: 3;
 }
 
-.slidenav-right
+/* Featured slideshow prev/next: CSS chevrons, no image assets. */
+.featuredslides .slidenav
 {
-   /* background-image: url("../images/icons/misc/slideright2.png");*/
+    -webkit-appearance: none;
+    appearance: none;
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    width: 50px;
-    position:absolute;
-    right:0px;
-    top:0px;
-    bottom: 0;
-    height: auto;
+    position: absolute;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0;
+    padding: 0;
+    border: 1px solid #604b91;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.16);
+    color: #4b3b77;
     cursor: pointer;
-    z-index: 110 !important;
+    z-index: 110;
+    line-height: 0;
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
 }
 
-.slidenav-left
+.featuredslides .slidenav-left
 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    width: 50px;
-    position:absolute;
-    left:0;
-    top:0px;
-    bottom: 0;
-    height: auto;
-    cursor: pointer;
-    z-index: 110 !important;
+    left: 10px;
 }
 
-.slidenav-left img,
-.slidenav-right img
+.featuredslides .slidenav-right
 {
+    right: 10px;
+}
+
+.featuredslides .slidenav::before
+{
+    content: "";
     display: block;
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    max-height: 100%;
-    object-fit: contain;
-    pointer-events: none;
+    width: 10px;
+    height: 10px;
+    border-style: solid;
+    border-color: currentColor;
+    border-width: 0 0 2.5px 2.5px;
+}
+
+.featuredslides .slidenav-left::before
+{
+    transform: rotate(45deg);
+    margin-left: 3px;
+}
+
+.featuredslides .slidenav-right::before
+{
+    transform: rotate(-135deg);
+    margin-right: 3px;
+}
+
+.featuredslides .slidenav:hover
+{
+    background: #f4f0fb;
+    color: #1f1f2d;
+    border-color: #4b3b77;
+}
+
+.featuredslides .slidenav:focus-visible
+{
+    outline: none;
+    box-shadow: 0 0 0 2px #edf3ff, 0 0 0 4px #604b91, 0 2px 10px rgba(15, 23, 42, 0.16);
+}
+
+.featuredslides .slidenav:active
+{
+    transform: scale(0.96);
 }
 
 
