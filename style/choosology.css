@@ -326,7 +326,9 @@ label.sel:before {
     background-color: #eeeeee;
     padding:5px;
     text-align: right;
-    z-index:5;
+    /* Above #viewwindow (101) and other content panes so the login box
+       (including Apply for lab access) stays visible and clickable. */
+    z-index: 200;
 }
 
 .footer
@@ -397,6 +399,8 @@ label.sel:before {
 #topbox
 {
     right: 50px;
+    overflow: visible;
+    max-width: min(420px, calc(100vw - 280px));
 }
 
 #contextlink
@@ -2543,12 +2547,13 @@ body.adv-picmodal-open
 
 #viewwindow
 {
-    top: 80px;
+    /* Clear the full logged-out #topbox (user/pass/remember/submit + Apply for lab access). */
+    top: 140px;
     left: 10px;
     margin-top:0px;
-    height: -moz-calc(100% - 100px);
-    height: -webkit-calc(100% - 100px);
-    height: calc(100% - 100px);
+    height: -moz-calc(100% - 160px);
+    height: -webkit-calc(100% - 160px);
+    height: calc(100% - 160px);
     width: -moz-calc(100% - 50px);
     width: -webkit-calc(100% - 50px);
     width: calc(100% - 50px);
