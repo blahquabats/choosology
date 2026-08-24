@@ -121,10 +121,10 @@ echo "";
         var slideCount = $cyc.children(".slidefolder").length;
         if ($cyc.length && slideCount >= 2) {
             $cyc.cycle({
-                speed: 1000,
-                manualSpeed: 1000,
+                speed: 600,
+                manualSpeed: 400,
                 timeout: 8000,
-                fx: "scrollHorz",
+                fx: "fade",
                 pauseOnHover: true,
                 prev: ".featuredslides .cycle-prev",
                 next: ".featuredslides .cycle-next",
