@@ -52,6 +52,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle/3.0.3/jquery.cycle.all.min.js"></script>
     <script src="scripts/jquery-dateFormat.js"></script>
     <script src="scripts/jquery-minicolors/jquery.minicolors.min.js"></script>
+    <script src="scripts/lib/choosology-utils.js"></script>
     <script src="scripts/choosology.js"></script>
     <!-- Konva 10.3.0 UMD (official npm konva.min.js). jsDelivr mirrors npm; cdnjs /ajax/libs/konva/10.x/konva.min.js was 404 when checked — swap to cdnjs when they publish this version. -->
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>

@@ -30,11 +30,16 @@
 		return $("<div/>").text(String(s == null ? "" : s)).html();
 	}
 
-	var CLIC_THEMES = ["amber", "violet", "slate"];
+	var CLIC_THEMES = (window.ChoosologyUtils && window.ChoosologyUtils.CLIC_THEMES)
+		? window.ChoosologyUtils.CLIC_THEMES.slice()
+		: ["amber", "violet", "slate"];
 
 	function getClicTheme() {
 		try {
 			var stored = localStorage.getItem("clicTheme");
+			if (window.ChoosologyUtils && window.ChoosologyUtils.normalizeClicTheme) {
+				return window.ChoosologyUtils.normalizeClicTheme(stored);
+			}
 			if (stored && CLIC_THEMES.indexOf(stored) >= 0) {
 				return stored;
 			}
@@ -43,7 +48,11 @@
 	}
 
 	function applyClicTheme(theme) {
-		theme = CLIC_THEMES.indexOf(theme) >= 0 ? theme : "amber";
+		if (window.ChoosologyUtils && window.ChoosologyUtils.normalizeClicTheme) {
+			theme = window.ChoosologyUtils.normalizeClicTheme(theme);
+		} else {
+			theme = CLIC_THEMES.indexOf(theme) >= 0 ? theme : "amber";
+		}
 		try {
 			localStorage.setItem("clicTheme", theme);
 		} catch (ignore) {}
@@ -65,15 +74,19 @@
 	}
 
 	function updateBadges(unread) {
-		var n = parseInt(unread, 10) || 0;
-		var label = n > 0 ? ("CLIC (" + n + ")") : "CLIC";
+		var info = (window.ChoosologyUtils && window.ChoosologyUtils.formatUnreadBadge)
+			? window.ChoosologyUtils.formatUnreadBadge(unread)
+			: null;
+		var n = info ? info.count : (parseInt(unread, 10) || 0);
+		var label = info ? info.label : (n > 0 ? ("CLIC (" + n + ")") : "CLIC");
 		$("#mystuff-messages").text(label);
 		var $badge = $("#msg_unread_badge");
 		if (!$badge.length) {
 			return;
 		}
 		if (n > 0) {
-			$badge.text(n > 99 ? "99+" : String(n)).removeAttr("hidden").attr("aria-hidden", "false");
+			var badgeText = info ? info.badgeText : (n > 99 ? "99+" : String(n));
+			$badge.text(badgeText).removeAttr("hidden").attr("aria-hidden", "false");
 			$badge.closest(".msg-login-notify").attr("data-unread", String(n));
 		} else {
 			$badge.attr("hidden", "hidden").attr("aria-hidden", "true").text("");

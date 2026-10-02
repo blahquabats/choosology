@@ -21,18 +21,7 @@ if (empty($_SESSION['user'])) {
 	exit;
 }
 
-function choosology_account_pic_tags(string $cat): array
-{
-	$cat = trim($cat);
-	if ($cat === '') {
-		return array();
-	}
-	$parts = preg_split('/\s*,\s*/', $cat, -1, PREG_SPLIT_NO_EMPTY);
-	if (!is_array($parts) || count($parts) === 0) {
-		return array($cat);
-	}
-	return array_values(array_unique(array_map('trim', $parts)));
-}
+require_once __DIR__ . '/../lib/pic-list-helpers.php';
 
 $pics = getUserPics((string) $_SESSION['user']);
 $tagMap = array();

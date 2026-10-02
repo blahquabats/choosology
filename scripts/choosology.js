@@ -1,5 +1,8 @@
 function count(array)
 {
+    if (typeof ChoosologyUtils !== "undefined" && ChoosologyUtils.count) {
+        return ChoosologyUtils.count(array);
+    }
     var c = 0;
     for(i in array) // in returns key, not object
         if(array[i] != undefined)
@@ -9,6 +12,9 @@ return c;
 }
 
 function strip_tags(input, allowed) {
+  if (typeof ChoosologyUtils !== "undefined" && ChoosologyUtils.stripTags) {
+    return ChoosologyUtils.stripTags(input, allowed);
+  }
   allowed = (((allowed || '') + '')
     .toLowerCase()
     .match(/<[a-z][a-z0-9]*>/g) || [])
@@ -52,6 +58,9 @@ function nicedatetime(datetime)
 
 function degreesToRadians(degrees) 
 {
+    if (typeof ChoosologyUtils !== "undefined" && ChoosologyUtils.degreesToRadians) {
+        return ChoosologyUtils.degreesToRadians(degrees);
+    }
     return (Math.PI/180) * degrees;
 }
 
@@ -375,6 +384,9 @@ function decodeEntities(input)
 }
 
 function choosologyUrlSafeGlobal(path) {
+    if (typeof ChoosologyUtils !== "undefined" && ChoosologyUtils.urlSafe) {
+        return ChoosologyUtils.urlSafe(path);
+    }
     if (typeof choosologyUrl === "function") {
         return choosologyUrl(path);
     }
@@ -388,7 +400,14 @@ function choosologyUrlSafeGlobal(path) {
 function makeNewExperiment(title, options) {
     options = options || {};
     title = String(title || "").trim();
-    if (!title) {
+    if (typeof ChoosologyUtils !== "undefined" && ChoosologyUtils.isValidExperimentTitle) {
+        if (!ChoosologyUtils.isValidExperimentTitle(title)) {
+            if (typeof showAlert === "function") {
+                showAlert("Please enter a name for the experiment.", "error");
+            }
+            return;
+        }
+    } else if (!title) {
         if (typeof showAlert === "function") {
             showAlert("Please enter a name for the experiment.", "error");
         }

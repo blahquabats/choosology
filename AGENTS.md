@@ -33,4 +33,8 @@ Both services are long-running: start each in its own tmux session (e.g. `mariad
 
 ### Lint / test / build
 
-- No linter, test suite, or build system is configured. For a syntax "lint", run `php -l` over the PHP files (all files outside `oldstuff/` currently pass), e.g. `find . -name '*.php' -not -path './oldstuff/*' -exec php -l {} \;`.
+- **PHPUnit** (PHP) and **Jest** (JS) are configured. See `tests/README.md`.
+  - Install: `composer install` and `npm install` (needs `php8.3-xml` / `ext-dom` for PHPUnit).
+  - Unit: `./vendor/bin/phpunit --testsuite Unit` and `npm test`.
+  - Integration: `bash tests/bin/prepare-test-db.sh` then `./vendor/bin/phpunit --testsuite Integration` (uses DB `choosology_test`; HTTP smoke tests need the PHP server on `:8000`).
+- For a syntax "lint", run `php -l` over the PHP files (all files outside `oldstuff/` currently pass), e.g. `find . -name '*.php' -not -path './oldstuff/*' -exec php -l {} \;`.

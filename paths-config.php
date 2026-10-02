@@ -48,13 +48,27 @@ function choosology_pics_universal_dir(): string
 }
 
 /**
+ * Clear cached web base (for tests that change env / SCRIPT_NAME).
+ */
+function choosology_web_base_reset(): void
+{
+	choosology_web_base(true);
+}
+
+/**
  * Web path prefix for the app (e.g. "" at domain root, "/choosology" in a subfolder).
  * Used to build absolute-style paths for JSON and Location headers.
  * Override: env CHOOSOLOGY_WEB_BASE, connect.local.php key web_base, or infer from SCRIPT_NAME.
+ *
+ * @param bool $reset When true, clear the static cache and return "".
  */
-function choosology_web_base(): string
+function choosology_web_base(bool $reset = false): string
 {
 	static $cached = null;
+	if ($reset) {
+		$cached = null;
+		return '';
+	}
 	if ($cached !== null) {
 		return $cached;
 	}
