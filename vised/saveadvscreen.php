@@ -70,6 +70,12 @@ for ($c = 1; $c <= 8; $c++)
 $q .= " where id = '$sid' and user = '$user'";
 if(runquery($q))
 {
+    $advused = (int) ($screeninfo['advused'] ?? 0);
+    if ($advused > 0) {
+        choosology_adv_touch_edited($db, $advused, (string) $user);
+        choosology_award_achievement($db, (string) $user, 'screenwright');
+        choosology_clipboard_set_checklist_flag($db, (string) $user, 'edit_screen', 'completed', 1);
+    }
     echo $q;    
 }
 else echo "Error: problem updating database";

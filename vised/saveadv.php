@@ -88,4 +88,8 @@ foreach ($boxgroups as $k => $p)
 }
 mysqli_commit($db);
 mysqli_autocommit($db, TRUE);
+$advidTouch = (int) preg_replace('/\D/', '', (string) ($_POST['advid'] ?? ''));
+if ($advidTouch > 0 && !empty($user) && function_exists('choosology_adv_touch_edited')) {
+	choosology_adv_touch_edited($db, $advidTouch, (string) $user);
+}
 ?>

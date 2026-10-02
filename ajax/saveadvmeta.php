@@ -229,5 +229,11 @@ if (!runquery($q)) {
 	exit;
 }
 
+if ($avail === 'public') {
+	require_once __DIR__ . '/../lib/clipboard-helpers.php';
+	choosology_award_achievement($db, $user, 'field_release');
+	choosology_clipboard_set_checklist_flag($db, $user, 'publish_experiment', 'completed', 1);
+}
+
 echo json_encode(array('ok' => 1), $jsonFlags);
 exit;

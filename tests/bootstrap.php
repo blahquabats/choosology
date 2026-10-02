@@ -17,6 +17,7 @@ require_once CHOOSOLOGY_ROOT . '/lib/resource-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/pic-list-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/news-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/feed-helpers.php';
+require_once CHOOSOLOGY_ROOT . '/lib/clipboard-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/icondefs.php';
 require_once CHOOSOLOGY_ROOT . '/tests/Support/ChoosologyTestDb.php';
 require_once CHOOSOLOGY_ROOT . '/messagesfunc.php';

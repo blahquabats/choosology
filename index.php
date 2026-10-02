@@ -120,6 +120,9 @@
         $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
         echo "<div class='msg-login-row'>";
         echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "<button type='button' class='msg-login-notify ms-clipboard-btn' id='clipboard_office_btn' title='My Office clipboard' aria-label='Open clipboard'>";
+        echo "<span class='msg-login-notify-label'>Clip</span>";
+        echo "</button>";
         echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";
         echo "<span class='msg-login-notify-label'>CLIC</span>";
         echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";

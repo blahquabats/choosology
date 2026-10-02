@@ -3,6 +3,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'paths-config.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'font-options.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'choosology-core.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'ending-helpers.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'clipboard-helpers.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'messagesfunc.php';
 require_once("authent.php");
 require_once("comments.php");

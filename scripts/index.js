@@ -260,6 +260,11 @@ $(function() {
                 });
             });
 
+            $(document).on("click", "#clipboard_office_btn", function(e) {
+                e.preventDefault();
+                window.location.hash = "#/mystuff/office";
+            });
+
             $(document).on("keypress", "#loginpass", function(e){
             		if (e.which == 13) {
             	    $('#loginsubmit').trigger("click");

@@ -7745,3 +7745,288 @@ body.msg-quick-open {
     background: #f8fafc;
     text-align: center;
 }
+
+/* ---- My Office / Clipboard / Degrees ---- */
+.ms-clipboard-btn
+{
+    margin-left: 6px;
+    background: #e8eef5;
+    border-color: #7a93ab;
+    color: #1c3a52;
+}
+.ms-clipboard-btn:hover
+{
+    background: #d7e4f2;
+}
+.ms-office-page,
+.ms-degrees-page
+{
+    box-sizing: border-box;
+    padding: 12px 16px 28px;
+    background:
+        linear-gradient(180deg, #f4f7fb 0%, #e9eef5 100%);
+}
+.ms-office-paper,
+.ms-degrees-paper
+{
+    max-width: 980px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #c5d0dc;
+    border-left: 5px solid #3d5a73;
+    border-radius: 0 10px 10px 0;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
+    padding: 18px 22px 24px;
+}
+.ms-office-eyebrow,
+.ms-degrees-eyebrow
+{
+    margin: 0 0 4px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5a7085;
+}
+.ms-office-eyebrow-tag,
+.ms-degrees-eyebrow-tag
+{
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border: 1px solid #b7c5d4;
+    border-radius: 3px;
+    background: #eef3f8;
+    font-size: 0.68rem;
+}
+.ms-office-title,
+.ms-degrees-title
+{
+    margin: 0 0 6px;
+    font-size: 1.55rem;
+    color: #1a2a3a;
+}
+.ms-office-lede,
+.ms-degrees-lede
+{
+    margin: 0 0 14px;
+    color: #4a5d70;
+    font-size: 0.95rem;
+}
+.ms-office-subnav
+{
+    display: flex;
+    gap: 8px;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d7e0ea;
+}
+.ms-office-subnav-btn
+{
+    border: 1px solid #9aafc2;
+    background: #f3f7fb;
+    color: #24384c;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.ms-office-subnav-btn.is-active,
+.ms-office-subnav-btn:hover
+{
+    background: #dbe7f3;
+    border-color: #3d5a73;
+}
+.ms-office-card
+{
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border: 1px solid #d5dee8;
+    border-radius: 6px;
+    background: #fbfcfe;
+}
+.ms-office-card h3
+{
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    color: #203040;
+}
+.ms-office-hint,
+.ms-office-muted,
+.ms-office-empty
+{
+    color: #667788;
+    font-size: 0.88rem;
+}
+.ms-office-link,
+.ms-office-linkish
+{
+    color: #1c5a7a;
+    font-weight: 600;
+    text-decoration: underline;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+}
+.ms-office-sep { margin: 0 6px; color: #98a6b8; }
+.ms-office-checklist,
+.ms-office-todos,
+.ms-degrees-list
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.ms-office-check-item,
+.ms-office-todo,
+.ms-degrees-item
+{
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e4ebf2;
+}
+.ms-office-check-item.is-done .ms-office-check-label,
+.ms-office-todo.is-done .ms-office-todo-label span
+{
+    text-decoration: line-through;
+    color: #7a8a9a;
+}
+.ms-office-check-label,
+.ms-degrees-item-label
+{
+    display: block;
+    font-weight: 700;
+    color: #1a2a3a;
+}
+.ms-office-check-hint,
+.ms-degrees-item-blurb
+{
+    display: block;
+    margin-top: 2px;
+    font-size: 0.82rem;
+    color: #667788;
+}
+.ms-office-check-actions
+{
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.ms-office-btn
+{
+    border: 1px solid #3d5a73;
+    background: #3d5a73;
+    color: #fff;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.ms-office-btn:hover { background: #2f4860; }
+.ms-office-btn--ghost
+{
+    background: transparent;
+    color: #3d5a73;
+}
+.ms-office-btn--small
+{
+    padding: 3px 8px;
+    font-size: 0.78rem;
+}
+.ms-office-badge
+{
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: #d9ead3;
+    color: #275522;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+.ms-office-pad,
+.ms-office-input
+{
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #b7c5d4;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font: inherit;
+    background: #fff;
+}
+.ms-office-pad { min-height: 140px; resize: vertical; }
+.ms-office-todo-form
+{
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.ms-office-todo-form .ms-office-input { flex: 1; }
+.ms-office-todo-label
+{
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex: 1;
+    cursor: pointer;
+}
+.ms-office-row
+{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+}
+.ms-office-status { font-size: 0.85rem; color: #3d5a73; }
+.ms-office-metrics-wrap
+{
+    overflow-x: auto;
+}
+.ms-office-metrics
+{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+}
+.ms-office-metrics th,
+.ms-office-metrics td
+{
+    border-bottom: 1px solid #e0e7ef;
+    padding: 8px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+.ms-office-metrics th
+{
+    background: #eef3f8;
+    color: #31485c;
+    font-weight: 700;
+}
+.ms-office-metrics-links a { margin-right: 8px; }
+.ms-degrees-item.is-locked { opacity: 0.72; }
+.ms-degrees-item-meta
+{
+    text-align: right;
+    flex-shrink: 0;
+    font-size: 0.78rem;
+}
+.ms-degrees-group
+{
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #7a8a9a;
+}
+.ms-degrees-earned { color: #275522; font-weight: 700; }
+.ms-degrees-locked { color: #98a6b8; }
+.ms-degrees-foot
+{
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: #4a5d70;
+}

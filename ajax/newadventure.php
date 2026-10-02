@@ -99,6 +99,9 @@ try {
 	}
 
 	mysqli_commit($db);
+	require_once __DIR__ . '/../lib/clipboard-helpers.php';
+	choosology_award_achievement($db, $user, 'lab_initiate');
+	choosology_clipboard_set_checklist_flag($db, $user, 'create_experiment', 'completed', 1);
 	echo json_encode(array('ok' => 1, 'id' => $newAdvId), $jsonFlags);
 } catch (Throwable $e) {
 	mysqli_rollback($db);

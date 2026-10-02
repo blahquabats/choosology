@@ -14,7 +14,7 @@ if [[ -f "$ROOT/choosology-schema.sql" ]]; then
   iconv -f UTF-16LE -t UTF-8 "$ROOT/choosology-schema.sql" | sudo mariadb "$DB_NAME"
 fi
 
-for f in ending_finds_setup.sql messages_digest_setup.sql signup_setup.sql news_setup.sql updates_setup.sql; do
+for f in ending_finds_setup.sql messages_digest_setup.sql signup_setup.sql news_setup.sql updates_setup.sql clipboard_setup.sql; do
   if [[ -f "$ROOT/sql/$f" ]]; then
     sudo mariadb "$DB_NAME" < "$ROOT/sql/$f" || true
   fi

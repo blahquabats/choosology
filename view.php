@@ -62,6 +62,24 @@ if (!empty($_GET['screen'])) {
 if (!$sid) die ("Can't find page information!");
 $screen = getScreenInfo($sid);
 
+/* Count a play start once per adventure per PHP session (initial load / begin screen). */
+$isBeginLoad = empty($_GET['screen']) || (string) ($_GET['screen'] ?? '') === (string) ($adv['begin'] ?? '');
+if ($isBeginLoad) {
+	if (session_status() === PHP_SESSION_NONE) {
+		@session_start();
+	}
+	if (!isset($_SESSION['play_counted']) || !is_array($_SESSION['play_counted'])) {
+		$_SESSION['play_counted'] = array();
+	}
+	$advidKey = (int) $id;
+	if ($advidKey > 0 && empty($_SESSION['play_counted'][$advidKey])) {
+		$_SESSION['play_counted'][$advidKey] = 1;
+		if (function_exists('choosology_adv_record_play_start')) {
+			choosology_adv_record_play_start($db, $advidKey);
+		}
+	}
+}
+
 //16345 for lots of choices
 if ($adv['pic'] && choosology_adv_pic_usable_for_display($adv['pic'])) {
 	$pu = getPicUrl($adv['pic'], true);
