@@ -90,7 +90,7 @@ function choosology_web_base(bool $reset = false): string
 		$trim = trim($sn, '/');
 		if ($trim !== '') {
 			$parts = explode('/', $trim);
-			foreach (array('ajax', 'vised', 'mystuff') as $appDir) {
+			foreach (array('ajax', 'vised', 'mystuff', 'lite') as $appDir) {
 				$i = array_search($appDir, $parts, true);
 				if ($i !== false) {
 					if ($i === 0) {

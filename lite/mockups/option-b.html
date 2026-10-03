@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lite style B — Instrument Panel</title>
+	<style>
+		:root {
+			--bg: #c0c0c0;
+			--face: #d4d0c8;
+			--paper: #ffffff;
+			--ink: #000000;
+			--muted: #404040;
+			--navy: #000080;
+			--hilite: #ffffff;
+			--shadow: #808080;
+			--darkshadow: #404040;
+			--title: #000080;
+			--title-text: #ffffff;
+			--accent: #008080;
+			--font-ui: "MS Sans Serif", Tahoma, Verdana, sans-serif;
+			--font-mono: "Courier New", monospace;
+		}
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--ink);
+			font: 15px/1.4 var(--font-ui);
+		}
+		a { color: var(--navy); }
+		.wrap { max-width: 52rem; margin: 0 auto; padding: 0.75rem; }
+		.win {
+			background: var(--face);
+			border-top: 2px solid var(--hilite);
+			border-left: 2px solid var(--hilite);
+			border-right: 2px solid var(--darkshadow);
+			border-bottom: 2px solid var(--darkshadow);
+			padding: 2px;
+			margin-bottom: 0.75rem;
+		}
+		.titlebar {
+			background: var(--title);
+			color: var(--title-text);
+			font-weight: bold;
+			padding: 0.25rem 0.4rem;
+			font-size: 0.85rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.titlebar .sys {
+			font-weight: normal;
+			font-size: 0.75rem;
+			opacity: 0.9;
+		}
+		.inner { padding: 0.55rem 0.6rem 0.7rem; }
+		.brand-row {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 0.35rem;
+			margin-bottom: 0.4rem;
+		}
+		.brand { font-size: 1.15rem; font-weight: bold; margin: 0; color: var(--navy); }
+		.tag { margin: 0; color: var(--muted); font-size: 0.78rem; }
+		.menubar {
+			border-top: 1px solid var(--shadow);
+			border-bottom: 1px solid var(--hilite);
+			padding: 0.25rem 0;
+			margin: 0.35rem 0 0.5rem;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.15rem 0.75rem;
+			font-size: 0.9rem;
+		}
+		.menubar a { text-decoration: none; }
+		.menubar a:hover { text-decoration: underline; }
+		.banner {
+			background: #ffffcc;
+			border: 1px solid #999900;
+			padding: 0.45rem 0.55rem;
+			margin-bottom: 0.75rem;
+			font-size: 0.88rem;
+		}
+		fieldset {
+			border-top: 2px solid var(--hilite);
+			border-left: 2px solid var(--hilite);
+			border-right: 2px solid var(--shadow);
+			border-bottom: 2px solid var(--shadow);
+			background: var(--paper);
+			margin: 0 0 0.65rem;
+			padding: 0.55rem 0.65rem 0.7rem;
+		}
+		legend {
+			font-weight: bold;
+			padding: 0 0.25rem;
+			color: var(--navy);
+		}
+		.meta { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.55rem; }
+		.screen {
+			border: 1px inset #808080;
+			padding: 0.55rem;
+			background: #f8f8f8;
+			margin-bottom: 0.55rem;
+		}
+		.btnrow { display: flex; flex-direction: column; gap: 0.35rem; }
+		.btnrow a {
+			display: block;
+			text-align: left;
+			text-decoration: none;
+			color: var(--ink);
+			background: var(--face);
+			border-top: 2px solid var(--hilite);
+			border-left: 2px solid var(--hilite);
+			border-right: 2px solid var(--darkshadow);
+			border-bottom: 2px solid var(--darkshadow);
+			padding: 0.35rem 0.5rem;
+			font-size: 0.9rem;
+		}
+		.btnrow a:active {
+			border-top: 2px solid var(--darkshadow);
+			border-left: 2px solid var(--darkshadow);
+			border-right: 2px solid var(--hilite);
+			border-bottom: 2px solid var(--hilite);
+		}
+		.ascii {
+			font-family: var(--font-mono);
+			font-size: 0.75rem;
+			line-height: 1.25;
+			white-space: pre;
+			overflow-x: auto;
+			background: #000080;
+			color: #c0c0c0;
+			padding: 0.55rem;
+			border: 1px inset #808080;
+			margin: 0 0 0.5rem;
+		}
+		.foot { font-size: 0.75rem; color: var(--muted); }
+		.swatches { display: flex; gap: 0.35rem; margin-top: 0.45rem; }
+		.swatches span {
+			width: 1.4rem; height: 1.4rem;
+			border: 1px solid #000;
+			display: inline-block;
+		}
+		.label-opt { font-size: 0.75rem; color: var(--accent); margin: 0 0 0.35rem; font-weight: bold; }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="win">
+			<div class="titlebar">
+				<span>Choosology Lite — Lab Terminal</span>
+				<span class="sys">_ □ ×</span>
+			</div>
+			<div class="inner">
+				<p class="label-opt">OPTION B — Instrument Panel</p>
+				<div class="brand-row">
+					<div>
+						<p class="brand">CHOOSOLOGY LITE</p>
+						<p class="tag">Authentic experience of the 1986 cohort</p>
+					</div>
+				</div>
+				<nav class="menubar">
+					<a href="#">Home</a>
+					<a href="#">News</a>
+					<a href="#">Browse</a>
+					<a href="#">Sign in</a>
+					<a href="#">Classic view</a>
+				</nav>
+
+				<div class="banner">
+					Classic seems slow on this connection.
+					<strong>Lite</strong> is the lean terminal UI.
+					<a href="#">Switch to Lite</a> · <a href="#">Dismiss</a>
+				</div>
+
+				<fieldset>
+					<legend>Experiment · Midnight Beaker</legend>
+					<p class="meta">by labtester · public · 4 screens</p>
+					<div class="screen">
+						<p>The bench lamp hums. A beaker ticks once, then goes still. Two corridors wait past the autoclave.</p>
+					</div>
+					<div class="btnrow">
+						<a href="#">1. Take the glowing path</a>
+						<a href="#">2. Take the dark hall</a>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>Structure (read-only)</legend>
+					<p class="meta">ASCII map · edit in Classic</p>
+					<pre class="ascii">[Start]
+   |
+   +-- Continue --> [Middle]
+                       |
+                       +-- glowing --> [Ending A]
+                       +-- dark    --> [Ending B]</pre>
+					<p><a href="#">Open graph editor in Classic →</a></p>
+					<div class="swatches">
+						<span style="background:#c0c0c0"></span>
+						<span style="background:#d4d0c8"></span>
+						<span style="background:#000080"></span>
+						<span style="background:#008080"></span>
+						<span style="background:#ffffcc"></span>
+					</div>
+				</fieldset>
+
+				<p class="foot">Beveled chrome, Win3.1-adjacent. Images stay small; no scripted chrome.</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

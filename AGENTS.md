@@ -24,6 +24,7 @@ Both services are long-running: start each in its own tmux session (e.g. `mariad
 
 ### App behavior gotchas
 
+- **Lite mode** (`/lite/`, future `lite.choosology.com`): Instrument Panel (Win3.1-adjacent) multi-page UI — Home, Browse, View/play, Structure (ASCII), Sign in. Almost no JS. Preference in `users.ui_mode` + cookie `choosology_ui`; Classic header **Lite** link and `scripts/lite-suggest.js` (viewport/latency banner). Local entry: `http://127.0.0.1:8000/lite/`. Style mockups under `lite/mockups/`. My Stuff stays Classic for now.
 - Signup is available from the login box via **Apply for lab access** (modal → `ajax/signupchallenge.php` + `ajax/signup.php`). Successful signup logs the user in immediately. Optional columns `newsletter` / `welcome_pending` are added automatically (or via `sql/signup_setup.sql`). Welcome mail uses PHP `mail()` when available; otherwise `welcome_pending` stays set for a later send.
 - End screens (no valid outgoing choices) render a lab-styled **ending panel** (`choosology_build_ending_panel_html`) with rating + comments, a count of end screens catalogued this visit/account, and a yes/no note on whether more endings exist (total count is never shown). Logged-in finds persist in `ending_finds` (`sql/ending_finds_setup.sql`); anonymous finds use the PHP session.
 - Passwords are stored as `md5("cYo" . password)` — legacy/insecure, but that is the current scheme.

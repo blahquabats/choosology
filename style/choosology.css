@@ -8303,3 +8303,39 @@ body.clipboard-modal-open
 {
     min-width: 180px;
 }
+
+/* Classic → Lite entry + suggest banner */
+.classic-lite-link
+{
+    float: right;
+    margin: 0 0 4px 8px;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+.classic-lite-link a
+{
+    color: #003399;
+    font-weight: bold;
+    text-decoration: underline;
+}
+.lite-suggest
+{
+    position: relative;
+    z-index: 250;
+    background: #ffffcc;
+    border: 2px solid #999900;
+    padding: 0.55rem 0.75rem;
+    margin: 0.5rem auto;
+    max-width: 40rem;
+    font: 0.9rem Tahoma, Verdana, sans-serif;
+    color: #000;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+}
+.lite-suggest a { color: #000080; font-weight: bold; }
+.lite-suggest-actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.85rem;
+    margin-top: 0.35rem;
+}

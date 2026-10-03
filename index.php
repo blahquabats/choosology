@@ -1,6 +1,13 @@
 <?php
     require_once("./connect.php");
     require_once("./auxfuncs.php");
+    require_once("./lib/lite-helpers.php");
+    choosology_ui_mode_ensure_schema($db);
+    /* Site-wide Lite preference: Classic entry redirects unless explicitly staying. */
+    if (choosology_ui_preferred_mode($db) === 'lite' && empty($_GET['stay'])) {
+        header('Location: ' . choosology_lite_url('index.php'));
+        exit;
+    }
     /* Web path to app root (empty when installed at domain root, e.g. "/choosology" in a subfolder). */
     $choosology_web_base = '';
     if (!empty($_SERVER['SCRIPT_NAME'])) {
@@ -62,6 +69,7 @@
     <script src='scripts/messages.js?v=clic2'></script>
     <script src='scripts/clipboard.js?v=clip2'></script>
     <script src='scripts/routes.js'></script>
+    <script src='scripts/lite-suggest.js?v=1'></script>
 
 
 </head>
@@ -106,6 +114,8 @@
 
 <div class="header" id='topbox'>
     <?php
+    $liteSwitchHref = htmlspecialchars(choosology_lite_url('switch.php?to=lite'), ENT_QUOTES, 'UTF-8');
+    echo "<div class='classic-lite-link'><a href='{$liteSwitchHref}' title='Authentic lean terminal UI — cohort of 1986'>Lite</a></div>";
     if (empty($_SESSION['user']))
     {
         echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";

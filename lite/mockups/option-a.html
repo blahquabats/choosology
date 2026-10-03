@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lite style A — Phosphor Bench</title>
+	<style>
+		:root {
+			--bg: #f4f6f1;
+			--paper: #fcfdf8;
+			--ink: #1a2418;
+			--muted: #4d5a48;
+			--line: #9aab90;
+			--accent: #1b7a3a;
+			--accent-dim: #d8ebd9;
+			--warn: #6b5a12;
+			--font-ui: "Lucida Console", "Courier New", monospace;
+			--font-body: Georgia, "Times New Roman", serif;
+		}
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--ink);
+			font: 16px/1.45 var(--font-body);
+		}
+		a { color: var(--accent); }
+		a:visited { color: #145c2c; }
+		.wrap { max-width: 52rem; margin: 0 auto; padding: 0.75rem; }
+		.top {
+			border: 2px solid var(--ink);
+			background: var(--paper);
+			padding: 0.5rem 0.75rem;
+			font-family: var(--font-ui);
+			font-size: 0.85rem;
+		}
+		.brand {
+			font-size: 1.35rem;
+			font-weight: bold;
+			letter-spacing: 0.04em;
+			margin: 0 0 0.25rem;
+		}
+		.tag {
+			color: var(--muted);
+			margin: 0 0 0.5rem;
+			font-size: 0.75rem;
+		}
+		.nav {
+			border-top: 1px solid var(--line);
+			padding-top: 0.4rem;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.35rem 0.85rem;
+		}
+		.nav a { text-decoration: none; border-bottom: 1px dotted var(--accent); }
+		.banner {
+			margin: 0.75rem 0;
+			border: 1px dashed var(--accent);
+			background: var(--accent-dim);
+			padding: 0.55rem 0.7rem;
+			font-family: var(--font-ui);
+			font-size: 0.8rem;
+		}
+		.panel {
+			border: 2px solid var(--ink);
+			background: var(--paper);
+			padding: 0.75rem;
+			margin-bottom: 0.75rem;
+		}
+		.panel h1 {
+			font-family: var(--font-ui);
+			font-size: 1.05rem;
+			margin: 0 0 0.35rem;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+		}
+		.meta { color: var(--muted); font-size: 0.9rem; margin: 0 0 0.75rem; }
+		.screen {
+			border: 1px solid var(--line);
+			background: #f0f4eb;
+			padding: 0.75rem;
+			margin: 0 0 0.75rem;
+		}
+		.choices { list-style: none; padding: 0; margin: 0; }
+		.choices li { margin: 0.35rem 0; }
+		.choices a {
+			display: block;
+			border: 1px solid var(--accent);
+			padding: 0.4rem 0.55rem;
+			text-decoration: none;
+			background: #fff;
+			font-family: var(--font-ui);
+			font-size: 0.85rem;
+		}
+		.choices a:hover { background: var(--accent-dim); }
+		.ascii {
+			font-family: var(--font-ui);
+			font-size: 0.72rem;
+			line-height: 1.25;
+			white-space: pre;
+			overflow-x: auto;
+			border: 1px solid var(--line);
+			background: #eef3ea;
+			padding: 0.55rem;
+			color: var(--ink);
+		}
+		.foot {
+			font-family: var(--font-ui);
+			font-size: 0.72rem;
+			color: var(--muted);
+			border-top: 1px solid var(--line);
+			padding-top: 0.5rem;
+		}
+		.swatches { display: flex; gap: 0.35rem; margin-top: 0.5rem; }
+		.swatches span {
+			width: 1.4rem; height: 1.4rem; border: 1px solid var(--ink);
+			display: inline-block;
+		}
+		.label-opt {
+			font-family: var(--font-ui);
+			font-size: 0.75rem;
+			color: var(--warn);
+			margin-bottom: 0.5rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<header class="top">
+			<p class="label-opt">OPTION A — Phosphor Bench</p>
+			<p class="brand">CHOOSOLOGY LITE</p>
+			<p class="tag">Authentic lab terminal · cohort of 1986</p>
+			<nav class="nav">
+				<a href="#">Home</a>
+				<a href="#">News</a>
+				<a href="#">Browse</a>
+				<a href="#">Sign in</a>
+				<a href="#">Classic view</a>
+			</nav>
+		</header>
+
+		<div class="banner">
+			Small screen or slow link detected on Classic.
+			<strong>Try Lite</strong> — same experiments, leaner terminal UI.
+			<a href="#">Switch to Lite</a> · <a href="#">Dismiss</a>
+		</div>
+
+		<section class="panel">
+			<h1>Experiment · Midnight Beaker</h1>
+			<p class="meta">by labtester · public · 4 screens</p>
+			<div class="screen">
+				<p>The bench lamp hums. A beaker ticks once, then goes still. Two corridors wait past the autoclave.</p>
+			</div>
+			<ul class="choices">
+				<li><a href="#">1. Take the glowing path</a></li>
+				<li><a href="#">2. Take the dark hall</a></li>
+			</ul>
+		</section>
+
+		<section class="panel">
+			<h1>Structure (read-only)</h1>
+			<p class="meta">ASCII map · edit in Classic</p>
+			<pre class="ascii">[Start]
+   |
+   +-- Continue --> [Middle]
+                       |
+                       +-- glowing --> [Ending A]
+                       +-- dark    --> [Ending B]</pre>
+			<p><a href="#">Open graph editor in Classic →</a></p>
+			<div class="swatches" title="Palette">
+				<span style="background:#f4f6f1"></span>
+				<span style="background:#fcfdf8"></span>
+				<span style="background:#1a2418"></span>
+				<span style="background:#1b7a3a"></span>
+				<span style="background:#d8ebd9"></span>
+			</div>
+		</section>
+
+		<footer class="foot">
+			Lite keeps images small and pages plain. Prefer Classic chrome? Use the link above.
+		</footer>
+	</div>
+</body>
+</html>
