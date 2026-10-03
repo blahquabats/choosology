@@ -62,6 +62,6 @@ $total = count($achievements);
 			<?php } ?>
 		</ul>
 
-		<p class="ms-degrees-foot">Tip: open <a href="#/mystuff/office">My Office → Clipboard</a> for the new researcher checklist.</p>
+		<p class="ms-degrees-foot">Tip: open the <strong>Clip</strong> button beside your login name for the new researcher checklist.</p>
 	</div>
 </div>

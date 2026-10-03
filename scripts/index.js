@@ -243,6 +243,9 @@ $(function() {
                         return;
                     }
                     choosologyCloseSignupModal();
+                    if (window.ChoosologyClipboard && typeof ChoosologyClipboard.markForceAutoOpenOnNextLoad === "function") {
+                        ChoosologyClipboard.markForceAutoOpenOnNextLoad();
+                    }
                     var newtext = "Logged in as " + (res.name || "researcher");
                     newtext += "<br><span id='logoutsubmit'><a href='#'>log out</a></span>";
                     var box = $("#topbox");
@@ -258,11 +261,6 @@ $(function() {
                 }).always(function() {
                     $submit.prop("disabled", false);
                 });
-            });
-
-            $(document).on("click", "#clipboard_office_btn", function(e) {
-                e.preventDefault();
-                window.location.hash = "#/mystuff/office";
             });
 
             $(document).on("keypress", "#loginpass", function(e){
@@ -287,6 +285,9 @@ $(function() {
                         response = $.trim(response);
                         if(response != 2)
                         {
+                            if (window.ChoosologyClipboard && typeof ChoosologyClipboard.markForceAutoOpenOnNextLoad === "function") {
+                                ChoosologyClipboard.markForceAutoOpenOnNextLoad();
+                            }
                             var newtext = "Logged in as "+response;
                             newtext += "<br><span id='logoutsubmit'><a href='#'>log out</a></span>";
                             var box = $("#topbox");

@@ -60,6 +60,7 @@
     
     <script src='scripts/index.js'></script>
     <script src='scripts/messages.js?v=clic2'></script>
+    <script src='scripts/clipboard.js?v=clip2'></script>
     <script src='scripts/routes.js'></script>
 
 
@@ -120,7 +121,7 @@
         $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
         echo "<div class='msg-login-row'>";
         echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "<button type='button' class='msg-login-notify ms-clipboard-btn' id='clipboard_office_btn' title='My Office clipboard' aria-label='Open clipboard'>";
+        echo "<button type='button' class='msg-login-notify ms-clipboard-btn' id='clipboard_office_btn' title='Open clipboard' aria-label='Open clipboard'>";
         echo "<span class='msg-login-notify-label'>Clip</span>";
         echo "</button>";
         echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";

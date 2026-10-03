@@ -160,16 +160,16 @@ function choosology_clipboard_checklist_defs(): array
 			'auto' => 'has_public',
 		),
 		array(
-			'key' => 'open_clipboard',
+					'key' => 'open_clipboard',
 			'label' => 'Visit your clipboard',
-			'hint' => 'You are looking at it — mark complete when ready',
+			'hint' => 'Open Clip beside your login name',
 			'achievement' => 'clipboard_clerk',
 			'auto' => 'visited_clipboard',
 		),
 		array(
 			'key' => 'write_note',
 			'label' => 'Save a personal note',
-			'hint' => 'Use the free-form pad below',
+			'hint' => 'Use the free-form pad on the clipboard',
 			'achievement' => 'scribbler',
 			'auto' => 'has_note',
 		),
@@ -183,7 +183,7 @@ function choosology_clipboard_checklist_defs(): array
 		array(
 			'key' => 'review_results',
 			'label' => 'Review experiment results',
-			'hint' => 'Open the Experiment Results panel in My Office',
+			'hint' => 'Open My Office for full metrics (highlights also appear on the clipboard)',
 			'achievement' => 'results_analyst',
 			'auto' => 'visited_results',
 		),
