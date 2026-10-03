@@ -138,10 +138,21 @@ fieldset.lite-panel {
 	min-inline-size: auto;
 }
 
+/* Keep legends inside the panel (default legend sits on the border edge). */
 fieldset.lite-panel legend {
+	float: left;
+	width: 100%;
 	font-weight: bold;
-	padding: 0 0.3rem;
+	padding: 0 0 0.35rem;
+	margin: 0 0 0.35rem;
+	border-bottom: 1px solid #c8c4bc;
 	color: var(--lite-navy);
+}
+
+fieldset.lite-panel::after {
+	content: "";
+	display: table;
+	clear: both;
 }
 
 .lite-meta {
