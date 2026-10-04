@@ -50,4 +50,5 @@ Shared logic belongs in `lib/` (or existing helpers) so Classic and Lite do not 
   - Install: `composer install` and `npm install` (needs `php8.3-xml` / `ext-dom` for PHPUnit).
   - Unit: `./vendor/bin/phpunit --testsuite Unit` and `npm test`.
   - Integration: `bash tests/bin/prepare-test-db.sh` then `./vendor/bin/phpunit --testsuite Integration` (uses DB `choosology_test`; HTTP smoke tests need the PHP server on `:8000`).
+  - Workflows (Classic + Lite multi-step, with click/time metrics): server on `:8000` + seeded public adventure, then `./vendor/bin/phpunit --testsuite Workflow` or `php tests/bin/run-workflows.php` (see `tests/README.md`).
 - For a syntax "lint", run `php -l` over the PHP files (all files outside `oldstuff/` currently pass), e.g. `find . -name '*.php' -not -path './oldstuff/*' -exec php -l {} \;`.

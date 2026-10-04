@@ -20,4 +20,6 @@ require_once CHOOSOLOGY_ROOT . '/lib/feed-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/clipboard-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/icondefs.php';
 require_once CHOOSOLOGY_ROOT . '/tests/Support/ChoosologyTestDb.php';
+require_once CHOOSOLOGY_ROOT . '/tests/Support/WorkflowHttpClient.php';
+require_once CHOOSOLOGY_ROOT . '/tests/Support/ChoosologyWorkflows.php';
 require_once CHOOSOLOGY_ROOT . '/messagesfunc.php';
