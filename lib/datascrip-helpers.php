@@ -1,14 +1,14 @@
 <?php
 /**
- * DataScrip — in-lab currency (denoted with the UAE Dirham sign د.إ).
+ * DataScrip — in-lab currency (denoted with Unicode U+20C3).
  */
 
 require_once __DIR__ . '/choosology-core.php';
 
-/** UAE Dirham sign used as the DataScrip glyph. */
+/** Currency glyph for DataScrip (U+20C3). */
 function choosology_datascrip_sign(): string
 {
-	return 'د.إ';
+	return "\u{20C3}";
 }
 
 function choosology_datascrip_format(int $amount, bool $withSign = true): string

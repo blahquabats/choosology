@@ -8,8 +8,8 @@ final class DataScripHelpersTest extends TestCase
 	public function testSignAndFormat(): void
 	{
 		require_once CHOOSOLOGY_ROOT . '/lib/datascrip-helpers.php';
-		$this->assertSame('د.إ', choosology_datascrip_sign());
-		$this->assertSame('د.إ 1,234', choosology_datascrip_format(1234));
+		$this->assertSame("\u{20C3}", choosology_datascrip_sign());
+		$this->assertSame("\u{20C3} 1,234", choosology_datascrip_format(1234));
 		$this->assertSame('42', choosology_datascrip_format(42, false));
 	}
 

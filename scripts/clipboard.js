@@ -151,7 +151,8 @@
 
 	function renderLedger(datascrip) {
 		var ds = datascrip || {};
-		var bal = ds.formatted || ((ds.sign || "د.إ") + " 0");
+		var scripSign = ds.sign || "\u20C3";
+		var bal = ds.formatted || (scripSign + " 0");
 		var recent = ds.recent || [];
 		var html =
 			'<p class="clip-scrip-balance">Balance: <strong>' + esc(bal) + "</strong></p>";
@@ -163,7 +164,7 @@
 			recent.forEach(function (row) {
 				var amt = parseInt(row.amount, 10) || 0;
 				var sign = amt >= 0 ? "+" : "−";
-				var absFmt = (ds.sign || "د.إ") + " " + String(Math.abs(amt));
+				var absFmt = scripSign + " " + String(Math.abs(amt));
 				html +=
 					'<li class="clip-ledger-item">' +
 					'<span class="clip-ledger-amt' + (amt >= 0 ? " is-credit" : " is-debit") + '">' +
