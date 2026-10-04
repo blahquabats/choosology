@@ -33,6 +33,16 @@ Both services are long-running: start each in its own tmux session (e.g. `mariad
 - **Clipboard:** floating overlay (`scripts/clipboard.js`) opened via header **Clip**; auto-opens after login and when returning after ~8 hours without opening/dismissing. Contains checklist (Degrees), recent activity, notepad, to-dos, and high-level recent results. **My Office** holds full filterable Experiment Results. Schema: `sql/clipboard_setup.sql` / `choosology_clipboard_ensure_schema`. API: `ajax/clipboard.php`. Degrees tab lists `user_achievements`.
 - The editor and some UI pull JS/CSS from public CDNs (jQuery UI, jQuery Cycle, Konva, minicolors) at runtime; the page shell works offline but the editor needs outbound internet.
 
+### Keeping Classic, Lite, and tests in sync
+
+When adding or changing features, **update all of the following in the same change** (do not leave Lite or tests for a follow-up unless the user explicitly scopes that out):
+
+1. **Classic UI** — existing SPA / My Stuff surfaces as today.
+2. **Lite UI** (`lite/`) — multi-page equivalent at basic fidelity. New Classic-only chrome (modals, overlays) should become Lite pages or plain links with back/cancel navigation. If a surface is still out of scope for Lite (e.g. My Stuff until that phase), note the gap in the Lite shell and link to Classic rather than silently omitting behavior users need.
+3. **Automated tests** — extend or adjust PHPUnit (`tests/Unit`, `tests/Integration`) and Jest (`tests/js`) for new helpers, endpoints, and regressions. Prefer testing shared PHP helpers and Lite URL/preference logic in Unit tests; use Integration/HTTP smoke when request/response contracts change. Run the relevant suites before finishing.
+
+Shared logic belongs in `lib/` (or existing helpers) so Classic and Lite do not diverge. Lite-specific presentation stays under `lite/` + `lib/lite-helpers.php`.
+
 ### Lint / test / build
 
 - **PHPUnit** (PHP) and **Jest** (JS) are configured. See `tests/README.md`.
