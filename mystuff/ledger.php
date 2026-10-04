@@ -13,14 +13,13 @@ $perPage = 50;
 $total = choosology_datascrip_ledger_count($db, $user);
 $entries = choosology_datascrip_ledger_entries($db, $user, $perPage, 0);
 $balance = choosology_datascrip_balance($db, $user);
-$sign = choosology_datascrip_sign();
 ?>
 <div class="intabs ms-ledger-page">
 	<header class="ms-ledger-head">
 		<p class="ms-ledger-eyebrow">DataScrip</p>
 		<h2 class="ms-ledger-title">Ledger</h2>
-		<p class="ms-ledger-balance">Balance: <strong><?php echo htmlspecialchars(choosology_datascrip_format($balance), ENT_QUOTES, 'UTF-8'); ?></strong></p>
-		<p class="ms-ledger-note">Full historical transparency for DataScrip movements (<?php echo htmlspecialchars($sign, ENT_QUOTES, 'UTF-8'); ?>). Showing the <?php echo (int) min($perPage, max($total, 0)); ?> most recent of <?php echo (int) $total; ?> entries.</p>
+		<p class="ms-ledger-balance">Balance: <strong><?php echo choosology_datascrip_format_html($balance); ?></strong></p>
+		<p class="ms-ledger-note">Full historical transparency for DataScrip movements (<?php echo choosology_datascrip_sign_html(); ?>). Showing the <?php echo (int) min($perPage, max($total, 0)); ?> most recent of <?php echo (int) $total; ?> entries.</p>
 	</header>
 
 	<?php if (!$entries) { ?>
@@ -40,12 +39,12 @@ $sign = choosology_datascrip_sign();
 					$when = $e['created_at'] !== '' ? nicedatetime($e['created_at']) : '';
 					$amt = (int) $e['amount'];
 					$amtClass = $amt >= 0 ? 'ms-ledger-amt--credit' : 'ms-ledger-amt--debit';
-					$amtTxt = ($amt >= 0 ? '+' : '−') . choosology_datascrip_format(abs($amt));
+					$amtHtml = ($amt >= 0 ? '+' : '−') . choosology_datascrip_format_html(abs($amt));
 					?>
 					<tr>
 						<td><?php echo htmlspecialchars($when, ENT_QUOTES, 'UTF-8'); ?></td>
-						<td class="<?php echo $amtClass; ?>"><?php echo htmlspecialchars($amtTxt, ENT_QUOTES, 'UTF-8'); ?></td>
-						<td><?php echo htmlspecialchars(choosology_datascrip_format((int) $e['balance_after']), ENT_QUOTES, 'UTF-8'); ?></td>
+						<td class="<?php echo $amtClass; ?>"><?php echo $amtHtml; ?></td>
+						<td><?php echo choosology_datascrip_format_html((int) $e['balance_after']); ?></td>
 						<td>
 							<?php echo htmlspecialchars((string) $e['label'], ENT_QUOTES, 'UTF-8'); ?>
 							<?php if (!empty($e['actor'])) { ?>

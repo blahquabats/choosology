@@ -149,13 +149,39 @@
 		return html;
 	}
 
+	function datascripSignUrl(ds) {
+		if (ds && ds.sign_url) {
+			return String(ds.sign_url);
+		}
+		if (typeof choosologyUrlSafeGlobal === "function") {
+			return choosologyUrlSafeGlobal("images/datascrip.png");
+		}
+		if (typeof choosologyUrl === "function") {
+			return choosologyUrl("images/datascrip.png");
+		}
+		return "/images/datascrip.png";
+	}
+
+	function datascripIconHtml(ds) {
+		return (
+			'<img class="datascrip-sign" src="' + esc(datascripSignUrl(ds)) +
+			'" alt="DataScrip" width="14" height="12" decoding="async">'
+		);
+	}
+
+	function datascripAmountHtml(ds, amount) {
+		var n = Math.abs(parseInt(amount, 10) || 0);
+		return datascripIconHtml(ds) + "&nbsp;" + esc(String(n));
+	}
+
 	function renderLedger(datascrip) {
 		var ds = datascrip || {};
-		var scripSign = ds.sign || "\u20C3";
-		var bal = ds.formatted || (scripSign + " 0");
+		var balHtml = ds.formatted_html
+			? String(ds.formatted_html)
+			: datascripAmountHtml(ds, ds.balance || 0);
 		var recent = ds.recent || [];
 		var html =
-			'<p class="clip-scrip-balance">Balance: <strong>' + esc(bal) + "</strong></p>";
+			'<p class="clip-scrip-balance">Balance: <strong>' + balHtml + "</strong></p>";
 		if (!recent.length) {
 			html +=
 				'<p class="clip-empty">No transactions yet. Daily check-ins, Degrees, and play earn DataScrip.</p>';
@@ -164,11 +190,10 @@
 			recent.forEach(function (row) {
 				var amt = parseInt(row.amount, 10) || 0;
 				var sign = amt >= 0 ? "+" : "−";
-				var absFmt = scripSign + " " + String(Math.abs(amt));
 				html +=
 					'<li class="clip-ledger-item">' +
 					'<span class="clip-ledger-amt' + (amt >= 0 ? " is-credit" : " is-debit") + '">' +
-					esc(sign + absFmt) + "</span>" +
+					sign + datascripAmountHtml(ds, amt) + "</span>" +
 					'<span class="clip-ledger-memo">' + esc(row.label || row.memo || row.reason_key || "") + "</span>" +
 					"</li>";
 			});

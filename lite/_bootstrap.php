@@ -46,12 +46,12 @@ function choosology_lite_header(array $opts = array()): void
 	$user = !empty($_SESSION['user']) ? (string) $_SESSION['user'] : '';
 	$scripFmt = '';
 	if ($user !== '') {
-		if (!function_exists('choosology_datascrip_format')) {
+		if (!function_exists('choosology_datascrip_format_html')) {
 			require_once dirname(__DIR__) . '/lib/datascrip-helpers.php';
 		}
 		global $db;
 		if ($db instanceof mysqli) {
-			$scripFmt = choosology_datascrip_format(choosology_datascrip_balance($db, $user));
+			$scripFmt = choosology_datascrip_format_html(choosology_datascrip_balance($db, $user));
 		}
 	}
 
@@ -92,7 +92,7 @@ function choosology_lite_header(array $opts = array()): void
 	if ($user !== '') {
 		echo '<p class="lite-userbox">Signed in as <strong>' . htmlspecialchars($user, ENT_QUOTES, 'UTF-8') . '</strong>';
 		if ($scripFmt !== '') {
-			echo '<br><span class="lite-scrip" title="DataScrip balance">DataScrip <strong>' . htmlspecialchars($scripFmt, ENT_QUOTES, 'UTF-8') . '</strong></span>';
+			echo '<br><span class="lite-scrip" title="DataScrip balance">DataScrip <strong>' . $scripFmt . '</strong></span>';
 		}
 		echo '<br>My Stuff extras remain in <a href="' . htmlspecialchars(choosology_classic_url('mystuff'), ENT_QUOTES, 'UTF-8') . '">Classic</a>';
 		echo '</p>' . "\n";

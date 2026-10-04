@@ -1,14 +1,38 @@
 <?php
 /**
- * DataScrip — in-lab currency (denoted with Unicode U+20C3).
+ * DataScrip — in-lab currency.
+ * UI glyph: images/datascrip.png (U+20C3 has poor font support).
  */
 
 require_once __DIR__ . '/choosology-core.php';
 
-/** Currency glyph for DataScrip (U+20C3). */
+/** Plain-text / alt fallback for the DataScrip glyph (U+20C3). */
 function choosology_datascrip_sign(): string
 {
 	return "\u{20C3}";
+}
+
+/** Site URL for the DataScrip glyph image. */
+function choosology_datascrip_sign_url(): string
+{
+	if (function_exists('choosology_site_url')) {
+		return choosology_site_url('images/datascrip.png');
+	}
+	return '/images/datascrip.png';
+}
+
+/**
+ * Inline <img> for the DataScrip glyph.
+ *
+ * @param string $extraClass Optional extra CSS class(es).
+ */
+function choosology_datascrip_sign_html(string $extraClass = ''): string
+{
+	$class = trim('datascrip-sign ' . $extraClass);
+	$url = htmlspecialchars(choosology_datascrip_sign_url(), ENT_QUOTES, 'UTF-8');
+	$alt = htmlspecialchars(choosology_datascrip_sign(), ENT_QUOTES, 'UTF-8');
+	$classAttr = htmlspecialchars($class, ENT_QUOTES, 'UTF-8');
+	return '<img class="' . $classAttr . '" src="' . $url . '" alt="' . $alt . '" width="14" height="12" decoding="async">';
 }
 
 function choosology_datascrip_format(int $amount, bool $withSign = true): string
@@ -18,6 +42,16 @@ function choosology_datascrip_format(int $amount, bool $withSign = true): string
 		return $n;
 	}
 	return choosology_datascrip_sign() . ' ' . $n;
+}
+
+/** HTML amount with image glyph (for UI). */
+function choosology_datascrip_format_html(int $amount, bool $withSign = true): string
+{
+	$n = htmlspecialchars(number_format($amount, 0, '.', ','), ENT_QUOTES, 'UTF-8');
+	if (!$withSign) {
+		return $n;
+	}
+	return '<span class="datascrip-amt">' . choosology_datascrip_sign_html() . '&nbsp;' . $n . '</span>';
 }
 
 /**
@@ -477,7 +511,7 @@ function choosology_datascrip_admin_grant(
 		if (!empty($res['ok']) && !empty($res['applied'])) {
 			$granted++;
 			if (function_exists('choosology_send_message')) {
-				$body = 'You received <strong>' . htmlspecialchars(choosology_datascrip_format($amount), ENT_QUOTES, 'UTF-8')
+				$body = 'You received <strong>' . choosology_datascrip_format_html($amount)
 					. '</strong> DataScrip.';
 				if ($memo !== '') {
 					$body .= '<br>' . htmlspecialchars($memo, ENT_QUOTES, 'UTF-8');
@@ -509,7 +543,9 @@ function choosology_datascrip_summary_for_user(mysqli $db, string $uname, int $r
 	return array(
 		'balance' => $balance,
 		'formatted' => choosology_datascrip_format($balance),
+		'formatted_html' => choosology_datascrip_format_html($balance),
 		'sign' => choosology_datascrip_sign(),
+		'sign_url' => choosology_datascrip_sign_url(),
 		'recent' => choosology_datascrip_ledger_entries($db, $uname, $recentLimit, 0),
 	);
 }

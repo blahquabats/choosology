@@ -67,7 +67,7 @@
     
     <script src='scripts/index.js'></script>
     <script src='scripts/messages.js?v=clic3'></script>
-    <script src='scripts/clipboard.js?v=clip3'></script>
+    <script src='scripts/clipboard.js?v=clip4'></script>
     <script src='scripts/routes.js'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
@@ -128,7 +128,7 @@
     {
         require_once __DIR__ . '/lib/datascrip-helpers.php';
         $scripBal = choosology_datascrip_balance($db, (string) $_SESSION['user']);
-        $scripFmt = htmlspecialchars(choosology_datascrip_format($scripBal), ENT_QUOTES, 'UTF-8');
+        $scripFmtHtml = choosology_datascrip_format_html($scripBal);
         $unreadMsg = (int) getNewMessages();
         $unreadAttr = $unreadMsg > 0 ? (string) $unreadMsg : '0';
         $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
@@ -142,7 +142,7 @@
         echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
         echo "</button>";
         echo "</div>";
-        echo "<div class='msg-login-scrip' title='DataScrip balance'><span class='msg-login-scrip-label'>DataScrip</span> <strong class='msg-login-scrip-amt'>{$scripFmt}</strong></div>";
+        echo "<div class='msg-login-scrip' title='DataScrip balance'><span class='msg-login-scrip-label'>DataScrip</span> <strong class='msg-login-scrip-amt'>{$scripFmtHtml}</strong></div>";
         echo "<br/> <span id='logoutsubmit'> <a href='#'> log out </a> </span>";
     }
     ?>

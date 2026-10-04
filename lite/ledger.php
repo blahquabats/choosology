@@ -31,7 +31,7 @@ choosology_lite_header(array('title' => 'Ledger', 'active' => 'ledger'));
 ?>
 <fieldset class="lite-panel">
 	<legend>DataScrip Ledger</legend>
-	<p class="lite-meta">Balance: <strong><?php echo htmlspecialchars(choosology_datascrip_format($balance), ENT_QUOTES, 'UTF-8'); ?></strong>
+	<p class="lite-meta">Balance: <strong><?php echo choosology_datascrip_format_html($balance); ?></strong>
 		· <?php echo (int) $total; ?> entries · page <?php echo (int) $page; ?> / <?php echo (int) $totalPages; ?></p>
 	<?php if (!$entries) { ?>
 		<p class="lite-muted">No transactions yet. Daily check-ins, Degrees, and play earn DataScrip.</p>
@@ -44,12 +44,12 @@ choosology_lite_header(array('title' => 'Ledger', 'active' => 'ledger'));
 				<?php foreach ($entries as $e) {
 					$when = $e['created_at'] !== '' ? nicedatetime($e['created_at']) : '';
 					$amt = (int) $e['amount'];
-					$amtTxt = ($amt >= 0 ? '+' : '−') . choosology_datascrip_format(abs($amt));
+					$amtHtml = ($amt >= 0 ? '+' : '−') . choosology_datascrip_format_html(abs($amt));
 					?>
 					<tr>
 						<td><?php echo htmlspecialchars($when, ENT_QUOTES, 'UTF-8'); ?></td>
-						<td><?php echo htmlspecialchars($amtTxt, ENT_QUOTES, 'UTF-8'); ?></td>
-						<td><?php echo htmlspecialchars(choosology_datascrip_format((int) $e['balance_after']), ENT_QUOTES, 'UTF-8'); ?></td>
+						<td><?php echo $amtHtml; ?></td>
+						<td><?php echo choosology_datascrip_format_html((int) $e['balance_after']); ?></td>
 						<td><?php echo htmlspecialchars((string) $e['label'], ENT_QUOTES, 'UTF-8'); ?></td>
 					</tr>
 				<?php } ?>

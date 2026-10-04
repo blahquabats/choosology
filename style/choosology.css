@@ -8305,6 +8305,18 @@ body.clipboard-modal-open
 }
 
 /* Classic → Lite entry + suggest banner */
+.datascrip-sign
+{
+    display: inline-block;
+    width: 0.95em;
+    height: 0.85em;
+    vertical-align: -0.1em;
+    object-fit: contain;
+}
+.datascrip-amt
+{
+    white-space: nowrap;
+}
 .msg-login-scrip
 {
     clear: both;
@@ -8321,6 +8333,11 @@ body.clipboard-modal-open
 {
     font-weight: bold;
     color: #0b5c2e;
+}
+.msg-login-scrip-amt .datascrip-sign
+{
+    width: 12px;
+    height: 11px;
 }
 .ms-ledger-page
 {

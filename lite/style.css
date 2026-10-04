@@ -133,6 +133,18 @@ a:visited { color: #000060; }
 	color: #004d26;
 }
 
+.datascrip-sign {
+	display: inline-block;
+	width: 0.95em;
+	height: 0.85em;
+	vertical-align: -0.1em;
+	object-fit: contain;
+}
+
+.datascrip-amt {
+	white-space: nowrap;
+}
+
 .lite-ledger-table {
 	width: 100%;
 	border-collapse: collapse;

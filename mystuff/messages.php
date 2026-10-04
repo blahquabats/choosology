@@ -130,12 +130,15 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 				<button type="button" class="msg-compose-x" id="msg_scrip_close" aria-label="Close">&times;</button>
 			</header>
 			<form id="msg_scrip_form" onsubmit="return false;">
-				<p class="msg-hint">Credit DataScrip (&#x20C3;) to one researcher or every account. Recipients get a CLIC system notice.</p>
+				<p class="msg-hint">Credit DataScrip (<?php
+					require_once __DIR__ . '/../lib/datascrip-helpers.php';
+					echo choosology_datascrip_sign_html();
+				?>) to one researcher or every account. Recipients get a CLIC system notice.</p>
 				<label class="msg-label"><input type="radio" name="msg_scrip_scope" id="msg_scrip_scope_one" value="one" checked> Individual user</label>
 				<label class="msg-label"><input type="radio" name="msg_scrip_scope" id="msg_scrip_scope_all" value="all"> All users</label>
 				<label class="msg-label" for="msg_scrip_to">Username</label>
 				<input type="text" id="msg_scrip_to" class="msg-input" maxlength="45" autocomplete="off" />
-				<label class="msg-label" for="msg_scrip_amount">Amount (&#x20C3;)</label>
+				<label class="msg-label" for="msg_scrip_amount">Amount (<?php echo choosology_datascrip_sign_html(); ?>)</label>
 				<input type="number" id="msg_scrip_amount" class="msg-input" min="1" max="100000" step="1" value="10" required />
 				<label class="msg-label" for="msg_scrip_memo">Memo (optional)</label>
 				<input type="text" id="msg_scrip_memo" class="msg-input" maxlength="255" />

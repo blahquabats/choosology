@@ -22,6 +22,7 @@ describe("DataScrip UI wiring", () => {
     expect(src).toContain("renderLedger");
     expect(src).toContain("#/mystuff/ledger");
     expect(src).toContain("datascrip");
+    expect(src).toContain("images/datascrip.png");
   });
 
   test("messages.js supports award_scrip", () => {
