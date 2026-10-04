@@ -262,4 +262,31 @@ if ($action === 'report') {
 	choosology_messages_json(array('ok' => 1, 'reported_to' => $n), $jsonFlags);
 }
 
+if ($action === 'award_scrip') {
+	if (empty($_SESSION['usertype']) || (int) $_SESSION['usertype'] < 1) {
+		choosology_messages_json(array('ok' => 0, 'error' => 'Admin access required.'), $jsonFlags);
+	}
+	require_once __DIR__ . '/../lib/datascrip-helpers.php';
+	$amount = (int) ($data['amount'] ?? 0);
+	$memo = isset($data['memo']) ? trim((string) $data['memo']) : '';
+	$scope = isset($data['scope']) ? trim((string) $data['scope']) : 'one';
+	$to = isset($data['to']) ? trim((string) $data['to']) : '';
+	$all = ($scope === 'all');
+	$result = choosology_datascrip_admin_grant($db, $user, $to, $amount, $memo, $all);
+	if (empty($result['ok'])) {
+		choosology_messages_json(array(
+			'ok' => 0,
+			'error' => $result['error'] ?? 'Award failed.',
+			'granted' => (int) ($result['granted'] ?? 0),
+		), $jsonFlags);
+	}
+	choosology_messages_json(array(
+		'ok' => 1,
+		'granted' => (int) $result['granted'],
+		'targets' => (int) $result['targets'],
+		'amount' => (int) $result['amount'],
+		'formatted' => choosology_datascrip_format((int) $result['amount']),
+	), $jsonFlags);
+}
+
 choosology_messages_json(array('ok' => 0, 'error' => 'Unknown action.'), $jsonFlags);

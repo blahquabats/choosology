@@ -206,7 +206,14 @@ function choosology_award_achievement(mysqli $db, string $uname, string $key): b
 		"INSERT IGNORE INTO user_achievements (uname, achievement_key, earned_at)
 		 VALUES ('$escU', '$escK', NOW())"
 	);
-	return (bool) $ok && mysqli_affected_rows($db) > 0;
+	$awarded = (bool) $ok && mysqli_affected_rows($db) > 0;
+	if ($awarded) {
+		if (!function_exists('choosology_datascrip_on_achievement')) {
+			require_once __DIR__ . '/datascrip-helpers.php';
+		}
+		choosology_datascrip_on_achievement($db, $uname, $key);
+	}
+	return $awarded;
 }
 
 /**
@@ -545,6 +552,13 @@ function choosology_adv_record_play_start(mysqli $db, int $advid): void
 		$db,
 		"UPDATE advs SET play_starts = play_starts + 1, last_played = NOW() WHERE id = $advid LIMIT 1"
 	);
+	/* Daily play DataScrip for signed-in researchers. */
+	if (!empty($_SESSION['user'])) {
+		if (!function_exists('choosology_datascrip_try_daily_play')) {
+			require_once __DIR__ . '/datascrip-helpers.php';
+		}
+		choosology_datascrip_try_daily_play($db, (string) $_SESSION['user']);
+	}
 }
 
 function choosology_adv_touch_edited(mysqli $db, int $advid, string $owner): void

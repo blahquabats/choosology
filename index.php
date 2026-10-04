@@ -66,8 +66,8 @@
     <script src="scripts/sammy.js"></script>
     
     <script src='scripts/index.js'></script>
-    <script src='scripts/messages.js?v=clic2'></script>
-    <script src='scripts/clipboard.js?v=clip2'></script>
+    <script src='scripts/messages.js?v=clic3'></script>
+    <script src='scripts/clipboard.js?v=clip3'></script>
     <script src='scripts/routes.js'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
@@ -126,6 +126,9 @@
     }
     else
     {
+        require_once __DIR__ . '/lib/datascrip-helpers.php';
+        $scripBal = choosology_datascrip_balance($db, (string) $_SESSION['user']);
+        $scripFmt = htmlspecialchars(choosology_datascrip_format($scripBal), ENT_QUOTES, 'UTF-8');
         $unreadMsg = (int) getNewMessages();
         $unreadAttr = $unreadMsg > 0 ? (string) $unreadMsg : '0';
         $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
@@ -139,6 +142,7 @@
         echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
         echo "</button>";
         echo "</div>";
+        echo "<div class='msg-login-scrip' title='DataScrip balance'><span class='msg-login-scrip-label'>DataScrip</span> <strong class='msg-login-scrip-amt'>{$scripFmt}</strong></div>";
         echo "<br/> <span id='logoutsubmit'> <a href='#'> log out </a> </span>";
     }
     ?>
@@ -155,6 +159,7 @@
             echo $tabUnread > 0 ? (' (' . $tabUnread . ')') : '';
         ?></a></li>
         <li><a href="mystuff/resources.php" id='mystuff-resources' class='tabsa' data-loc='resources'>Resources</a></li>
+        <li><a href="mystuff/ledger.php" id='mystuff-ledger' class='tabsa' data-loc='ledger'>Ledger</a></li>
         <li><a href="mystuff/degrees.php" id='mystuff-degrees' class='tabsa' data-loc='degrees'>Degrees</a></li>
         <li><a href="mystuff/account.php" id='mystuff-account' class='tabsa' data-loc='account'>My Information</a></li>
     </ul>

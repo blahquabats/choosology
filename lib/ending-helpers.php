@@ -112,6 +112,12 @@ function choosology_record_ending_find(mysqli $db, int $advid, int $screenid): a
 				"INSERT IGNORE INTO ending_finds (uname, adv, screen, found_at)
 				 VALUES ('$escUser', $advid, $screenid, NOW())"
 			);
+			if (mysqli_affected_rows($db) > 0) {
+				if (!function_exists('choosology_datascrip_try_ending_find')) {
+					require_once __DIR__ . '/datascrip-helpers.php';
+				}
+				choosology_datascrip_try_ending_find($db, $user, $advid, $screenid);
+			}
 		}
 	}
 

@@ -52,8 +52,24 @@ final class ChoosologyTestDb
 		$db = self::mysqli();
 		self::ensureSchema();
 		@mysqli_query($db, 'SET FOREIGN_KEY_CHECKS=0');
-		foreach (array('ending_finds', 'messages', 'advscreens', 'advs', 'users') as $t) {
-			@mysqli_query($db, "DELETE FROM `$t`");
+		foreach (array(
+			'datascrip_ledger',
+			'datascrip_balances',
+			'user_achievements',
+			'clipboard_checklist',
+			'clipboard_todos',
+			'clipboard_pad',
+			'ending_finds',
+			'messages',
+			'advscreens',
+			'advs',
+			'users',
+		) as $t) {
+			try {
+				mysqli_query($db, "DELETE FROM `$t`");
+			} catch (Throwable $e) {
+				/* table may not exist yet in a fresh test DB */
+			}
 		}
 		@mysqli_query($db, 'SET FOREIGN_KEY_CHECKS=1');
 

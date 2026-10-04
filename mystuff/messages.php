@@ -32,6 +32,9 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 				<button type="button" class="msg-folder" data-folder="sent" role="tab" aria-selected="false">Sent</button>
 			</div>
 			<button type="button" class="msg-btn msg-btn--primary" id="msg_compose_open">Compose</button>
+			<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+			<button type="button" class="msg-btn" id="msg_scrip_open" title="Award DataScrip to researchers">Award DataScrip</button>
+			<?php } ?>
 		</div>
 	</header>
 
@@ -114,6 +117,37 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 			</form>
 		</div>
 	</div>
+
+	<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+	<div class="msg-compose msg-compose--hidden" id="msg_scrip" aria-hidden="true">
+		<div class="msg-compose-backdrop" id="msg_scrip_backdrop"></div>
+		<div class="msg-compose-panel msg-compose-panel--narrow" role="dialog" aria-modal="true" aria-labelledby="msg_scrip_title">
+			<header class="msg-compose-header">
+				<div>
+					<p class="clic-legend clic-legend--compact">CLIC · Treasury</p>
+					<h3 class="msg-compose-title" id="msg_scrip_title">Award DataScrip</h3>
+				</div>
+				<button type="button" class="msg-compose-x" id="msg_scrip_close" aria-label="Close">&times;</button>
+			</header>
+			<form id="msg_scrip_form" onsubmit="return false;">
+				<p class="msg-hint">Credit DataScrip (د.إ) to one researcher or every account. Recipients get a CLIC system notice.</p>
+				<label class="msg-label"><input type="radio" name="msg_scrip_scope" id="msg_scrip_scope_one" value="one" checked> Individual user</label>
+				<label class="msg-label"><input type="radio" name="msg_scrip_scope" id="msg_scrip_scope_all" value="all"> All users</label>
+				<label class="msg-label" for="msg_scrip_to">Username</label>
+				<input type="text" id="msg_scrip_to" class="msg-input" maxlength="45" autocomplete="off" />
+				<label class="msg-label" for="msg_scrip_amount">Amount (د.إ)</label>
+				<input type="number" id="msg_scrip_amount" class="msg-input" min="1" max="100000" step="1" value="10" required />
+				<label class="msg-label" for="msg_scrip_memo">Memo (optional)</label>
+				<input type="text" id="msg_scrip_memo" class="msg-input" maxlength="255" />
+				<div class="msg-compose-actions">
+					<button type="button" class="msg-btn msg-btn--primary" id="msg_scrip_send">Award</button>
+					<button type="button" class="msg-btn" id="msg_scrip_cancel">Cancel</button>
+					<span class="msg-compose-status" id="msg_scrip_status" aria-live="polite"></span>
+				</div>
+			</form>
+		</div>
+	</div>
+	<?php } ?>
 </div>
 <script>
 (function () {

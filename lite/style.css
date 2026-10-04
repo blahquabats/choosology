@@ -127,6 +127,31 @@ a:visited { color: #000060; }
 
 .lite-userbox strong { color: var(--lite-ink); }
 
+.lite-scrip {
+	display: inline-block;
+	margin-top: 0.15rem;
+	color: #004d26;
+}
+
+.lite-ledger-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.85rem;
+	margin: 0.35rem 0;
+}
+
+.lite-ledger-table th,
+.lite-ledger-table td {
+	border-bottom: 1px solid #ccc;
+	padding: 0.3rem 0.35rem;
+	text-align: left;
+	vertical-align: top;
+}
+
+.lite-ledger-table th {
+	color: var(--lite-navy);
+}
+
 fieldset.lite-panel {
 	border-top: 2px solid var(--lite-hilite);
 	border-left: 2px solid var(--lite-hilite);

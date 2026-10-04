@@ -156,6 +156,9 @@ $_SESSION['user'] = $name;
 $_SESSION['usertype'] = 0;
 unset($_SESSION['signup_challenge']);
 
+require_once __DIR__ . '/../lib/datascrip-helpers.php';
+choosology_datascrip_try_daily_login($db, $name);
+
 choosology_signup_json(array(
 	'ok' => 1,
 	'name' => $name,

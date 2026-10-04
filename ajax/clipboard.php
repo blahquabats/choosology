@@ -6,6 +6,7 @@ ob_start();
 require_once __DIR__ . '/../connect.php';
 require_once __DIR__ . '/../auxfuncs.php';
 require_once __DIR__ . '/../lib/clipboard-helpers.php';
+require_once __DIR__ . '/../lib/datascrip-helpers.php';
 ob_end_clean();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -161,6 +162,8 @@ foreach (choosology_clipboard_checklist_defs() as $def) {
 	);
 }
 
+$scrip = choosology_datascrip_summary_for_user($db, $user, 5);
+
 choosology_clipboard_json(array(
 	'ok' => 1,
 	'pad' => choosology_clipboard_get_pad($db, $user),
@@ -169,4 +172,5 @@ choosology_clipboard_json(array(
 	'last_edited' => choosology_clipboard_last_edited_adv($db, $user),
 	'metrics' => choosology_clipboard_experiment_metrics($db, $user),
 	'achievements' => choosology_user_achievements($db, $user),
+	'datascrip' => $scrip,
 ));

@@ -128,6 +128,7 @@ $(function() {
             $("#mystuff-office").attr("href", 'mystuff/office.php');
             $("#mystuff-messages").attr("href", 'mystuff/messages.php');
             $("#mystuff-resources").attr("href", 'mystuff/resources.php');
+            $("#mystuff-ledger").attr("href", 'mystuff/ledger.php');
             $("#mystuff-degrees").attr("href", 'mystuff/degrees.php');
             $("#mystuff-account").attr("href", 'mystuff/account.php');
             $(".tabsa").on("mousedown", function(e){
@@ -622,8 +623,9 @@ function loadTab(loc, retryAfterShow)
     if(loc =="office") which = 1;
     if(loc =="messages") which = 2;
     if(loc =="resources") which = 3;
-    if(loc =="degrees") which = 4;
-    if(loc =="account") which = 5;
+    if(loc =="ledger") which = 4;
+    if(loc =="degrees") which = 5;
+    if(loc =="account") which = 6;
     var tabs = $("#tabswindow");
     try { tabs.tabs("refresh"); } catch (err) { /* ignore */ }
     if (!retryAfterShow && tabs.tabs("option", "active") === which && tabs.find(".ui-tabs-panel").eq(which).children().length) {

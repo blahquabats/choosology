@@ -9,7 +9,7 @@ $allowed = array('rp' => 'Recently published', 'tr' => 'Top rated', 're' => 'Rec
 if (!isset($allowed[$which])) {
 	$which = 'rp';
 }
-$titleQ = trim((string) ($_GET['q'] ?? ''));
+$titleQ = trim(choosology_undo_connect_string_mutation((string) ($_GET['q'] ?? '')));
 $page = max(1, (int) ($_GET['page'] ?? 1));
 $perPage = 12;
 $offset = ($page - 1) * $perPage;

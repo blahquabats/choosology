@@ -59,12 +59,13 @@
 			'    </div>' +
 			'    <div class="clip-modal-footer">' +
 			'      <a class="clip-footer-link" id="clipboard_to_office" href="#/mystuff/office">Full experiment results in My Office</a>' +
+			'      <a class="clip-footer-link" id="clipboard_to_ledger" href="#/mystuff/ledger">Full DataScrip Ledger</a>' +
 			'    </div>' +
 			'  </div>' +
 			'</div>';
 		$("body").append(html);
 		$("#clipboard_modal_close, #clipboard_modal .clip-modal-backdrop").on("click", close);
-		$("#clipboard_to_office").on("click", function () {
+		$("#clipboard_to_office, #clipboard_to_ledger").on("click", function () {
 			close();
 		});
 		$(document).on("keydown.clipboardModal", function (e) {
@@ -148,6 +149,36 @@
 		return html;
 	}
 
+	function renderLedger(datascrip) {
+		var ds = datascrip || {};
+		var bal = ds.formatted || ((ds.sign || "د.إ") + " 0");
+		var recent = ds.recent || [];
+		var html =
+			'<p class="clip-scrip-balance">Balance: <strong>' + esc(bal) + "</strong></p>";
+		if (!recent.length) {
+			html +=
+				'<p class="clip-empty">No transactions yet. Daily check-ins, Degrees, and play earn DataScrip.</p>';
+		} else {
+			html += '<ul class="clip-ledger-list">';
+			recent.forEach(function (row) {
+				var amt = parseInt(row.amount, 10) || 0;
+				var sign = amt >= 0 ? "+" : "−";
+				var absFmt = (ds.sign || "د.إ") + " " + String(Math.abs(amt));
+				html +=
+					'<li class="clip-ledger-item">' +
+					'<span class="clip-ledger-amt' + (amt >= 0 ? " is-credit" : " is-debit") + '">' +
+					esc(sign + absFmt) + "</span>" +
+					'<span class="clip-ledger-memo">' + esc(row.label || row.memo || row.reason_key || "") + "</span>" +
+					"</li>";
+			});
+			html += "</ul>";
+		}
+		html +=
+			'<p class="clip-hint clip-hint--foot">' +
+			'<a class="clip-link" href="#/mystuff/ledger">Full Ledger in My Stuff</a></p>';
+		return html;
+	}
+
 	function renderBody(data) {
 		var last = data.last_edited;
 		var activityHtml;
@@ -170,6 +201,10 @@
 		var html =
 			'<section class="clip-section" aria-labelledby="clip_activity_h">' +
 			'<h3 id="clip_activity_h">Recent activity</h3>' + activityHtml + "</section>" +
+			'<section class="clip-section" aria-labelledby="clip_ledger_h">' +
+			'<h3 id="clip_ledger_h">Ledger</h3>' +
+			'<p class="clip-hint">Recent DataScrip movements.</p>' +
+			renderLedger(data.datascrip) + "</section>" +
 			'<section class="clip-section" aria-labelledby="clip_check_h">' +
 			'<h3 id="clip_check_h">New researcher checklist</h3>' +
 			'<p class="clip-hint">Dismiss items you skip. Completing unlocks a Degree.</p>' +

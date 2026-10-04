@@ -257,6 +257,61 @@
 		});
 		$("#msg_compose_close, #msg_compose_cancel, #msg_compose_backdrop").on("click", closeCompose);
 
+		function openScripAward() {
+			$("#msg_scrip_status").text("");
+			$("#msg_scrip_to").val("");
+			$("#msg_scrip_amount").val("10");
+			$("#msg_scrip_memo").val("");
+			$("#msg_scrip_scope_one").prop("checked", true);
+			$("#msg_scrip_to").prop("disabled", false);
+			$("#msg_scrip").removeClass("msg-compose--hidden").attr("aria-hidden", "false");
+		}
+		function closeScripAward() {
+			$("#msg_scrip").addClass("msg-compose--hidden").attr("aria-hidden", "true");
+		}
+		$("#msg_scrip_open").on("click", openScripAward);
+		$("#msg_scrip_close, #msg_scrip_cancel, #msg_scrip_backdrop").on("click", closeScripAward);
+		$(document).on("change", "input[name='msg_scrip_scope']", function () {
+			var all = $("#msg_scrip_scope_all").is(":checked");
+			$("#msg_scrip_to").prop("disabled", all);
+		});
+		$("#msg_scrip_send").on("click", function () {
+			var all = $("#msg_scrip_scope_all").is(":checked");
+			var payload = {
+				scope: all ? "all" : "one",
+				to: String($("#msg_scrip_to").val() || "").trim(),
+				amount: parseInt($("#msg_scrip_amount").val(), 10) || 0,
+				memo: String($("#msg_scrip_memo").val() || "").trim()
+			};
+			if (!all && !payload.to) {
+				$("#msg_scrip_status").text("Enter a username.");
+				return;
+			}
+			if (payload.amount < 1) {
+				$("#msg_scrip_status").text("Enter a positive amount.");
+				return;
+			}
+			if (all && !window.confirm("Award DataScrip to ALL users?")) {
+				return;
+			}
+			$("#msg_scrip_status").text("Awarding…");
+			post("award_scrip", payload).done(function (res) {
+				if (!res || !res.ok) {
+					$("#msg_scrip_status").text((res && res.error) || "Award failed.");
+					return;
+				}
+				closeScripAward();
+				if (typeof showAlert === "function") {
+					showAlert(
+						"Awarded " + (res.formatted || res.amount) + " to " + res.granted + " researcher(s).",
+						"success"
+					);
+				}
+			}).fail(function () {
+				$("#msg_scrip_status").text("Network error.");
+			});
+		});
+
 		$("#msg_reply_btn").on("click", function () {
 			if (!state.current) {
 				return;

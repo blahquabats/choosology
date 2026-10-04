@@ -8305,6 +8305,98 @@ body.clipboard-modal-open
 }
 
 /* Classic → Lite entry + suggest banner */
+.msg-login-scrip
+{
+    clear: both;
+    margin: 2px 0 0;
+    font-size: 0.78rem;
+    color: #2a4a3a;
+    line-height: 1.25;
+}
+.msg-login-scrip-label
+{
+    opacity: 0.85;
+}
+.msg-login-scrip-amt
+{
+    font-weight: bold;
+    color: #0b5c2e;
+}
+.ms-ledger-page
+{
+    padding: 8px 4px 16px;
+}
+.ms-ledger-eyebrow
+{
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5a6a7a;
+}
+.ms-ledger-title
+{
+    margin: 0.15rem 0 0.35rem;
+    font-size: 1.25rem;
+}
+.ms-ledger-balance
+{
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+}
+.ms-ledger-note,
+.ms-ledger-empty
+{
+    color: #4a5d70;
+    font-size: 0.9rem;
+}
+.ms-ledger-table
+{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-top: 0.75rem;
+}
+.ms-ledger-table th,
+.ms-ledger-table td
+{
+    border-bottom: 1px solid #d5dde6;
+    padding: 0.4rem 0.45rem;
+    text-align: left;
+    vertical-align: top;
+}
+.ms-ledger-table th
+{
+    color: #3d5a73;
+    font-weight: bold;
+}
+.ms-ledger-amt--credit { color: #0b5c2e; font-weight: bold; }
+.ms-ledger-amt--debit { color: #8b1e1e; font-weight: bold; }
+.ms-ledger-actor { color: #6a7a8a; font-size: 0.85em; }
+.clip-scrip-balance { margin: 0 0 0.4rem; font-size: 0.9rem; }
+.clip-ledger-list
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.clip-ledger-item
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px dotted #c8d0d8;
+    font-size: 0.85rem;
+}
+.clip-ledger-amt { font-weight: bold; min-width: 4.5rem; }
+.clip-ledger-amt.is-credit { color: #0b5c2e; }
+.clip-ledger-amt.is-debit { color: #8b1e1e; }
+.clip-ledger-memo { color: #3d4a56; flex: 1; }
+.clip-modal-footer .clip-footer-link + .clip-footer-link
+{
+    margin-left: 0.75rem;
+}
 .classic-lite-link
 {
     float: right;

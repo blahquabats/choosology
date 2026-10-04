@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		exit;
 	}
 
-	$user = strip_tags(trim((string) ($_POST['logname'] ?? '')));
-	$password = (string) ($_POST['logpass'] ?? '');
+	$user = strip_tags(trim(choosology_undo_connect_string_mutation((string) ($_POST['logname'] ?? ''))));
+	$password = choosology_undo_connect_string_mutation((string) ($_POST['logpass'] ?? ''));
 	$remember = !empty($_POST['rememberlogin']);
 	if ($user === '' || $password === '') {
 		$error = 'Enter a username and password.';
@@ -49,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				}
 				makeCookies((string) $row['name']);
 			}
+			require_once dirname(__DIR__) . '/lib/datascrip-helpers.php';
+			choosology_datascrip_try_daily_login($db, (string) $row['name']);
 			/* Sync Lite preference when signing in from Lite. */
 			choosology_ui_save_preference($db, 'lite');
 			$next = trim((string) ($_POST['next'] ?? ''));

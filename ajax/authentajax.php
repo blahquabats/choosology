@@ -2,6 +2,7 @@
 $_GET['project_lazarus'] = "go";
 require_once("../connect.php");
 require_once("../auxfuncs.php");
+require_once("../lib/datascrip-helpers.php");
 
 if (isset($_POST['loginsubmit']))
 {
@@ -33,6 +34,7 @@ if (isset($_POST['loginsubmit']))
         $_SESSION['user'] = $result2['name'];
         $_SESSION['usertype'] = $result2['usertype'];
         $alluserinfo['newmessages'] = getNewMessages();
+        choosology_datascrip_try_daily_login($db, (string) $result2['name']);
         echo $result2['name'];
     }
     else
