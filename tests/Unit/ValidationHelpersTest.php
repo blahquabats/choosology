@@ -20,10 +20,13 @@ final class ValidationHelpersTest extends TestCase
 
 	public function testNicedatetimeModes(): void
 	{
+		require_once CHOOSOLOGY_ROOT . '/lib/date-format-helpers.php';
+		$_COOKIE = array();
 		$stamp = '2020-06-03 15:30:00';
 		$this->assertSame('06/03/2020', nicedatetime($stamp, 'date'));
 		$this->assertStringContainsString('m', nicedatetime($stamp, 'time'));
 		$this->assertStringContainsString('on', nicedatetime($stamp, 'datetime'));
+		$this->assertStringContainsString('06/03/2020', nicedatetime($stamp, 'datetime'));
 	}
 
 	public function testMakeStars(): void

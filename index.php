@@ -2,7 +2,10 @@
     require_once("./connect.php");
     require_once("./auxfuncs.php");
     require_once("./lib/lite-helpers.php");
+    require_once("./lib/date-format-helpers.php");
     choosology_ui_mode_ensure_schema($db);
+    choosology_date_format_ensure_schema($db);
+    $choosology_date_fmt = choosology_date_format_preferred($db);
     /* Site-wide Lite preference: Classic entry redirects unless explicitly staying. */
     if (choosology_ui_preferred_mode($db) === 'lite' && empty($_GET['stay'])) {
         header('Location: ' . choosology_lite_url('index.php'));
@@ -42,6 +45,7 @@
     <script src="scripts/jquery.js"></script>
     <script>
     window.CHOOSOLOGY_BASE = <?php echo json_encode($choosology_web_base, JSON_UNESCAPED_SLASHES); ?>;
+    window.CHOOSOLOGY_DATE_FMT = <?php echo json_encode($choosology_date_fmt, JSON_UNESCAPED_SLASHES); ?>;
     function choosologyUrl(path) {
         path = String(path || '').replace(/^\//, '');
         var b = typeof window.CHOOSOLOGY_BASE === 'string' ? window.CHOOSOLOGY_BASE : '';
@@ -115,7 +119,7 @@
 <div class="header" id='topbox'>
     <?php
     $liteSwitchHref = htmlspecialchars(choosology_lite_url('switch.php?to=lite'), ENT_QUOTES, 'UTF-8');
-    echo "<div class='classic-lite-link'><a href='{$liteSwitchHref}' title='Authentic lean terminal UI — cohort of 1986'>Lite</a></div>";
+    echo "<div class='classic-lite-link'><a href='{$liteSwitchHref}' title='Choosology 3.1 — lean terminal UI'>Lite</a></div>";
     if (empty($_SESSION['user']))
     {
         echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";

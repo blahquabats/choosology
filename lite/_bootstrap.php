@@ -1,6 +1,6 @@
 <?php
 /**
- * Shared Lite layout helpers.
+ * Shared Lite (Choosology 3.1) layout helpers.
  * Call choosology_lite_bootstrap() first from each page.
  */
 
@@ -18,6 +18,7 @@ function choosology_lite_bootstrap(): void
 	}
 	require_once dirname(__DIR__) . '/auxfuncs.php';
 	require_once dirname(__DIR__) . '/lib/lite-helpers.php';
+	require_once dirname(__DIR__) . '/lib/date-format-helpers.php';
 	if (is_readable(dirname(__DIR__) . '/lib/ending-helpers.php')) {
 		require_once dirname(__DIR__) . '/lib/ending-helpers.php';
 	}
@@ -27,6 +28,7 @@ function choosology_lite_bootstrap(): void
 		die('Database unavailable.');
 	}
 	choosology_ui_mode_ensure_schema($db);
+	choosology_date_format_ensure_schema($db);
 }
 
 /**
@@ -34,12 +36,13 @@ function choosology_lite_bootstrap(): void
  */
 function choosology_lite_header(array $opts = array()): void
 {
-	$title = (string) ($opts['title'] ?? 'Choosology Lite');
+	$title = (string) ($opts['title'] ?? 'Choosology 3.1');
 	$active = (string) ($opts['active'] ?? '');
-	$pageTitle = $title === 'Choosology Lite' ? $title : ($title . ' — Choosology Lite');
+	$pageTitle = $title === 'Choosology 3.1' ? $title : ($title . ' — Choosology 3.1');
 	$css = htmlspecialchars(choosology_site_url('lite/style.css'), ENT_QUOTES, 'UTF-8');
 	$home = htmlspecialchars(choosology_lite_url('index.php'), ENT_QUOTES, 'UTF-8');
 	$browse = htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8');
+	$news = htmlspecialchars(choosology_lite_url('news.php'), ENT_QUOTES, 'UTF-8');
 	$ledger = htmlspecialchars(choosology_lite_url('ledger.php'), ENT_QUOTES, 'UTF-8');
 	$login = htmlspecialchars(choosology_lite_url('login.php'), ENT_QUOTES, 'UTF-8');
 	$switchClassic = htmlspecialchars(choosology_lite_url('switch.php?to=classic'), ENT_QUOTES, 'UTF-8');
@@ -71,16 +74,16 @@ function choosology_lite_header(array $opts = array()): void
 	echo '<body>' . "\n";
 	echo '<div class="lite-wrap">' . "\n";
 	echo '<div class="lite-win">' . "\n";
-	echo '<div class="lite-titlebar"><span>Choosology Lite — Lab Terminal</span><span class="lite-titlebar-sys" aria-hidden="true">_ □ ×</span></div>' . "\n";
+	echo '<div class="lite-titlebar"><span>Choosology 3.1 — Lab Terminal</span><span class="lite-titlebar-sys" aria-hidden="true">_ □ ×</span></div>' . "\n";
 	echo '<div class="lite-inner">' . "\n";
 	echo '<div class="lite-brand-row">' . "\n";
-	echo '<div><p class="lite-brand">CHOOSOLOGY LITE</p>';
-	echo '<p class="lite-tag" title="Representative of the authentic experience of the original cohort of Choosologists from 1986.">';
-	echo 'Authentic lab terminal · cohort of 1986</p></div>' . "\n";
+	echo '<div><p class="lite-brand">CHOOSOLOGY 3.1</p>';
+	echo '<p class="lite-tag">Proprietary narrative application © 1986</p></div>' . "\n";
 	echo '<p class="lite-mode-link"><a href="' . $switchClassic . '" title="Full Classic Choosology interface">Classic view</a></p>' . "\n";
 	echo '</div>' . "\n";
-	echo '<nav class="lite-menubar" aria-label="Lite">' . "\n";
+	echo '<nav class="lite-menubar" aria-label="Choosology 3.1">' . "\n";
 	echo $nav('home', $home, 'Home') . "\n";
+	echo $nav('news', $news, 'News') . "\n";
 	echo $nav('browse', $browse, 'Browse') . "\n";
 	if ($user !== '') {
 		echo $nav('ledger', $ledger, 'Ledger') . "\n";
@@ -92,7 +95,7 @@ function choosology_lite_header(array $opts = array()): void
 	if ($user !== '') {
 		echo '<p class="lite-userbox">Signed in as <strong>' . htmlspecialchars($user, ENT_QUOTES, 'UTF-8') . '</strong>';
 		if ($scripFmt !== '') {
-			echo '<br><span class="lite-scrip" title="DataScrip balance">DataScrip <strong>' . $scripFmt . '</strong></span>';
+			echo ' <span class="lite-scrip" title="DataScrip balance">' . $scripFmt . '</span>';
 		}
 		echo '<br>My Stuff extras remain in <a href="' . htmlspecialchars(choosology_classic_url('mystuff'), ENT_QUOTES, 'UTF-8') . '">Classic</a>';
 		echo '</p>' . "\n";
@@ -101,7 +104,28 @@ function choosology_lite_header(array $opts = array()): void
 
 function choosology_lite_footer(): void
 {
-	echo '<p class="lite-foot">Lite keeps pages plain and images small. Prefer Classic chrome? Use Classic view above.</p>' . "\n";
 	echo '</div></div></div>' . "\n";
 	echo '</body></html>' . "\n";
+}
+
+/**
+ * Compact date-format preference form for Lite pages.
+ */
+function choosology_lite_date_format_form(string $nextPath = 'ledger.php'): void
+{
+	global $db;
+	$current = choosology_date_format_preferred($db instanceof mysqli ? $db : null);
+	$action = htmlspecialchars(choosology_lite_url('prefs.php'), ENT_QUOTES, 'UTF-8');
+	$next = htmlspecialchars($nextPath, ENT_QUOTES, 'UTF-8');
+	$mdy = ($current === CHOOSOLOGY_DATE_FMT_MDY) ? ' checked' : '';
+	$dmy = ($current === CHOOSOLOGY_DATE_FMT_DMY) ? ' checked' : '';
+	echo '<fieldset class="lite-panel lite-prefs">' . "\n";
+	echo '<legend>Date format</legend>' . "\n";
+	echo '<form method="post" action="' . $action . '" class="lite-date-form">' . "\n";
+	echo '<input type="hidden" name="next" value="' . $next . '">' . "\n";
+	echo '<label class="lite-radio"><input type="radio" name="date_format" value="mdy"' . $mdy . '> mm/dd/yyyy</label> ';
+	echo '<label class="lite-radio"><input type="radio" name="date_format" value="dmy"' . $dmy . '> dd/mm/yyyy</label> ';
+	echo '<button type="submit" class="lite-btn">Save</button>' . "\n";
+	echo '</form>' . "\n";
+	echo '</fieldset>' . "\n";
 }

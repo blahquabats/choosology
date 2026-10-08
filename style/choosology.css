@@ -5942,6 +5942,24 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
       font-weight: 700;
   }
 
+  .ms-account-datefmt
+  {
+      margin: 10px 0 4px;
+      padding: 0;
+      border: 0;
+      min-inline-size: 0;
+  }
+
+  .ms-account-datefmt .ms-account-label
+  {
+      margin-top: 0;
+  }
+
+  .ms-account-datefmt .ms-account-check
+  {
+      margin-bottom: 6px;
+  }
+
   .ms-account-hint
   {
       display: block;

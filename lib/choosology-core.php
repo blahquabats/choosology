@@ -25,19 +25,10 @@ function checkEmail($email): bool
 
 function nicedatetime($date, $mode = 'datetime')
 {
-	$phptime = strtotime((string) $date);
-	if ($phptime === false) {
-		return '';
+	if (!function_exists('choosology_format_user_date')) {
+		require_once __DIR__ . '/date-format-helpers.php';
 	}
-	switch ($mode) {
-		case 'date':
-			return date('m/d/Y', $phptime);
-		case 'time':
-			return date('g:ia', $phptime);
-		case 'datetime':
-		default:
-			return date('g:ia \o\n m/d/Y', $phptime);
-	}
+	return choosology_format_user_date($date, (string) $mode);
 }
 
 function decode($str, $strip = 0)

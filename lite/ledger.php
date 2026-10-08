@@ -73,4 +73,5 @@ choosology_lite_header(array('title' => 'Ledger', 'active' => 'ledger'));
 	<?php } ?>
 </fieldset>
 <?php
+choosology_lite_date_format_form('ledger.php' . ($page > 1 ? ('?page=' . $page) : ''));
 choosology_lite_footer();

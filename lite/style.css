@@ -128,9 +128,42 @@ a:visited { color: #000060; }
 .lite-userbox strong { color: var(--lite-ink); }
 
 .lite-scrip {
-	display: inline-block;
-	margin-top: 0.15rem;
+	display: inline;
+	margin-left: 0.35rem;
 	color: #004d26;
+	white-space: nowrap;
+}
+
+.lite-radio {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	margin-right: 0.65rem;
+	font-size: 0.88rem;
+}
+
+.lite-date-form {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.35rem 0.5rem;
+}
+
+.lite-news-title {
+	margin: 0 0 0.35rem;
+	font-size: 1.05rem;
+	color: var(--lite-navy);
+}
+
+.lite-news-body {
+	font-size: 0.92rem;
+	line-height: 1.45;
+}
+
+.lite-news-body p { margin: 0.4rem 0; }
+
+.lite-news-nav-current > a {
+	text-decoration: underline;
 }
 
 .datascrip-sign {
