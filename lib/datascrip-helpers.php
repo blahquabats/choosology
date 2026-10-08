@@ -354,6 +354,27 @@ function choosology_datascrip_db_day(mysqli $db): string
 }
 
 /**
+ * Format a Y-m-d (or datetime) day for a new ledger memo using the earner's date preference.
+ * Idempotency keys should keep raw Y-m-d; only human memos use this.
+ */
+function choosology_datascrip_memo_day(?mysqli $db, string $dayYmd, string $uname = ''): string
+{
+	if (!function_exists('choosology_format_user_date')) {
+		require_once __DIR__ . '/date-format-helpers.php';
+	}
+	$raw = trim($dayYmd);
+	if ($raw === '') {
+		return '';
+	}
+	$fmt = ($db instanceof mysqli && $uname !== '')
+		? choosology_date_format_for_user($db, $uname)
+		: choosology_date_format_preferred($db instanceof mysqli ? $db : null);
+	$stamp = (strpos($raw, ' ') !== false) ? $raw : ($raw . ' 12:00:00');
+	$label = choosology_format_user_date($stamp, 'date', $fmt);
+	return $label !== '' ? $label : $raw;
+}
+
+/**
  * Daily login grant (once per calendar day, DB timezone).
  *
  * @return array{ok:bool,applied:bool,balance:int,amount:int}
@@ -363,12 +384,13 @@ function choosology_datascrip_try_daily_login(mysqli $db, string $uname): array
 	$catalog = choosology_datascrip_reward_catalog();
 	$amount = (int) ($catalog['activities']['daily_login'] ?? 5);
 	$day = choosology_datascrip_db_day($db);
+	$dayLabel = choosology_datascrip_memo_day($db, $day, $uname);
 	return choosology_datascrip_apply(
 		$db,
 		$uname,
 		$amount,
 		'daily_login',
-		'Daily lab check-in (' . $day . ')',
+		'Daily lab check-in (' . $dayLabel . ')',
 		null,
 		'daily_login:' . $day
 	);
@@ -413,12 +435,13 @@ function choosology_datascrip_try_daily_play(mysqli $db, string $uname): array
 	$catalog = choosology_datascrip_reward_catalog();
 	$amount = (int) ($catalog['activities']['daily_play'] ?? 3);
 	$day = choosology_datascrip_db_day($db);
+	$dayLabel = choosology_datascrip_memo_day($db, $day, $uname);
 	return choosology_datascrip_apply(
 		$db,
 		$uname,
 		$amount,
 		'daily_play',
-		'Played an experiment (' . $day . ')',
+		'Played an experiment (' . $dayLabel . ')',
 		null,
 		'daily_play:' . $day
 	);

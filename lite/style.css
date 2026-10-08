@@ -147,6 +147,12 @@ a:visited { color: #000060; }
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.35rem 0.5rem;
+	margin: 0;
+	width: 100%;
+}
+
+.lite-prefs {
+	max-width: 100%;
 }
 
 .lite-news-title {
@@ -217,6 +223,11 @@ fieldset.lite-panel legend {
 	margin: 0 0 0.35rem;
 	border-bottom: 1px solid #c8c4bc;
 	color: var(--lite-navy);
+}
+
+/* Floated legend takes content out of flow — force body content below the rule. */
+fieldset.lite-panel > :not(legend) {
+	clear: both;
 }
 
 fieldset.lite-panel::after {

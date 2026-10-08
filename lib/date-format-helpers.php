@@ -61,24 +61,43 @@ function choosology_date_format_cookie_set(string $fmt): void
 }
 
 /**
+ * Cookie / default only (no DB). Used to avoid recursion from account lookups.
+ */
+function choosology_date_format_anonymous(): string
+{
+	$cookie = choosology_date_format_cookie_get();
+	return $cookie !== '' ? $cookie : CHOOSOLOGY_DATE_FMT_MDY;
+}
+
+/**
+ * Date format for a named account (falls back to cookie/default — never re-enters preferred).
+ */
+function choosology_date_format_for_user(?mysqli $db, string $uname): string
+{
+	$uname = trim($uname);
+	if ($db instanceof mysqli && $uname !== '') {
+		choosology_date_format_ensure_schema($db);
+		$esc = mysqli_real_escape_string($db, $uname);
+		$r = @mysqli_query($db, "SELECT date_format FROM users WHERE name='$esc' LIMIT 1");
+		if ($r && ($row = mysqli_fetch_assoc($r)) && isset($row['date_format']) && (string) $row['date_format'] !== '') {
+			return choosology_date_format_normalize((string) $row['date_format']);
+		}
+	}
+	return choosology_date_format_anonymous();
+}
+
+/**
  * Effective date format code: mdy | dmy.
  */
 function choosology_date_format_preferred(?mysqli $db = null): string
 {
-	if ($db instanceof mysqli) {
-		choosology_date_format_ensure_schema($db);
-		if (!empty($_SESSION['user'])) {
-			$esc = mysqli_real_escape_string($db, (string) $_SESSION['user']);
-			$r = @mysqli_query($db, "SELECT date_format FROM users WHERE name='$esc' LIMIT 1");
-			if ($r && ($row = mysqli_fetch_assoc($r)) && isset($row['date_format']) && (string) $row['date_format'] !== '') {
-				return choosology_date_format_normalize((string) $row['date_format']);
-			}
-		}
-	} elseif (isset($GLOBALS['db']) && $GLOBALS['db'] instanceof mysqli) {
-		return choosology_date_format_preferred($GLOBALS['db']);
+	if (!($db instanceof mysqli) && isset($GLOBALS['db']) && $GLOBALS['db'] instanceof mysqli) {
+		$db = $GLOBALS['db'];
 	}
-	$cookie = choosology_date_format_cookie_get();
-	return $cookie !== '' ? $cookie : CHOOSOLOGY_DATE_FMT_MDY;
+	if ($db instanceof mysqli && !empty($_SESSION['user'])) {
+		return choosology_date_format_for_user($db, (string) $_SESSION['user']);
+	}
+	return choosology_date_format_anonymous();
 }
 
 function choosology_date_format_save(?mysqli $db, string $fmt): void

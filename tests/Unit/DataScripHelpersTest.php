@@ -38,4 +38,15 @@ final class DataScripHelpersTest extends TestCase
 		$this->assertSame('Daily lab check-in', choosology_datascrip_reason_label('daily_login'));
 		$this->assertSame('Custom memo', choosology_datascrip_reason_label('daily_login', 'Custom memo'));
 	}
+
+	public function testMemoDayRespectsDateFormat(): void
+	{
+		require_once CHOOSOLOGY_ROOT . '/lib/datascrip-helpers.php';
+		require_once CHOOSOLOGY_ROOT . '/lib/date-format-helpers.php';
+		$_COOKIE = array();
+		$_COOKIE[CHOOSOLOGY_DATE_FMT_COOKIE] = 'mdy';
+		$this->assertSame('10/08/2026', choosology_datascrip_memo_day(null, '2026-10-08'));
+		$_COOKIE[CHOOSOLOGY_DATE_FMT_COOKIE] = 'dmy';
+		$this->assertSame('08/10/2026', choosology_datascrip_memo_day(null, '2026-10-08'));
+	}
 }
