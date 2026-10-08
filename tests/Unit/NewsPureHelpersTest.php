@@ -34,11 +34,24 @@ final class NewsPureHelpersTest extends TestCase
 
 	public function testFeedDates(): void
 	{
+		require_once CHOOSOLOGY_ROOT . '/lib/date-format-helpers.php';
+		$_COOKIE = array();
 		$this->assertSame('', choosology_feed_date_label(''));
 		$label = choosology_feed_date_label('2020-06-03 12:00:00');
-		$this->assertStringContainsString('2020', $label);
+		$this->assertSame('06/03/2020', $label);
+		$_COOKIE[CHOOSOLOGY_DATE_FMT_COOKIE] = 'dmy';
+		$this->assertSame('03/06/2020', choosology_feed_date_label('2020-06-03 12:00:00'));
 		$iso = choosology_feed_date_iso('2020-06-03 12:00:00');
 		$this->assertStringContainsString('2020', $iso);
 		$this->assertStringContainsString('T', $iso);
+	}
+
+	public function testBodySafe(): void
+	{
+		$html = choosology_news_body_safe('<p>Hi<em>there</em><script>alert(1)</script></p>');
+		$this->assertStringContainsString('<p>Hi<em>there</em>', $html);
+		$this->assertStringNotContainsString('<script>', $html);
+		$this->assertStringNotContainsString('alert', $html);
+		$this->assertStringContainsString('<p>', choosology_news_body_allowed_tags());
 	}
 }

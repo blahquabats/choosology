@@ -75,7 +75,7 @@
 		el.setAttribute('role', 'region');
 		el.setAttribute('aria-label', 'Lite mode suggestion');
 		el.innerHTML =
-			'<strong>Try Choosology Lite</strong> — the authentic lean terminal UI of the 1986 cohort. Better on small screens and slow links.' +
+			'<strong>Try Choosology 3.1</strong> — proprietary narrative application © 1986. Better on small screens and slow links.' +
 			'<div class="lite-suggest-actions">' +
 			'<a href="' + switchUrl + '">Switch to Lite</a>' +
 			'<a href="#" id="lite_suggest_dismiss">Dismiss</a>' +

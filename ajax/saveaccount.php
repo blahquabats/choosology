@@ -6,6 +6,7 @@ ob_start();
 require_once __DIR__ . '/../connect.php';
 require_once __DIR__ . '/../auxfuncs.php';
 require_once __DIR__ . '/../lib/account-helpers.php';
+require_once __DIR__ . '/../lib/date-format-helpers.php';
 ob_end_clean();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -49,6 +50,8 @@ if (choosology_account_plain_len($aboutRaw) > 400) {
 $about = choosology_account_sanitize_about($aboutRaw);
 
 $viewRestricted = !empty($data['view_restricted']) ? 1 : 0;
+$dateFmt = choosology_date_format_normalize((string) ($data['date_format'] ?? CHOOSOLOGY_DATE_FMT_MDY));
+choosology_date_format_ensure_schema($db);
 $picRaw = isset($data['pic']) ? trim((string) $data['pic']) : '';
 $picSql = '0';
 if ($picRaw !== '') {
@@ -94,10 +97,12 @@ if ($currentPassword !== '' || $newPassword !== '' || $confirmPassword !== '') {
 }
 
 $aboutEsc = mysqli_real_escape_string($db, $about);
+$dateFmtEsc = mysqli_real_escape_string($db, $dateFmt);
 $q = "UPDATE users SET
 	about = '$aboutEsc',
 	pic = '$picSql',
-	view_restricted = '$viewRestricted'
+	view_restricted = '$viewRestricted',
+	date_format = '$dateFmtEsc'
 	$passwordSetSql
 	WHERE name = '$escUser'
 	LIMIT 1";
@@ -106,4 +111,5 @@ if (!mysqli_query($db, $q)) {
 	choosology_account_json(array('ok' => 0, 'error' => 'Could not save account settings.'));
 }
 
-choosology_account_json(array('ok' => 1, 'passwordChanged' => $passwordChanged));
+choosology_date_format_cookie_set($dateFmt);
+choosology_account_json(array('ok' => 1, 'passwordChanged' => $passwordChanged, 'date_format' => $dateFmt));

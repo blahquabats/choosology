@@ -188,7 +188,7 @@ final class ChoosologyWorkflows
 		);
 		$home = $client->followRedirect($login, 0, 'lite_login_landing', 'Land on Lite home after login');
 		$assertions['login_redirect'] = in_array($login['code'], array(302, 303), true) || $home['code'] === 200;
-		$assertions['home_brand'] = str_contains($home['body'], 'CHOOSOLOGY LITE') || str_contains($home['body'], 'Signed in as');
+		$assertions['home_brand'] = str_contains($home['body'], 'CHOOSOLOGY 3.1') || str_contains($home['body'], 'Signed in as');
 
 		$browse = $client->request('GET', '/lite/browse.php', null, array(), 1, 'lite_browse', 'Open Browse');
 		$assertions['browse_ok'] = $browse['code'] === 200 && str_contains($browse['body'], 'Browse experiments');
@@ -366,7 +366,7 @@ final class ChoosologyWorkflows
 			'Login in Lite'
 		);
 		$liteHome = $client->followRedirect($login, 0, 'roundtrip_lite_home', 'Lite home');
-		$assertions['lite_start'] = $liteHome['code'] === 200 && str_contains($liteHome['body'], 'CHOOSOLOGY LITE');
+		$assertions['lite_start'] = $liteHome['code'] === 200 && str_contains($liteHome['body'], 'CHOOSOLOGY 3.1');
 
 		$toClassic = $client->request('GET', '/lite/switch.php?to=classic', null, array(), 1, 'switch_to_classic', 'Switch preference to Classic');
 		$classic = $client->followRedirect($toClassic, 0, 'classic_after_switch', 'Open Classic after switch');
@@ -382,7 +382,7 @@ final class ChoosologyWorkflows
 		$toLite = $client->request('GET', '/lite/switch.php?to=lite', null, array(), 1, 'switch_to_lite', 'Switch preference back to Lite');
 		$liteAgain = $client->followRedirect($toLite, 0, 'lite_after_switch', 'Return to Lite');
 		$assertions['lite_return'] = $liteAgain['code'] === 200 && (
-			str_contains($liteAgain['body'], 'CHOOSOLOGY LITE')
+			str_contains($liteAgain['body'], 'CHOOSOLOGY 3.1')
 			|| str_contains($liteAgain['body'], 'Signed in as')
 		);
 

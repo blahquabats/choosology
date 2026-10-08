@@ -17,52 +17,6 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'updates') {
 }
 
 /**
- * @return array{0:bool,1?:string} [ ok, error message ]
- */
-function choosology_news_table_ready(mysqli $db): array
-{
-	$chk = @mysqli_query($db, "SHOW TABLES LIKE 'news'");
-	if (!$chk || mysqli_num_rows($chk) === 0) {
-		return array(false, 'The <code>news</code> table was not found. Run <code>choosology-schema.sql</code> or <code>sql/news_setup.sql</code> on your database.');
-	}
-	return array(true);
-}
-
-function choosology_news_schema(mysqli $db): array
-{
-	static $cache = null;
-	if (is_array($cache)) {
-		return $cache;
-	}
-	$cache = array(
-		'has_body' => false,
-		'has_text' => false,
-		'has_whenposted' => false,
-		'has_by' => false,
-	);
-	$r = mysqli_query($db, 'SHOW COLUMNS FROM news');
-	if (!$r) {
-		return $cache;
-	}
-	while ($row = mysqli_fetch_assoc($r)) {
-		$f = isset($row['Field']) ? (string) $row['Field'] : '';
-		if ($f === 'body') {
-			$cache['has_body'] = true;
-		}
-		if ($f === 'text') {
-			$cache['has_text'] = true;
-		}
-		if ($f === 'whenposted') {
-			$cache['has_whenposted'] = true;
-		}
-		if ($f === 'by') {
-			$cache['has_by'] = true;
-		}
-	}
-	return $cache;
-}
-
-/**
  * Main-column HTML only (for full page inside #news-article-mount, or AJAX fragment=article).
  */
 function choosology_news_echo_main_article_html(
@@ -86,14 +40,17 @@ function choosology_news_echo_main_article_html(
 	if ($displayRow) {
 		$h = htmlspecialchars((string) $displayRow['headline'], ENT_QUOTES, 'UTF-8');
 		$bodyRaw = choosology_news_row_body_raw($displayRow);
-		$bodySafe = $bodyRaw !== '' ? strip_tags($bodyRaw, '<p><br><strong><em><b><i><a><ul><ol><li><h2><h3><blockquote><code><pre>') : '<p><em>No body text for this item yet.</em></p>';
+		$bodySafe = choosology_news_body_safe($bodyRaw);
 		$stampRaw = choosology_news_stamp_raw($displayRow);
 		$pub = '';
 		if ($stampRaw !== '') {
 			$ts = strtotime($stampRaw);
 			if ($ts > 0) {
+				if (!function_exists('choosology_format_user_date')) {
+					require_once __DIR__ . '/lib/date-format-helpers.php';
+				}
 				$iso = date('c', $ts);
-				$label = htmlspecialchars(date('M j, Y', $ts), ENT_QUOTES, 'UTF-8');
+				$label = htmlspecialchars(choosology_format_user_date($ts, 'date'), ENT_QUOTES, 'UTF-8');
 				$pub = '<p class="news-meta"><time datetime="' . htmlspecialchars($iso, ENT_QUOTES, 'UTF-8') . '">' . $label . '</time></p>';
 			}
 		}
@@ -252,9 +209,12 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 								$stampRaw = choosology_news_stamp_raw($row);
 								$dateStr = '';
 								if ($stampRaw !== '') {
-									$ts = strtotime($stampRaw);
-									if ($ts > 0) {
-										$dateStr = htmlspecialchars(date('M j, Y', $ts), ENT_QUOTES, 'UTF-8');
+									if (!function_exists('choosology_format_user_date')) {
+										require_once __DIR__ . '/lib/date-format-helpers.php';
+									}
+									$label = choosology_format_user_date($stampRaw, 'date');
+									if ($label !== '') {
+										$dateStr = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 									}
 								}
 								$active = (($newsId > 0 && $rid === $newsId) || ($newsId === 0 && $latestId > 0 && $rid === $latestId)) ? ' news-card--active' : '';

@@ -7,9 +7,12 @@ if (empty($_SESSION['user'])) {
 	return;
 }
 
+require_once __DIR__ . '/../lib/date-format-helpers.php';
+choosology_date_format_ensure_schema($db);
+
 $user = (string) $_SESSION['user'];
 $escUser = mysqli_real_escape_string($db, $user);
-$rows = runquery_assoc("SELECT name, email, about, pic, view_restricted FROM users WHERE name = '$escUser' LIMIT 1");
+$rows = runquery_assoc("SELECT name, email, about, pic, view_restricted, date_format FROM users WHERE name = '$escUser' LIMIT 1");
 if (!is_array($rows) || !isset($rows[0])) {
 	echo "<div class='intabs'><p class='error'>Could not load your account.</p></div>";
 	return;
@@ -21,6 +24,7 @@ $about = htmlspecialchars((string) ($account['about'] ?? ''), ENT_QUOTES, 'UTF-8
 $pic = trim((string) ($account['pic'] ?? ''));
 $picUrl = ($pic !== '' && ctype_digit($pic)) ? getPicUrl((int) $pic, true) : '';
 $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
+$dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ?? CHOOSOLOGY_DATE_FMT_MDY));
 ?>
 <div class="intabs ms-account-page">
 	<form id="ms-account-form" class="ms-account-paper" onsubmit="return false;">
@@ -60,6 +64,18 @@ $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
 					<input type="checkbox" id="acct_view_restricted"<?php echo $viewRestricted ? ' checked' : ''; ?>>
 					<span>Show restricted adventures when browsing</span>
 				</label>
+
+				<fieldset class="ms-account-datefmt">
+					<legend class="ms-account-label">Date format</legend>
+					<label class="ms-account-check">
+						<input type="radio" name="acct_date_format" id="acct_date_format_mdy" value="mdy"<?php echo $dateFmt === 'mdy' ? ' checked' : ''; ?>>
+						<span>mm/dd/yyyy</span>
+					</label>
+					<label class="ms-account-check">
+						<input type="radio" name="acct_date_format" id="acct_date_format_dmy" value="dmy"<?php echo $dateFmt === 'dmy' ? ' checked' : ''; ?>>
+						<span>dd/mm/yyyy</span>
+					</label>
+				</fieldset>
 
 				<label class="ms-account-label" for="acct_email">Email address</label>
 				<input type="email" id="acct_email" value="<?php echo $email; ?>" readonly>
@@ -134,6 +150,7 @@ $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
 			pic: String($("#acct_pic").val() || ""),
 			about: accountAboutHtml(),
 			viewRestricted: $("#acct_view_restricted").is(":checked") ? "1" : "0",
+			dateFormat: String($("input[name='acct_date_format']:checked").val() || "mdy"),
 			currentPassword: $("#acct_current_password").val() || "",
 			newPassword: $("#acct_new_password").val() || "",
 			confirmPassword: $("#acct_confirm_password").val() || ""
@@ -349,6 +366,7 @@ $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
 			pic: $("#acct_pic").val(),
 			about: $("#acct_about").val(),
 			view_restricted: $("#acct_view_restricted").is(":checked") ? 1 : 0,
+			date_format: $("input[name='acct_date_format']:checked").val() || "mdy",
 			current_password: $("#acct_current_password").val(),
 			new_password: $("#acct_new_password").val(),
 			confirm_password: $("#acct_confirm_password").val()
@@ -365,6 +383,9 @@ $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
 			if (res && res.ok) {
 				$("#acct_current_password, #acct_new_password, #acct_confirm_password").val("");
 				$("#acct_status").text(res.passwordChanged ? "Saved. Password updated." : "Saved.");
+				if (res.date_format) {
+					window.CHOOSOLOGY_DATE_FMT = res.date_format;
+				}
 				if (window.tinymce && tinymce.get("acct_about")) {
 					tinymce.get("acct_about").save();
 				}

@@ -4,7 +4,7 @@
  */
 
 /**
- * Format a DB datetime for feed display (e.g. "Jun 3, 2020").
+ * Format a DB datetime for feed display (user date preference).
  */
 function choosology_feed_date_label(string $stampRaw): string
 {
@@ -12,11 +12,10 @@ function choosology_feed_date_label(string $stampRaw): string
 	if ($t === '' || $t === '0000-00-00 00:00:00') {
 		return '';
 	}
-	$ts = strtotime($t);
-	if ($ts <= 0) {
-		return '';
+	if (!function_exists('choosology_format_user_date')) {
+		require_once __DIR__ . '/date-format-helpers.php';
 	}
-	return date('M j, Y', $ts);
+	return choosology_format_user_date($t, 'date');
 }
 
 /**

@@ -53,7 +53,8 @@ var decodeEntities = (function () {
 
 function nicedatetime(datetime)
 {
-    return $.format.date(datetime, "h:mma on MM/dd/yyyy").toLowerCase();
+    var datePat = (window.CHOOSOLOGY_DATE_FMT === "dmy") ? "dd/MM/yyyy" : "MM/dd/yyyy";
+    return $.format.date(datetime, "h:mma on " + datePat).toLowerCase();
 }
 
 function degreesToRadians(degrees) 
