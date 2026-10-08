@@ -396,11 +396,39 @@ label.sel:before {
     border-top: none;
 }
 
+/* Login / account chrome + adjacent Lite switch (not nested inside login). */
+.classic-top-cluster
+{
+    position: fixed;
+    top: -2px;
+    right: 50px;
+    z-index: 200;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: min(520px, calc(100vw - 260px));
+}
+
+.classic-top-cluster > .header
+{
+    position: static;
+    top: auto;
+    right: auto;
+    flex: 0 0 auto;
+}
+
+#litebox
+{
+    padding: 4px;
+    text-align: center;
+}
+
 #topbox
 {
-    right: 50px;
     overflow: visible;
-    max-width: min(420px, calc(100vw - 280px));
+    max-width: min(420px, calc(100vw - 320px));
+    text-align: right;
 }
 
 #contextlink
@@ -8432,18 +8460,34 @@ body.clipboard-modal-open
 {
     margin-left: 0.75rem;
 }
-.classic-lite-link
+/* Win3.1-adjacent control, matching Lite .lite-btn bevel. */
+.classic-lite-btn
 {
-    float: right;
-    margin: 0 0 4px 8px;
-    font-size: 0.8rem;
+    display: inline-block;
+    text-decoration: none;
+    color: #000000;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 0.28rem 0.55rem;
+    font: bold 0.82rem Tahoma, Verdana, "MS Sans Serif", sans-serif;
     line-height: 1.2;
+    cursor: pointer;
+    white-space: nowrap;
 }
-.classic-lite-link a
+.classic-lite-btn:hover
 {
-    color: #003399;
-    font-weight: bold;
-    text-decoration: underline;
+    color: #000080;
+}
+.classic-lite-btn:active
+{
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    color: #000000;
 }
 .lite-suggest
 {

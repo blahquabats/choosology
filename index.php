@@ -116,40 +116,47 @@
 <div class="header" id='alertbox'>
 </div>
 
-<div class="header" id='topbox'>
-    <?php
-    $liteSwitchHref = htmlspecialchars(choosology_lite_url('switch.php?to=lite'), ENT_QUOTES, 'UTF-8');
-    echo "<div class='classic-lite-link'><a href='{$liteSwitchHref}' title='Choosology 3.1 — lean terminal UI'>Lite</a></div>";
-    if (empty($_SESSION['user']))
-    {
-        echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";
-        echo "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />\n";
-        echo "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>";
-        echo "<button type='button' id='loginsubmit'>Submit</button>";
-        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
-    }
-    else
-    {
-        require_once __DIR__ . '/lib/datascrip-helpers.php';
-        $scripBal = choosology_datascrip_balance($db, (string) $_SESSION['user']);
-        $scripFmtHtml = choosology_datascrip_format_html($scripBal);
-        $unreadMsg = (int) getNewMessages();
-        $unreadAttr = $unreadMsg > 0 ? (string) $unreadMsg : '0';
-        $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
-        echo "<div class='msg-login-row'>";
-        echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "<button type='button' class='msg-login-notify ms-clipboard-btn' id='clipboard_office_btn' title='Open clipboard' aria-label='Open clipboard'>";
-        echo "<span class='msg-login-notify-label'>Clip</span>";
-        echo "</button>";
-        echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";
-        echo "<span class='msg-login-notify-label'>CLIC</span>";
-        echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "</button>";
-        echo "</div>";
-        echo "<div class='msg-login-scrip' title='DataScrip balance'><span class='msg-login-scrip-label'>DataScrip</span> <strong class='msg-login-scrip-amt'>{$scripFmtHtml}</strong></div>";
-        echo "<br/> <span id='logoutsubmit'> <a href='#'> log out </a> </span>";
-    }
-    ?>
+<?php
+$liteSwitchHref = htmlspecialchars(choosology_lite_url('switch.php?to=lite'), ENT_QUOTES, 'UTF-8');
+$liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-page layout with almost no JavaScript; better on slow links and small screens. Opens Lite and saves your preference.';
+?>
+<div class="classic-top-cluster">
+	<div class="header" id="litebox">
+		<a class="classic-lite-btn" id="classic_lite_btn" href="<?php echo $liteSwitchHref; ?>" title="<?php echo htmlspecialchars($liteSwitchTitle, ENT_QUOTES, 'UTF-8'); ?>">Lite</a>
+	</div>
+	<div class="header" id="topbox">
+	    <?php
+	    if (empty($_SESSION['user']))
+	    {
+	        echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";
+	        echo "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />\n";
+	        echo "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>";
+	        echo "<button type='button' id='loginsubmit'>Submit</button>";
+	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
+	    }
+	    else
+	    {
+	        require_once __DIR__ . '/lib/datascrip-helpers.php';
+	        $scripBal = choosology_datascrip_balance($db, (string) $_SESSION['user']);
+	        $scripFmtHtml = choosology_datascrip_format_html($scripBal);
+	        $unreadMsg = (int) getNewMessages();
+	        $unreadAttr = $unreadMsg > 0 ? (string) $unreadMsg : '0';
+	        $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
+	        echo "<div class='msg-login-row'>";
+	        echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
+	        echo "<button type='button' class='msg-login-notify ms-clipboard-btn' id='clipboard_office_btn' title='Open clipboard' aria-label='Open clipboard'>";
+	        echo "<span class='msg-login-notify-label'>Clip</span>";
+	        echo "</button>";
+	        echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";
+	        echo "<span class='msg-login-notify-label'>CLIC</span>";
+	        echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
+	        echo "</button>";
+	        echo "</div>";
+	        echo "<div class='msg-login-scrip' title='DataScrip balance'><span class='msg-login-scrip-label'>DataScrip</span> <strong class='msg-login-scrip-amt'>{$scripFmtHtml}</strong></div>";
+	        echo "<br/> <span id='logoutsubmit'> <a href='#'> log out </a> </span>";
+	    }
+	    ?>
+	</div>
 </div>
 <div class='contentcontainer'>
 <?php if (!empty($_SESSION['user'])) { ?>
