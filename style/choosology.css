@@ -8220,6 +8220,18 @@ body.clipboard-modal-open
     border-radius: 8px;
     box-shadow: 0 12px 36px rgba(15, 23, 42, 0.22);
     overflow: hidden;
+    transition: max-height 0.38s ease;
+}
+.clip-modal-panel--loading
+{
+    max-height: 240px;
+}
+@media (prefers-reduced-motion: reduce)
+{
+    .clip-modal-panel
+    {
+        transition: none;
+    }
 }
 .clip-modal-header
 {
@@ -8258,29 +8270,52 @@ body.clipboard-modal-open
 }
 .clip-modal-x
 {
-    border: 0;
-    background: transparent;
-    font-size: 1.6rem;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #98a6b8;
+    border-radius: 6px;
+    background: #fff;
+    color: #2a4055;
+    font-size: 1.55rem;
     line-height: 1;
-    color: #4a5d70;
+    font-family: Arial, Helvetica, sans-serif;
     cursor: pointer;
-    padding: 0 4px;
 }
-.clip-modal-x:hover { color: #111; }
+.clip-modal-x:hover
+{
+    border-color: #3d5a73;
+    background: #eef3f8;
+    color: #1a2a3a;
+}
+.clip-modal-x:focus
+{
+    outline: 2px solid #4488cc;
+    outline-offset: 2px;
+}
 .clip-modal-body
 {
-    padding: 12px 16px 8px;
+    padding: 12px 16px 16px;
     overflow: auto;
     flex: 1;
 }
-.clip-modal-footer
+.clip-modal-body--loading
 {
-    padding: 10px 16px;
-    border-top: 1px solid #d7e0ea;
-    background: #f3f7fb;
-    text-align: center;
+    position: relative;
+    min-height: 160px;
+    height: 160px;
+    overflow: hidden;
 }
-.clip-footer-link,
+.clip-modal-body--loading .ajaxloader
+{
+    background-size: 120px;
+}
 .clip-link
 {
     color: #1c5a7a;
@@ -8430,6 +8465,14 @@ body.clipboard-modal-open
     align-items: center;
     margin-top: 6px;
 }
+.clip-row--pad-save
+{
+    justify-content: flex-end;
+}
+.clip-row--pad-save .clip-status
+{
+    margin-right: auto;
+}
 .clip-status { font-size: 0.8rem; color: #3d5a73; }
 .ms-office-filters
 {
@@ -8555,10 +8598,6 @@ body.clipboard-modal-open
 .clip-ledger-amt.is-credit { color: #0b5c2e; }
 .clip-ledger-amt.is-debit { color: #8b1e1e; }
 .clip-ledger-memo { color: #3d4a56; flex: 1; }
-.clip-modal-footer .clip-footer-link + .clip-footer-link
-{
-    margin-left: 0.75rem;
-}
 /* Win3.1-adjacent control, matching Lite .lite-btn bevel. */
 .classic-lite-btn
 {
