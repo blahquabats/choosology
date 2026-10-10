@@ -29,16 +29,17 @@
                     window.location.hash = "#/home";
                     return;
                 }
-                if(this.params['splat'] !== "")
-                {
-                    pendingMystuffTab = this.params['splat'];
+                var splat = this.params['splat'];
+                if (splat === undefined || splat === null) {
+                    splat = '';
                 }
+                /* Normalize empty / office / results / etc. into the Classic room hub. */
+                pendingMystuffTab = splat !== '' ? splat : 'office';
                 showMenuOption("mystuff");
-                if(this.params['splat'] !== "" && activemenu === "mystuff")
-                {
-                    loadTab(this.params['splat']);
+                if (activemenu === "mystuff") {
+                    loadTab(pendingMystuffTab);
+                    pendingMystuffTab = null;
                 }
-                
         });
         this.get('#/search', function(context) {
                 showMenuOption("browse");

@@ -5,13 +5,24 @@ const fs = require("fs");
 const path = require("path");
 
 describe("DataScrip UI wiring", () => {
-  test("index.js loadTab includes ledger", () => {
+  test("index.js Classic hub routes ledger via My Office", () => {
     const src = fs.readFileSync(
       path.join(__dirname, "../../scripts/index.js"),
       "utf8"
     );
-    expect(src).toContain('loc =="ledger"');
+    expect(src).toContain("ms-room-hub-mode");
     expect(src).toContain("mystuff/ledger.php");
+    expect(src).toContain("ChoosologyOffice");
+  });
+
+  test("office.js exposes shop buy and ledger hotspot", () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, "../../scripts/office.js"),
+      "utf8"
+    );
+    expect(src).toContain("mystuff/ledger.php");
+    expect(src).toContain('action: action');
+    expect(src).toContain("ajax/office.php");
   });
 
   test("clipboard.js renders Ledger section", () => {

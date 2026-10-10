@@ -117,6 +117,10 @@ function choosology_record_ending_find(mysqli $db, int $advid, int $screenid): a
 					require_once __DIR__ . '/datascrip-helpers.php';
 				}
 				choosology_datascrip_try_ending_find($db, $user, $advid, $screenid);
+				if (!function_exists('choosology_office_on_ending_find')) {
+					require_once __DIR__ . '/office-helpers.php';
+				}
+				choosology_office_on_ending_find($db, $user);
 			}
 		}
 	}
