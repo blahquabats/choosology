@@ -39,6 +39,14 @@
 		return $("body").attr("data-logged-in") === "1" || $("#clipboard_office_btn").length > 0;
 	}
 
+	function prefersReducedMotion() {
+		try {
+			return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+		} catch (e) {
+			return false;
+		}
+	}
+
 	function ensureModal() {
 		if ($("#clipboard_modal").length) {
 			return;
@@ -54,24 +62,55 @@
 			'      </div>' +
 			'      <button type="button" class="clip-modal-x" id="clipboard_modal_close" aria-label="Close clipboard">&times;</button>' +
 			'    </div>' +
-			'    <div class="clip-modal-body" id="clipboard_modal_body">' +
-			'      <p class="clip-hint">Loading…</p>' +
-			'    </div>' +
-			'    <div class="clip-modal-footer">' +
-			'      <a class="clip-footer-link" id="clipboard_to_office" href="#/mystuff/office">Full experiment results in My Office</a>' +
-			'      <a class="clip-footer-link" id="clipboard_to_ledger" href="#/mystuff/ledger">Full DataScrip Ledger</a>' +
-			'    </div>' +
+			'    <div class="clip-modal-body" id="clipboard_modal_body"></div>' +
 			'  </div>' +
 			'</div>';
 		$("body").append(html);
 		$("#clipboard_modal_close, #clipboard_modal .clip-modal-backdrop").on("click", close);
-		$("#clipboard_to_office, #clipboard_to_ledger").on("click", function () {
-			close();
-		});
 		$(document).on("keydown.clipboardModal", function (e) {
 			if (e.key === "Escape" && !$("#clipboard_modal").hasClass("clip-modal--hidden")) {
 				close();
 			}
+		});
+	}
+
+	function showLoadingState() {
+		var $panel = $("#clipboard_modal .clip-modal-panel");
+		$panel
+			.addClass("clip-modal-panel--loading")
+			.off("transitionend.clipExpand")
+			.css("max-height", "");
+		$("#clipboard_modal_body")
+			.addClass("clip-modal-body--loading")
+			.html('<div class="ajaxloader" role="status" aria-label="Loading"></div>');
+	}
+
+	/** After content is in the DOM, grow the panel from the compact loading height. */
+	function expandPanelAfterLoad() {
+		var $panel = $("#clipboard_modal .clip-modal-panel");
+		var $body = $("#clipboard_modal_body");
+		$body.removeClass("clip-modal-body--loading");
+		if (!$panel.length) {
+			return;
+		}
+		if (prefersReducedMotion()) {
+			$panel.removeClass("clip-modal-panel--loading").css("max-height", "");
+			return;
+		}
+		var startH = $panel.outerHeight();
+		$panel.css("max-height", startH + "px");
+		$panel.removeClass("clip-modal-panel--loading");
+		var targetH = Math.min($panel.prop("scrollHeight") + 2, window.innerHeight - 80);
+		requestAnimationFrame(function () {
+			requestAnimationFrame(function () {
+				$panel.css("max-height", Math.max(startH, targetH) + "px");
+			});
+		});
+		$panel.off("transitionend.clipExpand").on("transitionend.clipExpand", function (e) {
+			if (e.target !== $panel[0]) {
+				return;
+			}
+			$panel.off("transitionend.clipExpand").css("max-height", "");
 		});
 	}
 
@@ -108,9 +147,7 @@
 				'<span class="clip-check-label">' + esc(it.label) + "</span>" +
 				'<span class="clip-check-hint">' + esc(it.hint) + "</span>" +
 				'</div><div class="clip-check-actions">';
-			if (!it.completed) {
-				html += '<button type="button" class="clip-btn clip-btn--small" data-check-complete>Done</button>';
-			} else {
+			if (it.completed) {
 				html += '<span class="clip-badge">Complete</span>';
 			}
 			html +=
@@ -233,14 +270,14 @@
 			renderLedger(data.datascrip) + "</section>" +
 			'<section class="clip-section" aria-labelledby="clip_check_h">' +
 			'<h3 id="clip_check_h">New researcher checklist</h3>' +
-			'<p class="clip-hint">Dismiss items you skip. Completing unlocks a Degree.</p>' +
+			'<p class="clip-hint">Complete each item by doing the task. Dismiss anything you skip.</p>' +
 			renderChecklist(data.checklist) + "</section>" +
 			'<section class="clip-section" aria-labelledby="clip_pad_h">' +
 			'<h3 id="clip_pad_h">Personal notepad</h3>' +
 			'<textarea id="clip_pad" class="clip-pad" rows="5" maxlength="50000">' + esc(padBody) + "</textarea>" +
-			'<div class="clip-row">' +
-			'<button type="button" class="clip-btn" id="clip_pad_save">Save note</button>' +
-			'<span id="clip_pad_status" class="clip-status" aria-live="polite"></span></div></section>' +
+			'<div class="clip-row clip-row--pad-save">' +
+			'<span id="clip_pad_status" class="clip-status" aria-live="polite"></span>' +
+			'<button type="button" class="clip-btn" id="clip_pad_save">Save note</button></div></section>' +
 			'<section class="clip-section" aria-labelledby="clip_todo_h">' +
 			'<h3 id="clip_todo_h">To-do list</h3>' +
 			'<form id="clip_todo_form" class="clip-todo-form" onsubmit="return false;">' +
@@ -311,20 +348,8 @@
 				}
 			});
 		});
-		$("#clipboard_modal_body").off("click.clipCheckDone").on("click.clipCheckDone", "[data-check-complete]", function () {
-			var $item = $(this).closest(".clip-check-item");
-			post("complete_checklist", { item_key: $item.attr("data-item-key") }).done(function (res) {
-				if (res && res.ok) {
-					$item.addClass("is-done");
-					$item.find("[data-check-complete]").replaceWith('<span class="clip-badge">Complete</span>');
-					return;
-				}
-				if (typeof showAlert === "function") {
-					showAlert((res && res.error) || "Finish this task before marking it done.", "error");
-				}
-			});
-		});
-		$("#clipboard_modal_body").off("click.clipNav").on("click.clipNav", "a.clip-link, a.clip-footer-link", function () {
+		$("#clipboard_modal_body").off("click.clipCheckDone");
+		$("#clipboard_modal_body").off("click.clipNav").on("click.clipNav", "a.clip-link", function () {
 			/* allow navigation; close overlay so destination is visible */
 			close();
 		});
@@ -336,7 +361,7 @@
 			return;
 		}
 		ensureModal();
-		$("#clipboard_modal_body").html('<p class="clip-hint">Loading…</p>');
+		showLoadingState();
 		$("#clipboard_modal").removeClass("clip-modal--hidden").attr("aria-hidden", "false");
 		$("body").addClass("clipboard-modal-open");
 		post("summary").done(function (res) {
@@ -344,12 +369,15 @@
 				$("#clipboard_modal_body").html(
 					'<p class="clip-hint">' + esc((res && res.error) || "Could not load clipboard.") + "</p>"
 				);
+				expandPanelAfterLoad();
 				return;
 			}
 			renderBody(res);
+			expandPanelAfterLoad();
 			post("visit_clipboard");
 		}).fail(function () {
 			$("#clipboard_modal_body").html('<p class="clip-hint">Network error loading clipboard.</p>');
+			expandPanelAfterLoad();
 		});
 		if (!opts.auto) {
 			try {
@@ -359,6 +387,8 @@
 	}
 
 	function close() {
+		var $panel = $("#clipboard_modal .clip-modal-panel");
+		$panel.off("transitionend.clipExpand").removeClass("clip-modal-panel--loading").css("max-height", "");
 		$("#clipboard_modal").addClass("clip-modal--hidden").attr("aria-hidden", "true");
 		$("body").removeClass("clipboard-modal-open");
 		try {
