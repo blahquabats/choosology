@@ -364,20 +364,34 @@
 		showLoadingState();
 		$("#clipboard_modal").removeClass("clip-modal--hidden").attr("aria-hidden", "false");
 		$("body").addClass("clipboard-modal-open");
-		post("summary").done(function (res) {
-			if (!res || !res.ok) {
-				$("#clipboard_modal_body").html(
-					'<p class="clip-hint">' + esc((res && res.error) || "Could not load clipboard.") + "</p>"
-				);
+		var openedAt = Date.now();
+		/* Keep the spinner visible briefly so the expand animation can read on fast local loads. */
+		var MIN_LOAD_MS = prefersReducedMotion() ? 0 : 320;
+		function finishOpen(renderFn) {
+			var wait = Math.max(0, MIN_LOAD_MS - (Date.now() - openedAt));
+			window.setTimeout(function () {
+				if ($("#clipboard_modal").hasClass("clip-modal--hidden")) {
+					return;
+				}
+				renderFn();
 				expandPanelAfterLoad();
-				return;
-			}
-			renderBody(res);
-			expandPanelAfterLoad();
-			post("visit_clipboard");
+			}, wait);
+		}
+		post("summary").done(function (res) {
+			finishOpen(function () {
+				if (!res || !res.ok) {
+					$("#clipboard_modal_body").html(
+						'<p class="clip-hint">' + esc((res && res.error) || "Could not load clipboard.") + "</p>"
+					);
+					return;
+				}
+				renderBody(res);
+				post("visit_clipboard");
+			});
 		}).fail(function () {
-			$("#clipboard_modal_body").html('<p class="clip-hint">Network error loading clipboard.</p>');
-			expandPanelAfterLoad();
+			finishOpen(function () {
+				$("#clipboard_modal_body").html('<p class="clip-hint">Network error loading clipboard.</p>');
+			});
 		});
 		if (!opts.auto) {
 			try {

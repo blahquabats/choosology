@@ -19,6 +19,7 @@ describe("Clipboard UI polish", () => {
     expect(js).toContain("expandPanelAfterLoad");
     expect(js).toContain('class="ajaxloader"');
     expect(js).toContain("clip-modal-panel--loading");
+    expect(js).toContain("MIN_LOAD_MS");
     expect(css).toContain(".clip-modal-panel--loading");
     expect(css).toContain("transition: max-height");
   });
