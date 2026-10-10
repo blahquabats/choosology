@@ -28,6 +28,7 @@ $entries = choosology_datascrip_ledger_entries($db, $user, $perPage, $offset);
 $balance = choosology_datascrip_balance($db, $user);
 
 choosology_lite_header(array('title' => 'Ledger', 'active' => 'ledger'));
+choosology_lite_guide_panel('ledger', 'ledger.php' . ($page > 1 ? ('?page=' . $page) : ''));
 ?>
 <fieldset class="lite-panel">
 	<legend>DataScrip Ledger</legend>
@@ -74,4 +75,5 @@ choosology_lite_header(array('title' => 'Ledger', 'active' => 'ledger'));
 </fieldset>
 <?php
 choosology_lite_date_format_form('ledger.php' . ($page > 1 ? ('?page=' . $page) : ''));
+choosology_lite_guide_form('ledger.php' . ($page > 1 ? ('?page=' . $page) : ''));
 choosology_lite_footer();

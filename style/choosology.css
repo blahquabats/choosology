@@ -9097,3 +9097,106 @@ body.clipboard-modal-open
         align-items: stretch;
     }
 }
+
+/* ---- Lab guide (mascot bubble; theme tokens come from the mascot pack) ---- */
+.guide-panel--classic
+{
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    z-index: 400;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    width: min(24rem, calc(100vw - 40px));
+    pointer-events: none;
+}
+.guide-panel--classic .guide-portrait,
+.guide-panel--classic .guide-bubble
+{
+    pointer-events: auto;
+}
+.guide-portrait
+{
+    flex: 0 0 auto;
+    width: 88px;
+    height: 106px;
+    object-fit: contain;
+    image-rendering: auto;
+    filter: drop-shadow(0 4px 0 rgba(28, 26, 22, 0.18));
+}
+.guide-portrait--empty
+{
+    display: block;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--guide-accent, #c4a35a);
+}
+.guide-bubble
+{
+    flex: 1 1 auto;
+    min-width: 0;
+    background: var(--guide-paper, #f4ecd8);
+    color: var(--guide-ink, #1c1a16);
+    border: 2px solid var(--guide-ink, #1c1a16);
+    border-left: 8px solid var(--guide-accent, #c4a35a);
+    border-radius: 8px;
+    padding: 10px 12px 12px;
+    box-shadow: 4px 4px 0 rgba(28, 26, 22, 0.18);
+    font: 0.92rem/1.35 Trebuchet MS, Verdana, sans-serif;
+}
+.guide-name
+{
+    margin: 0 0 4px;
+    font: 700 0.72rem/1.2 Consolas, "Courier New", monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--guide-accent, #c4a35a);
+}
+.guide-text
+{
+    margin: 0 0 10px;
+}
+.guide-choices
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.guide-choice
+{
+    font: 700 0.82rem/1.2 Trebuchet MS, Verdana, sans-serif;
+    color: var(--guide-ink, #1c1a16);
+    background: #fffdf8;
+    border: 2px solid var(--guide-ink, #1c1a16);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+.guide-choice:hover,
+.guide-choice:focus
+{
+    background: var(--guide-accent, #c4a35a);
+    outline: none;
+}
+.guide-choice:disabled
+{
+    opacity: 0.6;
+    cursor: wait;
+}
+@media (max-width: 700px)
+{
+    .guide-panel--classic
+    {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: auto;
+    }
+    .guide-portrait
+    {
+        width: 64px;
+        height: 78px;
+    }
+}

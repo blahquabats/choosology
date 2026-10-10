@@ -7,6 +7,7 @@ require_once __DIR__ . '/../connect.php';
 require_once __DIR__ . '/../auxfuncs.php';
 require_once __DIR__ . '/../lib/account-helpers.php';
 require_once __DIR__ . '/../lib/date-format-helpers.php';
+require_once __DIR__ . '/../lib/guide-helpers.php';
 ob_end_clean();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -52,6 +53,13 @@ $about = choosology_account_sanitize_about($aboutRaw);
 $viewRestricted = !empty($data['view_restricted']) ? 1 : 0;
 $dateFmt = choosology_date_format_normalize((string) ($data['date_format'] ?? CHOOSOLOGY_DATE_FMT_MDY));
 choosology_date_format_ensure_schema($db);
+choosology_guide_ensure_schema($db);
+$guideSetSql = '';
+$guideOn = null;
+if (array_key_exists('guide_enabled', $data)) {
+	$guideOn = choosology_guide_flag_on($data['guide_enabled']) ? 1 : 0;
+	$guideSetSql = ", guide_enabled = '$guideOn'";
+}
 $picRaw = isset($data['pic']) ? trim((string) $data['pic']) : '';
 $picSql = '0';
 if ($picRaw !== '') {
@@ -104,6 +112,7 @@ $q = "UPDATE users SET
 	view_restricted = '$viewRestricted',
 	date_format = '$dateFmtEsc'
 	$passwordSetSql
+	$guideSetSql
 	WHERE name = '$escUser'
 	LIMIT 1";
 
@@ -112,4 +121,12 @@ if (!mysqli_query($db, $q)) {
 }
 
 choosology_date_format_cookie_set($dateFmt);
-choosology_account_json(array('ok' => 1, 'passwordChanged' => $passwordChanged, 'date_format' => $dateFmt));
+if ($guideOn !== null) {
+	choosology_guide_cookie_set($guideOn === 1);
+}
+choosology_account_json(array(
+	'ok' => 1,
+	'passwordChanged' => $passwordChanged,
+	'date_format' => $dateFmt,
+	'guide_enabled' => $guideOn === null ? (choosology_guide_enabled($db) ? 1 : 0) : $guideOn,
+));

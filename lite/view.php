@@ -123,7 +123,16 @@ $returnUrl = $from > 0
 	? choosology_lite_url('view.php?id=' . $id . '&screen=' . $from)
 	: '';
 
+$guideNext = 'view.php?id=' . $id;
+if (isset($_GET['screen'])) {
+	$guideNext .= '&screen=' . $sid;
+}
+if ($from > 0) {
+	$guideNext .= '&from=' . $from;
+}
+
 choosology_lite_header(array('title' => $title, 'active' => 'browse'));
+choosology_lite_guide_panel('view', $guideNext);
 ?>
 <fieldset class="lite-panel">
 	<legend><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></legend>
@@ -163,4 +172,5 @@ choosology_lite_header(array('title' => $title, 'active' => 'browse'));
 	</p>
 </fieldset>
 <?php
+choosology_lite_guide_form($guideNext);
 choosology_lite_footer();

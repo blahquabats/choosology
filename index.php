@@ -3,9 +3,12 @@
     require_once("./auxfuncs.php");
     require_once("./lib/lite-helpers.php");
     require_once("./lib/date-format-helpers.php");
+    require_once("./lib/guide-helpers.php");
     choosology_ui_mode_ensure_schema($db);
     choosology_date_format_ensure_schema($db);
+    choosology_guide_ensure_schema($db);
     $choosology_date_fmt = choosology_date_format_preferred($db);
+    $choosology_guide_on = choosology_guide_enabled($db) ? 1 : 0;
     /* Site-wide Lite preference: Classic entry redirects unless explicitly staying. */
     if (choosology_ui_preferred_mode($db) === 'lite' && empty($_GET['stay'])) {
         header('Location: ' . choosology_lite_url('index.php'));
@@ -40,12 +43,13 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=myoffice1" />
+    <link rel="stylesheet" href="style/choosology.css?v=guide1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
     window.CHOOSOLOGY_BASE = <?php echo json_encode($choosology_web_base, JSON_UNESCAPED_SLASHES); ?>;
     window.CHOOSOLOGY_DATE_FMT = <?php echo json_encode($choosology_date_fmt, JSON_UNESCAPED_SLASHES); ?>;
+    window.CHOOSOLOGY_GUIDE = <?php echo $choosology_guide_on ? '1' : '0'; ?>;
     function choosologyUrl(path) {
         path = String(path || '').replace(/^\//, '');
         var b = typeof window.CHOOSOLOGY_BASE === 'string' ? window.CHOOSOLOGY_BASE : '';
@@ -73,6 +77,7 @@
     <script src='scripts/messages.js?v=clic3'></script>
     <script src='scripts/clipboard.js?v=clip4'></script>
     <script src='scripts/office.js?v=office2'></script>
+    <script src='scripts/guide.js?v=guide1'></script>
     <script src='scripts/routes.js'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
