@@ -40,6 +40,10 @@
                     loadTab(pendingMystuffTab);
                     pendingMystuffTab = null;
                 }
+                var guideTab = String(splat || "").split("?")[0].split("/")[0];
+                if (guideTab === "ledger" && window.ChoosologyGuide) {
+                    window.ChoosologyGuide.signal("ledger");
+                }
         });
         this.get('#/search', function(context) {
                 showMenuOption("browse");
@@ -57,6 +61,9 @@
         });
         this.get('#/edit/:id', function(context) {
                 showMenuOption("editadv", "id="+this.params['id']);
+                if (window.ChoosologyGuide) {
+                    window.ChoosologyGuide.signal("graph_editor");
+                }
         });
       
       

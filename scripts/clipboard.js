@@ -339,6 +339,9 @@
 		$("#clipboard_modal_body").html('<p class="clip-hint">Loading…</p>');
 		$("#clipboard_modal").removeClass("clip-modal--hidden").attr("aria-hidden", "false");
 		$("body").addClass("clipboard-modal-open");
+		if (window.ChoosologyGuide) {
+			window.ChoosologyGuide.signal("clipboard");
+		}
 		post("summary").done(function (res) {
 			if (!res || !res.ok) {
 				$("#clipboard_modal_body").html(

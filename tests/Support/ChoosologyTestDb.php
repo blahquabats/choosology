@@ -59,6 +59,8 @@ final class ChoosologyTestDb
 			'clipboard_checklist',
 			'clipboard_todos',
 			'clipboard_pad',
+			'guide_progress',
+			'guide_seen',
 			'ending_finds',
 			'messages',
 			'advscreens',

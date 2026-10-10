@@ -443,3 +443,48 @@ button.lite-btn:active {
 	.lite-form input[type="search"],
 	.lite-form select { max-width: none; }
 }
+
+/* Lab guide panel — same tokens as Classic, drawn as an Instrument Panel form */
+.guide-panel--lite {
+	display: flex;
+	align-items: flex-end;
+	gap: 0.6rem;
+	margin: 0 0 0.65rem;
+	padding: 0.45rem;
+	background: var(--guide-paper, #f4ecd8);
+	color: var(--guide-ink, #000);
+	border-top: 2px solid var(--lite-hilite);
+	border-left: 2px solid var(--lite-hilite);
+	border-right: 2px solid var(--lite-darkshadow);
+	border-bottom: 2px solid var(--lite-darkshadow);
+}
+.guide-panel--lite .guide-portrait {
+	width: 72px;
+	height: 86px;
+	object-fit: contain;
+	flex: 0 0 auto;
+	background: var(--lite-paper);
+	border: 1px solid var(--lite-shadow);
+}
+.guide-panel--lite .guide-bubble { flex: 1 1 auto; min-width: 0; }
+.guide-panel--lite .guide-name {
+	margin: 0 0 0.2rem;
+	font-weight: bold;
+	color: var(--lite-navy);
+}
+.guide-panel--lite .guide-text { margin: 0 0 0.45rem; }
+.guide-panel--lite .guide-choices {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+.guide-panel--lite .guide-choice {
+	font: inherit;
+	background: var(--lite-face);
+	border-top: 2px solid var(--lite-hilite);
+	border-left: 2px solid var(--lite-hilite);
+	border-right: 2px solid var(--lite-darkshadow);
+	border-bottom: 2px solid var(--lite-darkshadow);
+	padding: 0.15rem 0.55rem;
+	cursor: pointer;
+}
