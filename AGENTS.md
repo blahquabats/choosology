@@ -13,7 +13,9 @@ Choosology is a legacy flat-file PHP web application (interactive "choose your o
 | MariaDB (database `choosology`) | Start via `sudo mysqld_safe` in a tmux session; connect check: `sudo mariadb -e "SELECT VERSION();"` | No systemd in the container, so `service`/`systemctl` do not work. The data dir and `choosology` DB (imported schema + a local `choosology`/`choosology` TCP user) persist in the VM snapshot; you only need to (re)start the daemon. |
 | PHP dev web server | `php -S 0.0.0.0:8000 -t /workspace` in a tmux session, then open `http://127.0.0.1:8000/index.php` | Runs the whole app; no build needed. PHP fatal errors/warnings print to the server's stderr (the tmux pane), not a file. |
 
-Both services are long-running: start each in its own tmux session (e.g. `mariadb`, `php-dev`) so they survive across commands. Do not put service startup in the update script.
+Both services are long-running: start each in its own tmux session (e.g. `mariadb`, `php-dev`) so they survive across commands. Do not put service startup in the update/`install` script.
+
+**Cloud Agents:** packages belong in environment `install` (`scripts/cloud-agent-install.sh`); MariaDB + `php -S 0.0.0.0:8000` (+ IPv6 localhost forward) belong in environment `start` (`scripts/cloud-agent-start.sh`). After a successful environment build is Saved/activated, new agents skip reinstall and auto-start services — you should not need to apt-install PHP every session.
 
 ### Database
 
