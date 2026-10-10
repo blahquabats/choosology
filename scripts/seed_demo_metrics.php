@@ -245,7 +245,7 @@ mysqli_query($db, "DELETE FROM ratings WHERE adv=$id");
 mysqli_query($db, "DELETE FROM comments WHERE whichboard='adv$id'");
 mysqli_query($db, "DELETE FROM ending_finds WHERE adv=$id");
 
-echo "Demo metrics ready for {$owner}. Open My Stuff → My Office.\n";
+echo "Demo metrics ready for {$owner}. Open My Office.\n";
 foreach (choosology_clipboard_experiment_metrics($db, $owner) as $row) {
 	echo sprintf(
 		"  #%d %s | %s | plays=%d comments=%d ratings=%d avg=%s endings=%d\n",

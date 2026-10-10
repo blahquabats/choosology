@@ -46,7 +46,7 @@ var configmenu = {
   mystuff : {
       show: "#tabswindow",
       id: 'mystuff',
-      name: 'My Stuff',
+      name: 'My Office',
       load: false,
       bgtop: 0,
       bgleft: 0,
@@ -658,7 +658,7 @@ function loadTab(loc, retryAfterShow)
     tabs.tabs("option", "active", which);
     try { tabs.tabs("load", which); } catch (err2) { /* ignore */ }
 
-    /* Direct hash loads can select before the My Stuff window finishes showing; retry once after the show/refresh cycle. */
+    /* Direct hash loads can select before the My Office window finishes showing; retry once after the show/refresh cycle. */
     if (!retryAfterShow) return;
     window.__choosologyLoadTabRetryToken = (window.__choosologyLoadTabRetryToken || 0) + 1;
     var retryToken = window.__choosologyLoadTabRetryToken;

@@ -759,7 +759,7 @@ function choosology_send_welcome_email(string $name, string $email): bool
 		. "Your application to the Choosology Lab has been filed. You are cleared for access.\n\n"
 		. "Next steps (more tutorial material will land here later):\n"
 		. "  1. Sign in with your lab handle.\n"
-		. "  2. Open My Stuff → Experiments to begin your first experiment.\n"
+		. "  2. Open My Office → Experiments to begin your first experiment.\n"
 		. "  3. Browse the catalog when you want inspiration.\n\n"
 		. "We only email what you asked for on your application.\n\n"
 		. "— The Choosology Lab\n";

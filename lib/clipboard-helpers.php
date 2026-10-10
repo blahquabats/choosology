@@ -141,7 +141,7 @@ function choosology_clipboard_checklist_defs(): array
 		array(
 			'key' => 'create_experiment',
 			'label' => 'Draft your first experiment',
-			'hint' => 'My Stuff → Experiments → New experiment',
+			'hint' => 'My Office → Experiments → New experiment',
 			'achievement' => 'lab_initiate',
 			'auto' => 'has_adventure',
 		),

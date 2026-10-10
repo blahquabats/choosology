@@ -488,7 +488,9 @@
 
 .ending-panel .CAentercomment .fakebutton,
 .ending-panel .CAentercomment .fakebutton.fgreen,
-.ending-panel .CAentercomment #subcombutton
+.ending-panel .CAentercomment #subcombutton,
+.ending-panel .CAentercomment .choosology-btn,
+.ending-panel .CAentercomment .choosology-btn--primary
 {
     float: none !important;
     display: inline-block !important;
@@ -517,7 +519,9 @@
 
 .ending-panel .CAentercomment .fakebutton:hover,
 .ending-panel .CAentercomment .fakebutton.fgreen:hover,
-.ending-panel .CAentercomment #subcombutton:hover
+.ending-panel .CAentercomment #subcombutton:hover,
+.ending-panel .CAentercomment .choosology-btn:hover,
+.ending-panel .CAentercomment .choosology-btn--primary:hover
 {
     border-width: 2px !important;
     background: transparent !important;

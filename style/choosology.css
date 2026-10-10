@@ -4740,6 +4740,44 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
      font-size: 8pt;
      color: #666666;
   }
+
+/* Shared primary actions (My Office toolbar, comment Submit, etc.). */
+.choosology-btn
+{
+    appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    display: inline-block;
+    float: none;
+    margin: 0;
+    border: 1px solid #3d5a73;
+    background: #f3f0e8;
+    color: #3d5a73;
+    padding: 0.35rem 0.85rem;
+    font: 700 0.78rem/1.2 "Trebuchet MS", Verdana, sans-serif;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+}
+.choosology-btn:hover
+{
+    background: #fff;
+}
+.choosology-btn--primary
+{
+    background: #3d5a73;
+    color: #f5f2ea;
+}
+.choosology-btn--primary:hover
+{
+    background: #2f4860;
+    color: #fff;
+}
+.CAentercomment .choosology-btn
+{
+    min-width: 5.5rem;
+}
   
   .CAentercommentloader
   {

@@ -35,7 +35,7 @@
           <textarea id='CAtext".$this->which."' class='CAtextarea empty' onfocus=\"checkCATextArea(this, 'f')\" onblur=\"checkCATextArea(this, 'b')\" maxlength='500'>Enter your comment here...</textarea>
           <div class='CAentercomment-actions'>
           <span class='CAentercomment-hint'>(500 characters max)</span>
-          ".makeFakeButton("subcombutton", "submitCAComment('".$this->which."', '".$this->screenid."')",false, "say", "<span id='CAsubmit".$this->which."'>Submit</span>", "green")."
+          <button type='button' class='choosology-btn choosology-btn--primary' id='subcombutton' onclick=\"submitCAComment('".$this->which."', '".$this->screenid."')\"><span id='CAsubmit".$this->which."'>Submit</span></button>
           </div>
           </div>";                                    
           $this->html.=$html;

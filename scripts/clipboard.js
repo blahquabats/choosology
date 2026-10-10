@@ -201,7 +201,7 @@
 		}
 		html +=
 			'<p class="clip-hint clip-hint--foot">' +
-			'<a class="clip-link" href="#/mystuff/ledger">Full Ledger in My Stuff</a></p>';
+			'<a class="clip-link" href="#/mystuff/ledger">Full Ledger in My Office</a></p>';
 		return html;
 	}
 

@@ -38,7 +38,7 @@ choosology_lite_header(array('title' => 'Home', 'active' => 'home'));
 <fieldset class="lite-panel">
 	<legend>Welcome</legend>
 	<p>Here at Choosology Labs, Choosologists discover new elements of fiction through branching experiments.</p>
-	<p class="lite-meta">You are on <strong>Choosology 3.1</strong> — the lean terminal UI. My Stuff management stays in Classic for now.</p>
+	<p class="lite-meta">You are on <strong>Choosology 3.1</strong> — the lean terminal UI. My Office management stays in Classic for now.</p>
 	<p>
 		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8'); ?>">Browse experiments</a>
 		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('news.php'), ENT_QUOTES, 'UTF-8'); ?>">Lab notes</a>

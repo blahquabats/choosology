@@ -396,7 +396,7 @@ function choosologyUrlSafeGlobal(path) {
 }
 
 /**
- * Create a new experiment from My Stuff (or elsewhere) and open the graph editor.
+ * Create a new experiment from My Office (or elsewhere) and open the graph editor.
  */
 function makeNewExperiment(title, options) {
     options = options || {};

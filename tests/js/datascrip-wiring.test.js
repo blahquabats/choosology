@@ -63,6 +63,31 @@ describe("DataScrip UI wiring", () => {
     expect(topboxChunk).not.toContain("classic-lite-btn");
   });
 
+  test("Classic nav labels My Office (not My Stuff)", () => {
+    const indexSrc = fs.readFileSync(
+      path.join(__dirname, "../../index.php"),
+      "utf8"
+    );
+    const jsSrc = fs.readFileSync(
+      path.join(__dirname, "../../scripts/index.js"),
+      "utf8"
+    );
+    expect(indexSrc).toContain("My&nbsp;Office");
+    expect(indexSrc).not.toContain("My&nbsp;Stuff");
+    expect(jsSrc).toContain("name: 'My Office'");
+    expect(jsSrc).not.toContain("name: 'My Stuff'");
+  });
+
+  test("comment Submit uses shared choosology-btn (not legacy fakebutton)", () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, "../../comments.php"),
+      "utf8"
+    );
+    expect(src).toContain("choosology-btn choosology-btn--primary");
+    expect(src).toContain("id='subcombutton'");
+    expect(src).not.toContain("makeFakeButton(\"subcombutton\"");
+  });
+
   test("logged-in header is compact icon chrome without DataScrip word", () => {
     const src = fs.readFileSync(
       path.join(__dirname, "../../index.php"),

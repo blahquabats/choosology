@@ -189,7 +189,7 @@ function checkSendMessage($user, $board, $screen = 0)
 			return false;
 		}
 		$title = "$user commented on your profile";
-		$body = 'See the new comment <a href="#/mystuff">in My Stuff</a> or on your profile.';
+		$body = 'See the new comment <a href="#/mystuff">in My Office</a> or on your profile.';
 		choosology_send_message((string) $res[0], 'Choosology', $title, $body, 'system');
 		return true;
 	}

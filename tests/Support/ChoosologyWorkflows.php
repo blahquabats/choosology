@@ -341,7 +341,7 @@ final class ChoosologyWorkflows
 		);
 		$assertions['login_ok'] = $login['code'] === 200 && trim($login['body']) === $user;
 
-		$ledger = $client->request('GET', '/mystuff/ledger.php', null, array(), 1, 'classic_ledger_open', 'Open My Stuff Ledger fragment');
+		$ledger = $client->request('GET', '/mystuff/ledger.php', null, array(), 1, 'classic_ledger_open', 'Open My Office Ledger fragment');
 		$assertions['ledger_ok'] = $ledger['code'] === 200 && str_contains($ledger['body'], 'DataScrip');
 		$assertions['glyph_img'] = str_contains($ledger['body'], 'datascrip.png');
 

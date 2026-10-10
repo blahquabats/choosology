@@ -58,7 +58,7 @@ php tests/bin/run-workflows.php --only=lite_login_browse_play_ending,classic_log
 | `lite_login_browse_play_ending` | Lite | Login → Browse → open experiment → two choices → ending |
 | `classic_login_play_ending` | Classic | AJAX login → shell → view → screenajax middle → ending |
 | `lite_login_ledger` | Lite | Login → DataScrip Ledger (glyph image) |
-| `classic_login_ledger` | Classic | AJAX login → My Stuff Ledger fragment |
+| `classic_login_ledger` | Classic | AJAX login → My Office Ledger fragment |
 | `mode_switch_roundtrip` | Both | Lite login → Classic switch → Lite switch |
 | `lite_structure_inspect` | Lite | Login → play → ASCII structure → back |
 

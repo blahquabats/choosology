@@ -102,7 +102,7 @@
 		});
 	}
 
-	/* ---------- Full Messages center (My Stuff tab) ---------- */
+	/* ---------- Full Messages center (My Office / CLIC) ---------- */
 	function initCenter(root) {
 		if (!root || root.getAttribute("data-msg-bound") === "1") {
 			return;

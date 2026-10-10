@@ -31,7 +31,7 @@
     <a class='chalkoption blue' onclick="return showMenuOption('home');" >HomE</a><br>
     <a class='chalkoption orange' onclick="return showMenuOption('news');" >News</a><br>
     <a class='chalkoption red' onclick="return showMenuOption('browse')" >ExperimeNts</a><br>
-    <a class='chalkoption green' onclick="return showMenuOption('mystuff')" >My Stuff</a>
+    <a class='chalkoption green' onclick="return showMenuOption('mystuff')" >My Office</a>
 </div>
 
 <script src="scripts/jcanvas.js"></script>
@@ -40,7 +40,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=loginbar1" />
+    <link rel="stylesheet" href="style/choosology.css?v=myoffice1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -105,7 +105,7 @@
 <?php if (!empty($_SESSION['user'])) { ?>
 <div class='navbutton orange navdisabled' id="mystuff_nav" onclick="location.href='#/mystuff'" >
     <?php echo icon("person", "64px"); ?><br />
-    My&nbsp;Stuff
+    My&nbsp;Office
 </div>
 <?php } ?>
 <div class="header" style='cursor: pointer;' onclick="location.href='#/home'">
