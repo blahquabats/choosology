@@ -40,11 +40,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-<<<<<<< HEAD
-    <link rel="stylesheet" href="style/choosology.css?v=office1" />
-=======
     <link rel="stylesheet" href="style/choosology.css?v=loginbar1" />
->>>>>>> 0423409 (Compact logged-in header: icon-only Clip/CLIC, drop DataScrip label)
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
