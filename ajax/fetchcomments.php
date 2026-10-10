@@ -19,6 +19,13 @@ $error = '0';
   $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
   if($page < 1) $page=1;
   if(!$board) exit;
+  if ($board === 'review') {
+      $isAdmin = !empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1;
+      if (!$isAdmin) {
+          echo '<response><id>review</id><insertion>0</insertion><deletion>0</deletion><num>0</num><pagesize>0</pagesize><error>Not authorized.</error></response>';
+          exit;
+      }
+  }
   if(substr($board, 0, 6) == "byuser") $pagesize = 5;
   else $pagesize = 20;
   echo "<response>";
@@ -89,8 +96,9 @@ $error = '0';
    else echo "<deletion>0</deletion>";
    
   
-  if($board=="review" && $_GET['approvealldem']==1)
+  if($board=="review" && !empty($_GET['approvealldem']) && (string) $_GET['approvealldem'] === '1')
    {
+       /* Admin gate already enforced above for board=review. */
        $aq="update comments set reviewed=1 where reviewed=0";
        mysqli_query($db, $aq);
    }

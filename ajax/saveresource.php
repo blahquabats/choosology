@@ -52,8 +52,13 @@ $escUser = mysqli_real_escape_string($db, $user);
 $escName = mysqli_real_escape_string($db, $name);
 $escCat = mysqli_real_escape_string($db, $cat);
 
+$own = runquery_assoc("SELECT id FROM pics WHERE id = '$id' AND user = '$escUser' LIMIT 1");
+if (!$own || empty($own[0]['id'])) {
+	choosology_resource_save_json(array('ok' => 0, 'error' => 'Picture not found.'));
+}
+
 $q = "UPDATE pics SET imagename = '$escName', cat = '$escCat' WHERE id = '$id' AND user = '$escUser' LIMIT 1";
-if (!mysqli_query($db, $q) || mysqli_affected_rows($db) < 0) {
+if (!mysqli_query($db, $q)) {
 	choosology_resource_save_json(array('ok' => 0, 'error' => 'Could not save picture info.'));
 }
 
