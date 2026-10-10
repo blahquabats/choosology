@@ -33,6 +33,11 @@ if (!is_numeric($advid)) {
 	exit;
 }
 
+if (empty($_SESSION['user'])) {
+	echo json_encode(array('0', 'Not signed in.'), $jsonFlags);
+	exit;
+}
+
 $infos = getAdv($advid);
 if ($infos === false) {
 	echo json_encode(array('0', 'Experiment not found.'), $jsonFlags);
@@ -41,6 +46,13 @@ if ($infos === false) {
 
 $adv = $infos[0];
 $screens = $infos[1];
+$owner = (string) ($adv['user'] ?? '');
+$sessionUser = (string) $_SESSION['user'];
+$isAdmin = !empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1;
+if ($owner !== $sessionUser && !$isAdmin) {
+	echo json_encode(array('0', 'Not allowed.'), $jsonFlags);
+	exit;
+}
 
 $payload = json_encode(array($adv, $screens), $jsonFlags);
 if ($payload === false) {

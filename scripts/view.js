@@ -2,6 +2,11 @@
  * Hide images that fail to load so play/view never shows broken-image chrome or alt text.
  * (img error does not bubble, so each img is bound directly.)
  */
+var commentsTimer = null;
+var screenNavGen = 0;
+/** Set by initTheaterMode so exitTheaterMode can clear animation cleanly. */
+var theaterCtl = null;
+
 function silenceBrokenImages(root)
 {
     var $root = root ? $(root) : $(".advcanvas");
@@ -27,6 +32,15 @@ function silenceBrokenImages(root)
     });
 }
 
+function clearViewTimers()
+{
+    if (commentsTimer) {
+        clearTimeout(commentsTimer);
+        commentsTimer = null;
+    }
+    screenNavGen++;
+}
+
 function goToScreen(screenid, fromscreen, reverse)
 {
     if(reverse) direction = "right";
@@ -45,6 +59,7 @@ function goToScreen(screenid, fromscreen, reverse)
 
 function reloadScreen(screenid)
 {
+    var gen = ++screenNavGen;
     $.ajax({
        url: "ajax/screenajax.php",
        data: {screen: screenid,
@@ -52,6 +67,7 @@ function reloadScreen(screenid)
     })
     .done(function(text)
     {
+        if (gen !== screenNavGen) return;
         var response = $.parseJSON(text);
         $("#choicemeat").html(response.choices);
         bindEndingReveal($(".choicecontainer"));
@@ -63,6 +79,7 @@ function replaceScreen(screenid, fromscreen, reverse)
 {
     if(reverse) direction = "left";
     else direction = "right";
+    var gen = ++screenNavGen;
     $.ajax({
        url: "ajax/screenajax.php",
        data: {screen: screenid,
@@ -71,6 +88,7 @@ function replaceScreen(screenid, fromscreen, reverse)
     })
     .done(function(text)
     {
+        if (gen !== screenNavGen) return;
         var response = $.parseJSON(text);
         
         $("#lastscreen").off().show("fade");
@@ -86,7 +104,10 @@ function replaceScreen(screenid, fromscreen, reverse)
         $(".text").toggle({
                 effect: "slide",
                 direction: direction,
-                complete: checkComments
+                complete: function () {
+                    if (gen !== screenNavGen) return;
+                    checkComments();
+                }
             });
 
     });   
@@ -108,34 +129,22 @@ function showComments(board, screen)
         }
     })
     .done(loadCommentsResponse);
-    /*.done(function(text)
-    {
-        var response = text;
-        
-        var xml = $( response );
-        
-        var id = xml.find("id").text(),
-        comments = xml.find("comments").text(),
-        pagesize = xml.find("pagesize").text(),
-        error = xml.find("error").text();
-        $("#CAcommentsholder"+id).html(comments);
-        /*
-        $(".starsrating"+id).val(rating.text());
-        
-        $(".starsloading"+id).hide();
-        showAvgStars(id);
-        var rr=$(".rateresponse"+id);
-
-    });   */
 }
     
 function checkComments()
 {
+    if (commentsTimer) {
+        clearTimeout(commentsTimer);
+        commentsTimer = null;
+    }
     if($("#commentsexist").length)
     {
         var advid = $("#advid").val();
         var screenid = $("#screenid").val();
-        window.setTimeout(function(){showComments("adv"+advid, screenid)}, 500) ;
+        commentsTimer = window.setTimeout(function(){
+            commentsTimer = null;
+            showComments("adv"+advid, screenid);
+        }, 500);
     }
 }
 
@@ -176,6 +185,7 @@ function initTheaterMode()
     var animTimer = null;
     var animating = false;
     if (!$toggle.length) {
+        theaterCtl = null;
         return;
     }
 
@@ -275,6 +285,11 @@ function initTheaterMode()
         setTheater(!isOn());
     }
 
+    theaterCtl = {
+        setTheater: setTheater,
+        clearAnimTimer: clearAnimTimer
+    };
+
     $toggle.off("click.theater").on("click.theater", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -301,13 +316,20 @@ function initTheaterMode()
 /** Leave theater when navigating away from the play view. */
 function exitTheaterMode()
 {
-    try {
-        sessionStorage.removeItem("choosology_theater_mode");
-    } catch (e) { /* ignore */ }
-    document.body.classList.remove(
-        "choosology-theater",
-        "choosology-theater-anim-in",
-        "choosology-theater-anim-out"
-    );
+    clearViewTimers();
+    if (theaterCtl && typeof theaterCtl.setTheater === "function") {
+        theaterCtl.setTheater(false, { instant: true });
+    } else {
+        try {
+            sessionStorage.removeItem("choosology_theater_mode");
+        } catch (e) { /* ignore */ }
+        document.body.classList.remove(
+            "choosology-theater",
+            "choosology-theater-anim-in",
+            "choosology-theater-anim-out"
+        );
+    }
     $(document).off("keydown.theater");
+    $("#theater_toggle").attr("aria-pressed", "false").text("Theater mode");
+    $("#theater_exit").attr("hidden", "hidden");
 }

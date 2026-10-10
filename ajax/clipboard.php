@@ -120,18 +120,27 @@ if ($action === 'dismiss_checklist') {
 
 if ($action === 'complete_checklist') {
 	$key = trim((string) ($data['item_key'] ?? ''));
-	$ach = '';
+	$found = null;
 	foreach (choosology_clipboard_checklist_defs() as $def) {
 		if ($def['key'] === $key) {
-			$ach = $def['achievement'];
+			$found = $def;
 			break;
 		}
 	}
-	if ($ach === '') {
+	if ($found === null) {
 		choosology_clipboard_json(array('ok' => 0, 'error' => 'Unknown checklist item.'));
 	}
+	/* Require the auto-condition so Done cannot grant Degrees/DataScrip without the task. */
+	$autoMap = choosology_clipboard_eval_auto($db, $user, $sessionFlags);
+	$autoKey = (string) ($found['auto'] ?? '');
+	if ($autoKey === '' || empty($autoMap[$autoKey])) {
+		choosology_clipboard_json(array(
+			'ok' => 0,
+			'error' => 'Finish this task before marking it done.',
+		));
+	}
 	choosology_clipboard_set_checklist_flag($db, $user, $key, 'completed', 1);
-	choosology_award_achievement($db, $user, $ach);
+	choosology_award_achievement($db, $user, (string) $found['achievement']);
 	choosology_clipboard_json(array('ok' => 1));
 }
 

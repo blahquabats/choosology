@@ -53,6 +53,9 @@ if(!$screeninfo || $screeninfo[0]['id'] != $sid)
     die("Error: screen not found");
 }
 $screeninfo = $screeninfo[0];
+if ((string) ($screeninfo['user'] ?? '') !== (string) $user) {
+    die("Error: not allowed");
+}
 
 $q = "update advscreens set text = \"$content\", name = \"$screenlabel\" ";
 for ($c = 1; $c <= 8; $c++)
@@ -67,7 +70,8 @@ for ($c = 1; $c <= 8; $c++)
 	$choice = mysqli_real_escape_string($db, html_entity_decode($choicetext . '|Q-D-|' . $cpid));
 	$q .= ", choice$c = \"$choice\"";
 }
-$q .= " where id = '$sid' and user = '$user'";
+$escUser = mysqli_real_escape_string($db, (string) $user);
+$q .= " where id = '$sid' and user = '$escUser'";
 if(runquery($q))
 {
     $advused = (int) ($screeninfo['advused'] ?? 0);

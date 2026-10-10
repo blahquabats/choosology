@@ -25,4 +25,22 @@ final class ClipboardCatalogTest extends TestCase
 			$this->assertNotSame('', $def['auto']);
 		}
 	}
+
+	public function testEvalAutoExposesChecklistAutoKeys(): void
+	{
+		require_once CHOOSOLOGY_ROOT . '/lib/clipboard-helpers.php';
+		$this->assertTrue(function_exists('choosology_clipboard_eval_auto'));
+		$expected = array(
+			'has_adventure',
+			'has_public',
+			'has_note',
+			'has_todo',
+			'has_screenwright',
+			'visited_clipboard',
+			'visited_results',
+		);
+		foreach (choosology_clipboard_checklist_defs() as $def) {
+			$this->assertContains($def['auto'], $expected, $def['key']);
+		}
+	}
 }

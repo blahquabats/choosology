@@ -2,6 +2,8 @@
 var sammy_app;
 var activemenu;
 var pendingMystuffTab = null;
+/** Bumps on each menu navigation so stale hide/show/load callbacks are ignored. */
+var menuNavGen = 0;
 var configmenu = {
   duration: 600,
   home: {
@@ -675,6 +677,7 @@ function showMenuOption(which, param)
 {
     if (activemenu == which && !param) return false;
     var conf = configmenu[which];
+    var gen = ++menuNavGen;
 
     if (activemenu === "viewadv" && which !== "viewadv" && typeof exitTheaterMode === "function") {
         exitTheaterMode();
@@ -687,7 +690,9 @@ function showMenuOption(which, param)
         var m = typeof param === "string" && param.match(/(?:^|[&?])id=(\d*)/);
         var rid = m ? m[1] : "";
         $mount.stop(true, true).hide("blind", { direction: "up" }, 220, function () {
+            if (gen !== menuNavGen) return;
             $mount.load(loadUrl, function (responseText, status) {
+                if (gen !== menuNavGen) return;
                 if (status === "error") {
                     $mount.html("<p class='news-empty'>Could not load this item.</p>").show();
                     return;
@@ -707,28 +712,13 @@ function showMenuOption(which, param)
 
     var toshow = $(conf.show);
     var toeffect = conf.effect ? conf.effect : "slide";
+    var hideconf = null;
 
     if(activemenu)
     {
-        var hideconf = configmenu[activemenu];
+        hideconf = configmenu[activemenu];
         var tohide = $(hideconf.show);
         var hideeffect = hideconf.effect ? hideconf.effect : "slide";
-   /* if(hideconf.transfer == "1")
-        {
-            tohide.effect({
-                effect: "transfer",
-                duration: configmenu.duration,
-                easing: "easeOutCirc",
-                to:  $("#"+activemenu+"_nav"),
-                className: "navbutton",
-                queue: 0,
-                complete: function() {
-                tohide.hide();
-                }
-            });
-        }
-        else 
-        {*/
             tohide.hide({
                 effect: hideeffect,
                 direction: hideconf.direction,
@@ -737,6 +727,7 @@ function showMenuOption(which, param)
                 easing: "easeOutCirc",
                 queue: 0,
                 complete: function(){
+                    if (gen !== menuNavGen) return;
                     if(hideconf.id != "mystuff") 
                     {
                         tohide.empty();                
@@ -744,38 +735,16 @@ function showMenuOption(which, param)
                     }
                 }
             });
-        //}
-     //   alert(activemenu);
     
     }
 
-   /* $("#"+activemenu+"_nav").removeClass("navdisabled").animate({ left: "-=22", easing:"easeInCirc", queue: 0}, 400);
-    $("#"+which+"_nav").addClass("navdisabled").animate({ left: "+=22", easing:"easeInCirc", queue: 0}, 400);;
-    */
     $("#"+activemenu+"_nav").addClass("navdisabled").animate({ left: "-=22", easing:"easeInCirc", queue: 0}, 400);
     $("#"+which+"_nav").removeClass("navdisabled").animate({ left: "+=22", easing:"easeInCirc", queue: 0}, 400);
     activemenu = which;
 
 
     window.setTimeout(function(){
-    
-       /* if(conf.transfer == "1")
-        {
-            $("#"+which+"_nav").effect({
-                effect: "transfer",
-                duration: configmenu.duration,
-                easing: "easeOutCirc",
-                //to:  $("#"+activemenu+"_nav"),
-                to:  $("#fakebackground"),
-                className: "navbutton",
-                queue: 0,
-                complete: function() {
-                     toshow.show();
-                }
-            });
-        }
-        else 
-        {*/
+            if (gen !== menuNavGen) return;
 
             toshow.show({
                 effect: toeffect,
@@ -786,11 +755,13 @@ function showMenuOption(which, param)
                 queue: 0,
                 complete: function()
                 {
+                    if (gen !== menuNavGen) return;
                     if (conf.load) 
                         {
                             var url = conf.load;
                             if(param) url = url+"?"+param;
                             toshow.load(url, function () {
+                                if (gen !== menuNavGen) return;
                                 if (which === "news" && $("#news-add-form").length) {
                                     choosologyApplyAdminKind(choosologyAdminKind());
                                 }
@@ -811,7 +782,6 @@ function showMenuOption(which, param)
                     }
                 }
             });
-        //}
         
         if(conf.showback) 
         {
@@ -834,10 +804,6 @@ function showMenuOption(which, param)
         }
         else $("#contextlink").slideUp("slow")
         $("#fakebackground").cycle(parseInt(conf.bgcol, 10));
-        //$("#fakebackground").html("here is a sentence");
-        /*$("body").animate({
-        	backgroundColor: conf.bgcolor
-        }, 600);*/
 
         if(conf.darken) $('#backgrounddark').fadeIn(1000);
         else $('#backgrounddark').fadeOut(1000);

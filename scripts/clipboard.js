@@ -317,6 +317,10 @@
 				if (res && res.ok) {
 					$item.addClass("is-done");
 					$item.find("[data-check-complete]").replaceWith('<span class="clip-badge">Complete</span>');
+					return;
+				}
+				if (typeof showAlert === "function") {
+					showAlert((res && res.error) || "Finish this task before marking it done.", "error");
 				}
 			});
 		});

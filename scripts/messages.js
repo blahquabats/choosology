@@ -271,10 +271,12 @@
 		}
 		$("#msg_scrip_open").on("click", openScripAward);
 		$("#msg_scrip_close, #msg_scrip_cancel, #msg_scrip_backdrop").on("click", closeScripAward);
-		$(document).on("change", "input[name='msg_scrip_scope']", function () {
-			var all = $("#msg_scrip_scope_all").is(":checked");
-			$("#msg_scrip_to").prop("disabled", all);
-		});
+		$(document)
+			.off("change.msgScripScope")
+			.on("change.msgScripScope", "input[name='msg_scrip_scope']", function () {
+				var all = $("#msg_scrip_scope_all").is(":checked");
+				$("#msg_scrip_to").prop("disabled", all);
+			});
 		$("#msg_scrip_send").on("click", function () {
 			var all = $("#msg_scrip_scope_all").is(":checked");
 			var payload = {

@@ -266,16 +266,15 @@ function choosology_clipboard_set_checklist_flag(mysqli $db, string $uname, stri
 }
 
 /**
- * Evaluate auto conditions and complete checklist items + award achievements.
+ * Evaluate checklist auto-conditions for a user.
  *
  * @param array<string,bool> $sessionFlags e.g. visited_clipboard, visited_results
- * @return list<string> newly completed item keys
+ * @return array<string,bool>
  */
-function choosology_clipboard_sync_checklist(mysqli $db, string $uname, array $sessionFlags = array()): array
+function choosology_clipboard_eval_auto(mysqli $db, string $uname, array $sessionFlags = array()): array
 {
 	choosology_clipboard_ensure_schema($db);
 	$escU = mysqli_real_escape_string($db, $uname);
-	$completedNow = array();
 
 	$hasAdv = false;
 	$hasPublic = false;
@@ -307,7 +306,7 @@ function choosology_clipboard_sync_checklist(mysqli $db, string $uname, array $s
 		$hasScreenwright = true;
 	}
 
-	$autoMap = array(
+	return array(
 		'has_adventure' => $hasAdv,
 		'has_public' => $hasPublic,
 		'has_note' => $hasNote,
@@ -316,6 +315,20 @@ function choosology_clipboard_sync_checklist(mysqli $db, string $uname, array $s
 		'visited_clipboard' => !empty($sessionFlags['visited_clipboard']),
 		'visited_results' => !empty($sessionFlags['visited_results']),
 	);
+}
+
+/**
+ * Evaluate auto conditions and complete checklist items + award achievements.
+ *
+ * @param array<string,bool> $sessionFlags e.g. visited_clipboard, visited_results
+ * @return list<string> newly completed item keys
+ */
+function choosology_clipboard_sync_checklist(mysqli $db, string $uname, array $sessionFlags = array()): array
+{
+	choosology_clipboard_ensure_schema($db);
+	$escU = mysqli_real_escape_string($db, $uname);
+	$completedNow = array();
+	$autoMap = choosology_clipboard_eval_auto($db, $uname, $sessionFlags);
 
 	$state = array();
 	$sr = mysqli_query($db, "SELECT item_key, dismissed, completed FROM clipboard_checklist WHERE uname = '$escU'");
@@ -444,10 +457,11 @@ function choosology_clipboard_set_todo_done(mysqli $db, string $uname, int $id, 
 	choosology_clipboard_ensure_schema($db);
 	$escU = mysqli_real_escape_string($db, $uname);
 	$doneSql = $done ? '1, done_at = NOW()' : '0, done_at = NULL';
-	return (bool) mysqli_query(
+	$ok = (bool) mysqli_query(
 		$db,
 		"UPDATE clipboard_todos SET done = $doneSql WHERE id = $id AND uname = '$escU' LIMIT 1"
 	);
+	return $ok && mysqli_affected_rows($db) > 0;
 }
 
 function choosology_clipboard_delete_todo(mysqli $db, string $uname, int $id): bool
@@ -457,7 +471,8 @@ function choosology_clipboard_delete_todo(mysqli $db, string $uname, int $id): b
 	}
 	choosology_clipboard_ensure_schema($db);
 	$escU = mysqli_real_escape_string($db, $uname);
-	return (bool) mysqli_query($db, "DELETE FROM clipboard_todos WHERE id = $id AND uname = '$escU' LIMIT 1");
+	$ok = (bool) mysqli_query($db, "DELETE FROM clipboard_todos WHERE id = $id AND uname = '$escU' LIMIT 1");
+	return $ok && mysqli_affected_rows($db) > 0;
 }
 
 /**

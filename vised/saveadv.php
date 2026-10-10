@@ -15,10 +15,20 @@ else
 	exit;
 }
 
+$advidTouch = (int) preg_replace('/\D/', '', (string) ($_POST['advid'] ?? ''));
+if ($advidTouch < 1) {
+	exit;
+}
+$escUser = mysqli_real_escape_string($db, (string) $user);
+$own = runquery_assoc("SELECT id FROM advs WHERE id = '$advidTouch' AND user = '$escUser' LIMIT 1");
+if (!$own || empty($own[0]['id'])) {
+	exit;
+}
+
 function addNew($name, $title)
 {
-    global $boxgroups, $user;
-    $vals = array("name"=>$title, "user"=>$user, "advused"=>":".addslashes($_POST['advid']).":");
+    global $boxgroups, $user, $advidTouch;
+    $vals = array("name"=>$title, "user"=>$user, "advused"=>$advidTouch);
     $newid = insert("advscreens", $vals);
     $newname = $newid;
     foreach($boxgroups as $k=>&$v) // go through everything and update the id
@@ -71,6 +81,10 @@ foreach ($boxgroups as $k => $p)
         continue;
     }
     else $id = substr($k,4);
+    $id = preg_replace('/\D/', '', (string) $id);
+    if ($id === '') {
+        continue;
+    }
     
     $q = "update advscreens set xpos = '{$p['x']}', ypos = '{$p['y']}'";
     if($p['deleted']) $q .= ", deleted = '{$p['deleted']}' ";
@@ -79,7 +93,7 @@ foreach ($boxgroups as $k => $p)
            if($p['connections'][$ck]) $q .= ", choice$ck = \"{$p['connections'][$ck]}\"";
            else $q .= ", choice$ck= ''";
         }
-    $q .= " where id = '$id'";
+    $q .= " where id = '$id' AND user = '$escUser' AND advused = '$advidTouch'";
     
     echo $q."
     
@@ -88,8 +102,7 @@ foreach ($boxgroups as $k => $p)
 }
 mysqli_commit($db);
 mysqli_autocommit($db, TRUE);
-$advidTouch = (int) preg_replace('/\D/', '', (string) ($_POST['advid'] ?? ''));
-if ($advidTouch > 0 && !empty($user) && function_exists('choosology_adv_touch_edited')) {
+if (!empty($user) && function_exists('choosology_adv_touch_edited')) {
 	choosology_adv_touch_edited($db, $advidTouch, (string) $user);
 }
 ?>

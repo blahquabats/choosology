@@ -365,69 +365,72 @@
     if (!$root || $root.data("officeBound")) return;
     $root.data("officeBound", 1);
 
-    $root.on("click", "[data-hotspot]", function (e) {
-      e.preventDefault();
-      openHotspot($(this).attr("data-hotspot"));
-    });
-    $root.on("click", "[data-office-panel]", function (e) {
-      e.preventDefault();
-      openHotspot($(this).attr("data-office-panel"));
-    });
-    $root.on("click", "[data-office-close]", function (e) {
-      e.preventDefault();
-      closeOverlay();
-    });
-    $root.on("click", "#ms_trophy_back", function (e) {
-      e.preventDefault();
-      closeTrophy();
-    });
-    $root.on("click", ".ms-room-pedestal", function (e) {
-      e.preventDefault();
-      var idx = parseInt($(this).attr("data-pedestal"), 10);
-      if ($(this).hasClass("is-filled")) {
-        if (!window.confirm("Clear this pedestal?")) return;
-        post("clear_trinket", { pedestal_index: idx }).done(function (res) {
-          if (res && res.ok) applyState(res.state);
+    /* Namespace + off-before-on so remounts do not stack handlers. */
+    $root
+      .off("click.choosologyOffice")
+      .on("click.choosologyOffice", "[data-hotspot]", function (e) {
+        e.preventDefault();
+        openHotspot($(this).attr("data-hotspot"));
+      })
+      .on("click.choosologyOffice", "[data-office-panel]", function (e) {
+        e.preventDefault();
+        openHotspot($(this).attr("data-office-panel"));
+      })
+      .on("click.choosologyOffice", "[data-office-close]", function (e) {
+        e.preventDefault();
+        closeOverlay();
+      })
+      .on("click.choosologyOffice", "#ms_trophy_back", function (e) {
+        e.preventDefault();
+        closeTrophy();
+      })
+      .on("click.choosologyOffice", ".ms-room-pedestal", function (e) {
+        e.preventDefault();
+        var idx = parseInt($(this).attr("data-pedestal"), 10);
+        if ($(this).hasClass("is-filled")) {
+          if (!window.confirm("Clear this pedestal?")) return;
+          post("clear_trinket", { pedestal_index: idx }).done(function (res) {
+            if (res && res.ok) applyState(res.state);
+          });
+        } else {
+          openHotspot("trophy");
+        }
+      })
+      .on("click.choosologyOffice", "[data-buy-key]", function (e) {
+        e.preventDefault();
+        var key = $(this).attr("data-buy-key");
+        post("buy", { item_key: key }).done(function (res) {
+          if (!res || !res.ok) {
+            window.alert((res && res.error) || "Purchase failed.");
+            return;
+          }
+          applyState(res.state);
+          renderShopOrInventory("shop");
         });
-      } else {
-        openHotspot("trophy");
-      }
-    });
-    $root.on("click", "[data-buy-key]", function (e) {
-      e.preventDefault();
-      var key = $(this).attr("data-buy-key");
-      post("buy", { item_key: key }).done(function (res) {
-        if (!res || !res.ok) {
-          window.alert((res && res.error) || "Purchase failed.");
-          return;
-        }
-        applyState(res.state);
-        renderShopOrInventory("shop");
+      })
+      .on("click.choosologyOffice", "[data-equip-key]", function (e) {
+        e.preventDefault();
+        var key = $(this).attr("data-equip-key");
+        var slot = $(this).attr("data-equip-slot");
+        post("equip_decor", { item_key: key, slot: slot }).done(function (res) {
+          if (!res || !res.ok) {
+            window.alert((res && res.error) || "Could not equip.");
+            return;
+          }
+          applyState(res.state);
+          var title = $root.find("#ms_room_overlay_title").text();
+          if (title === HOTSPOT_TITLES.shop) renderShopOrInventory("shop");
+          else if (title === HOTSPOT_TITLES.inventory) renderShopOrInventory("inventory");
+        });
+      })
+      .on("click.choosologyOffice", "[data-display-key]", function (e) {
+        e.preventDefault();
+        placeTrinketInteractive($(this).attr("data-display-key"));
+      })
+      .on("click.choosologyOffice", ".ms-trophy-item", function (e) {
+        e.preventDefault();
+        placeTrinketInteractive($(this).attr("data-item-key"));
       });
-    });
-    $root.on("click", "[data-equip-key]", function (e) {
-      e.preventDefault();
-      var key = $(this).attr("data-equip-key");
-      var slot = $(this).attr("data-equip-slot");
-      post("equip_decor", { item_key: key, slot: slot }).done(function (res) {
-        if (!res || !res.ok) {
-          window.alert((res && res.error) || "Could not equip.");
-          return;
-        }
-        applyState(res.state);
-        var title = $root.find("#ms_room_overlay_title").text();
-        if (title === HOTSPOT_TITLES.shop) renderShopOrInventory("shop");
-        else if (title === HOTSPOT_TITLES.inventory) renderShopOrInventory("inventory");
-      });
-    });
-    $root.on("click", "[data-display-key]", function (e) {
-      e.preventDefault();
-      placeTrinketInteractive($(this).attr("data-display-key"));
-    });
-    $root.on("click", ".ms-trophy-item", function (e) {
-      e.preventDefault();
-      placeTrinketInteractive($(this).attr("data-item-key"));
-    });
 
     $(document)
       .off("keydown.choosologyOffice")
@@ -448,8 +451,9 @@
       $root = $("#ms_room_page");
     }
     if (!$root.length) return;
-    /* Allow remount after jQuery UI replaces panel HTML. */
-    $root.removeData("officeBound");
+    /* Allow remount after jQuery UI replaces panel HTML; drop prior handlers first. */
+    $root.off("click.choosologyOffice").removeData("officeBound");
+    $(document).off("keydown.choosologyOffice");
     bind();
     refreshState().always(function () {
       var pending =
