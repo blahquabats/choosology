@@ -41,7 +41,10 @@ describe("Clipboard UI polish", () => {
     expect(js).not.toContain("Full filterable results");
   });
 
-  test("close control is enlarged", () => {
-    expect(css).toMatch(/\.clip-modal-x\s*\{[^}]*font-size:\s*2\.15rem/s);
+  test("close control is a bordered button with hover", () => {
+    expect(css).toMatch(/\.clip-modal-x\s*\{[^}]*border:\s*1px solid/s);
+    expect(css).toMatch(/\.clip-modal-x:hover\s*\{[^}]*border-color:/s);
+    expect(css).toMatch(/\.clip-modal-x:hover\s*\{[^}]*background:/s);
   });
 });
+
