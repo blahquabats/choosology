@@ -8510,3 +8510,491 @@ body.clipboard-modal-open
     gap: 0.5rem 0.85rem;
     margin-top: 0.35rem;
 }
+
+/* ===== Classic My Office graphical hub ===== */
+#tabswindow.ms-room-hub-mode > ul.ui-tabs-nav
+{
+    display: none !important;
+}
+#tabswindow.ms-room-hub-mode .ui-tabs-panel
+{
+    padding: 0.4rem 0.5rem 0.75rem;
+}
+.ms-room-page
+{
+    --ms-room-slate: #3d5a73;
+    --ms-room-paper: #e8e4d8;
+    --ms-room-ink: #2a3036;
+    --ms-room-amber: #c4923a;
+    position: relative;
+    color: var(--ms-room-ink);
+}
+.ms-room-chrome
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.65rem 1rem;
+    margin-bottom: 0.55rem;
+    padding: 0.35rem 0.15rem;
+}
+.ms-room-eyebrow
+{
+    margin: 0;
+    font: 0.68rem/1 Consolas, "Courier New", monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ms-room-slate);
+}
+.ms-room-eyebrow-tag
+{
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--ms-room-slate);
+    font-size: 0.62rem;
+}
+.ms-room-title
+{
+    margin: 0.15rem 0 0.2rem;
+    font: 700 1.35rem/1.15 Trebuchet MS, Verdana, sans-serif;
+    color: var(--ms-room-slate);
+}
+.ms-room-lede
+{
+    margin: 0;
+    max-width: 36rem;
+    font: 0.88rem/1.35 Verdana, sans-serif;
+    color: #4a525a;
+}
+.ms-room-toolbar
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+.ms-room-balance
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-right: 0.35rem;
+    padding: 0.2rem 0.45rem;
+    background: var(--ms-room-paper);
+    border: 1px solid #b8b2a2;
+    font: 0.82rem Consolas, monospace;
+}
+.ms-room-btn
+{
+    appearance: none;
+    border: 1px solid var(--ms-room-slate);
+    background: #f3f0e8;
+    color: var(--ms-room-slate);
+    padding: 0.35rem 0.7rem;
+    font: 700 0.78rem/1.2 Trebuchet MS, Verdana, sans-serif;
+    cursor: pointer;
+}
+.ms-room-btn:hover
+{
+    background: #fff;
+}
+.ms-room-btn--accent
+{
+    background: var(--ms-room-slate);
+    color: #f5f2ea;
+}
+.ms-room-btn--accent:hover
+{
+    background: #2f4860;
+}
+.ms-room-stage-wrap
+{
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    border: 2px solid #6a737c;
+    background: linear-gradient(180deg, #7a8680 0%, #5c6862 42%, #8a8472 42%, #6e6858 100%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    overflow: hidden;
+}
+.ms-room-stage
+{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    min-height: 280px;
+}
+.ms-room-layer
+{
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.ms-room-layer img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    image-rendering: auto;
+}
+.ms-room-layer--window { z-index: 1; }
+.ms-room-layer--wallpaper { z-index: 2; mix-blend-mode: multiply; opacity: 0.85; }
+.ms-room-layer--flooring { z-index: 3; }
+.ms-room-layer--bookshelf { z-index: 4; }
+.ms-room-layer--corner { z-index: 5; }
+.ms-room-layer--desk { z-index: 6; }
+.ms-room-layer--computer { z-index: 7; }
+.ms-room-layer--computer img
+{
+    animation: ms-room-crt-blink 5.5s ease-in-out infinite;
+}
+.ms-room-layer--lighting
+{
+    z-index: 8;
+    mix-blend-mode: soft-light;
+    opacity: 0.9;
+    animation: ms-room-light-pulse 7s ease-in-out infinite;
+}
+@keyframes ms-room-crt-blink
+{
+    0%, 92%, 100% { filter: brightness(1); }
+    94% { filter: brightness(1.25); }
+    96% { filter: brightness(0.85); }
+}
+@keyframes ms-room-light-pulse
+{
+    0%, 100% { opacity: 0.75; }
+    50% { opacity: 0.95; }
+}
+.ms-room-hotspot
+{
+    position: absolute;
+    z-index: 20;
+    border: 1px dashed rgba(245, 230, 190, 0.55);
+    background: rgba(40, 48, 56, 0.28);
+    color: #f4efe3;
+    font: 700 0.62rem/1 Consolas, monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.15rem 0.25rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+}
+.ms-room-hotspot:hover,
+.ms-room-hotspot:focus
+{
+    background: rgba(61, 90, 115, 0.72);
+    border-style: solid;
+    outline: none;
+}
+.ms-room-hotspot--experiments { left: 6%; top: 48%; width: 12%; height: 22%; }
+.ms-room-hotspot--resources { left: 6%; top: 72%; width: 12%; height: 12%; }
+.ms-room-hotspot--messages { left: 22%; top: 58%; width: 10%; height: 10%; }
+.ms-room-hotspot--ledger { left: 42%; top: 62%; width: 10%; height: 10%; }
+.ms-room-hotspot--account { left: 54%; top: 48%; width: 9%; height: 8%; }
+.ms-room-hotspot--results { left: 36%; top: 18%; width: 12%; height: 10%; }
+.ms-room-hotspot--degrees { left: 18%; top: 16%; width: 12%; height: 10%; }
+.ms-room-hotspot--trophy { right: 4%; top: 38%; width: 12%; height: 28%; }
+.ms-room-pedestal
+{
+    position: absolute;
+    z-index: 21;
+    width: 7.5%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(196, 146, 58, 0.65);
+    background: rgba(30, 34, 38, 0.35);
+    padding: 0;
+    cursor: pointer;
+}
+.ms-room-pedestal img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+.ms-room-pedestal-empty
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(244, 239, 227, 0.7);
+    font: 700 1rem/1 Consolas, monospace;
+}
+.ms-room-pedestal--0 { left: 48%; top: 52%; }
+.ms-room-pedestal--1 { left: 14%; top: 28%; }
+.ms-room-pedestal--2 { left: 72%; top: 34%; }
+.ms-room-overlay
+{
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+}
+.ms-room-overlay--hidden
+{
+    display: none;
+}
+.ms-room-overlay-backdrop
+{
+    position: absolute;
+    inset: 0;
+    background: rgba(28, 32, 36, 0.45);
+    cursor: pointer;
+}
+.ms-room-overlay-panel
+{
+    position: relative;
+    z-index: 1;
+    width: min(920px, 96%);
+    max-height: min(78vh, 640px);
+    margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--ms-room-paper);
+    border: 2px solid var(--ms-room-slate);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+}
+.ms-room-overlay-head
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid #c5bfb0;
+    background: #ddd7c8;
+}
+.ms-room-overlay-title
+{
+    margin: 0;
+    font: 700 1rem/1.2 Trebuchet MS, Verdana, sans-serif;
+    color: var(--ms-room-slate);
+}
+.ms-room-overlay-close
+{
+    border: 0;
+    background: transparent;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--ms-room-slate);
+}
+.ms-room-panel-body
+{
+    overflow: auto;
+    padding: 0.65rem 0.75rem 0.9rem;
+    flex: 1;
+}
+.ms-room-grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.65rem;
+}
+.ms-room-tile
+{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #b8b2a2;
+    background: #f7f4ec;
+    padding: 0.45rem;
+    gap: 0.35rem;
+}
+.ms-room-tile.is-equipped
+{
+    border-color: var(--ms-room-amber);
+    box-shadow: inset 0 0 0 1px rgba(196, 146, 58, 0.45);
+}
+.ms-room-tile-img
+{
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: #cfd4c8;
+}
+.ms-room-tile-meta
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font: 0.78rem/1.25 Verdana, sans-serif;
+}
+.ms-room-tile-blurb
+{
+    color: #5a626a;
+}
+.ms-room-tile-slot
+{
+    font: 0.68rem Consolas, monospace;
+    text-transform: uppercase;
+    color: var(--ms-room-slate);
+}
+.ms-room-tile-actions .ms-room-btn
+{
+    width: 100%;
+}
+.ms-room-empty
+{
+    grid-column: 1 / -1;
+    margin: 0.5rem 0;
+    color: #5a626a;
+}
+.ms-trophy-view
+{
+    position: relative;
+    z-index: 30;
+    min-height: 360px;
+    animation: ms-trophy-fade 0.35s ease;
+}
+.ms-trophy-view--hidden
+{
+    display: none;
+}
+@keyframes ms-trophy-fade
+{
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.ms-trophy-bar
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.55rem;
+}
+.ms-trophy-title
+{
+    margin: 0;
+    font: 700 1.15rem/1.2 Trebuchet MS, Verdana, sans-serif;
+    color: var(--ms-room-slate);
+}
+.ms-trophy-hint
+{
+    margin: 0;
+    flex: 1 1 12rem;
+    font: 0.82rem/1.35 Verdana, sans-serif;
+    color: #4a525a;
+}
+.ms-trophy-scroll
+{
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 2px solid #6a737c;
+    background: #5c6862;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.ms-trophy-scroll::before,
+.ms-trophy-scroll::after
+{
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2.2rem;
+    z-index: 2;
+    pointer-events: none;
+}
+.ms-trophy-scroll::before
+{
+    left: 0;
+    background: linear-gradient(90deg, rgba(40,44,48,0.55), transparent);
+}
+.ms-trophy-scroll::after
+{
+    right: 0;
+    background: linear-gradient(270deg, rgba(40,44,48,0.55), transparent);
+}
+.ms-trophy-strip
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0;
+    min-height: 240px;
+    width: max-content;
+    background-repeat: repeat-x;
+    background-size: 280px 100%;
+    background-position: left bottom;
+    padding: 1.1rem 0.5rem 1.4rem;
+}
+.ms-trophy-bay
+{
+    flex: 0 0 140px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0.35rem;
+    min-height: 200px;
+}
+.ms-trophy-bay--empty,
+.ms-trophy-bay--grow
+{
+    flex-basis: 220px;
+    align-items: center;
+    color: #f0ebe0;
+    font: 0.85rem/1.35 Verdana, sans-serif;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+}
+.ms-trophy-item
+{
+    width: 100%;
+    border: 1px solid rgba(196, 146, 58, 0.55);
+    background: rgba(35, 40, 44, 0.42);
+    color: #f4efe3;
+    padding: 0.4rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+.ms-trophy-item img
+{
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+.ms-trophy-item-label
+{
+    font: 700 0.72rem/1.2 Trebuchet MS, Verdana, sans-serif;
+    text-align: center;
+}
+.ms-trophy-item-badge
+{
+    font: 0.62rem Consolas, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+}
+.ms-trophy-item.is-displayed
+{
+    box-shadow: inset 0 0 0 1px var(--ms-room-amber);
+}
+.ms-trophy-item-badge--action
+{
+    color: #f0d59a;
+}
+@media (max-width: 700px)
+{
+    .ms-room-hotspot
+    {
+        font-size: 0.55rem;
+    }
+    .ms-room-chrome
+    {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

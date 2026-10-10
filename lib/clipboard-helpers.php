@@ -123,7 +123,7 @@ function choosology_achievement_catalog(): array
 		),
 		'results_analyst' => array(
 			'label' => 'Results Analyst',
-			'blurb' => 'Reviewed experiment usage metrics in My Office.',
+			'blurb' => 'Reviewed experiment usage metrics from the My Office Results chart.',
 			'group' => 'office',
 		),
 	);
@@ -183,7 +183,7 @@ function choosology_clipboard_checklist_defs(): array
 		array(
 			'key' => 'review_results',
 			'label' => 'Review experiment results',
-			'hint' => 'Open My Office for full metrics (highlights also appear on the clipboard)',
+			'hint' => 'Open My Office → Results wall chart for full metrics (highlights also appear on the clipboard)',
 			'achievement' => 'results_analyst',
 			'auto' => 'visited_results',
 		),
@@ -212,6 +212,10 @@ function choosology_award_achievement(mysqli $db, string $uname, string $key): b
 			require_once __DIR__ . '/datascrip-helpers.php';
 		}
 		choosology_datascrip_on_achievement($db, $uname, $key);
+		if (!function_exists('choosology_office_on_achievement')) {
+			require_once __DIR__ . '/office-helpers.php';
+		}
+		choosology_office_on_achievement($db, $uname, $key);
 	}
 	return $awarded;
 }

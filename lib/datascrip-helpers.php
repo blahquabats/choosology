@@ -338,6 +338,8 @@ function choosology_datascrip_reason_label(string $reasonKey, string $memo = '')
 			return 'Admin DataScrip award';
 		case 'admin_grant_all':
 			return 'Lab-wide DataScrip award';
+		case 'office_shop':
+			return 'Office décor purchase';
 		default:
 			return $reasonKey !== '' ? $reasonKey : 'DataScrip movement';
 	}

@@ -617,18 +617,33 @@ $(function() {
 function loadTab(loc, retryAfterShow)
 {
     if (!$("#tabswindow").length) return;
-    var which = 0;
-
-    if(loc =="experiments") which = 0;
-    if(loc =="office") which = 1;
-    if(loc =="messages") which = 2;
-    if(loc =="resources") which = 3;
-    if(loc =="ledger") which = 4;
-    if(loc =="degrees") which = 5;
-    if(loc =="account") which = 6;
+    /* Classic hub: always load the My Office room panel; other locs open as hotspot overlays. */
+    var hubLoc = loc || "office";
+    var which = 1; /* mystuff/office.php */
     var tabs = $("#tabswindow");
+    tabs.addClass("ms-room-hub-mode");
+
+    if (hubLoc && hubLoc !== "office") {
+        if (window.ChoosologyOffice && typeof ChoosologyOffice.setPendingHotspot === "function") {
+            ChoosologyOffice.setPendingHotspot(hubLoc);
+        } else {
+            window.__choosologyOfficeHotspot = hubLoc;
+        }
+    } else {
+        window.__choosologyOfficeHotspot = null;
+        if (window.ChoosologyOffice && typeof ChoosologyOffice.setPendingHotspot === "function") {
+            ChoosologyOffice.setPendingHotspot(null);
+        }
+    }
+
     try { tabs.tabs("refresh"); } catch (err) { /* ignore */ }
-    if (!retryAfterShow && tabs.tabs("option", "active") === which && tabs.find(".ui-tabs-panel").eq(which).children().length) {
+    var $officePanel = tabs.find(".ui-tabs-panel").eq(which);
+    var officeLoaded = $officePanel.find(".ms-room-page").length > 0;
+    if (!retryAfterShow && tabs.tabs("option", "active") === which && officeLoaded) {
+        if (hubLoc && hubLoc !== "office" && window.ChoosologyOffice && typeof ChoosologyOffice.openHotspot === "function") {
+            ChoosologyOffice.openHotspot(hubLoc);
+            window.__choosologyOfficeHotspot = null;
+        }
         return;
     }
     tabs.tabs("option", "active", which);
@@ -777,9 +792,12 @@ function showMenuOption(which, param)
                         }
                     if (which === "mystuff") {
                         try { $("#tabswindow").tabs("refresh"); } catch (err) { /* ignore */ }
+                        $("#tabswindow").addClass("ms-room-hub-mode");
                         if (pendingMystuffTab) {
                             loadTab(pendingMystuffTab, true);
                             pendingMystuffTab = null;
+                        } else {
+                            loadTab("office", true);
                         }
                     }
                 }
