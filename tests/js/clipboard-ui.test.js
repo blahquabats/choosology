@@ -37,6 +37,8 @@ describe("Clipboard UI polish", () => {
     expect(js).not.toContain("clipboard_to_ledger");
     expect(js).not.toContain("Full experiment results");
     expect(js).not.toContain("Full DataScrip Ledger");
+    expect(js).not.toContain("Full Ledger in My Office");
+    expect(js).not.toContain("Full filterable results");
   });
 
   test("close control is enlarged", () => {

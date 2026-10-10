@@ -180,9 +180,6 @@
 				"</div></li>";
 		});
 		html += "</ul>";
-		html +=
-			'<p class="clip-hint clip-hint--foot">Showing recent highlights. ' +
-			'<a class="clip-link" href="#/mystuff/office">Full filterable results in My Office</a>.</p>';
 		return html;
 	}
 
@@ -236,9 +233,6 @@
 			});
 			html += "</ul>";
 		}
-		html +=
-			'<p class="clip-hint clip-hint--foot">' +
-			'<a class="clip-link" href="#/mystuff/ledger">Full Ledger in My Office</a></p>';
 		return html;
 	}
 
