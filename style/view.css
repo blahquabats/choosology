@@ -591,6 +591,86 @@ body.choosology-theater #viewwindow
     box-shadow: none !important;
     z-index: 5001 !important;
     background-color: #000;
+    transform-origin: center center;
+}
+
+/* Lightweight enter / exit motion (skipped when prefers-reduced-motion). */
+@media (prefers-reduced-motion: no-preference)
+{
+    body.choosology-theater-anim-in #viewwindow
+    {
+        animation: choosology-theater-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    body.choosology-theater-anim-in .theater-exit
+    {
+        animation: choosology-theater-exit-in 0.28s ease 0.08s both;
+    }
+    body.choosology-theater-anim-out #viewwindow
+    {
+        animation: choosology-theater-out 0.28s ease-in both;
+        pointer-events: none;
+    }
+    body.choosology-theater-anim-out .theater-exit
+    {
+        animation: choosology-theater-exit-out 0.2s ease both;
+        pointer-events: none;
+    }
+}
+
+@keyframes choosology-theater-in
+{
+    from
+    {
+        opacity: 0.55;
+        transform: scale(0.97);
+    }
+    to
+    {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes choosology-theater-out
+{
+    from
+    {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to
+    {
+        opacity: 0.65;
+        transform: scale(0.985);
+    }
+}
+
+@keyframes choosology-theater-exit-in
+{
+    from
+    {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to
+    {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes choosology-theater-exit-out
+{
+    from
+    {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to
+    {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
 }
 
 body.choosology-theater #viewwindow .advcanvas

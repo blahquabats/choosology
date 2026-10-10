@@ -165,14 +165,27 @@ function checkComments()
 /**
  * Theater mode: expand the adventure play surface to fill the viewport.
  * Off by default; session preference only (does not force on for new visits).
+ * Enter/exit use a short CSS animation unless the user prefers reduced motion.
  */
 function initTheaterMode()
 {
     var STORAGE_KEY = "choosology_theater_mode";
+    var ANIM_MS = 320;
     var $toggle = $("#theater_toggle");
     var $exit = $("#theater_exit");
+    var animTimer = null;
+    var animating = false;
     if (!$toggle.length) {
         return;
+    }
+
+    function prefersReducedMotion()
+    {
+        try {
+            return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+        } catch (e) {
+            return false;
+        }
     }
 
     function isOn()
@@ -180,14 +193,22 @@ function initTheaterMode()
         return document.body.classList.contains("choosology-theater");
     }
 
-    function setTheater(on)
+    function clearAnimTimer()
     {
-        on = !!on;
-        document.body.classList.toggle("choosology-theater", on);
+        if (animTimer) {
+            clearTimeout(animTimer);
+            animTimer = null;
+        }
+        animating = false;
+        document.body.classList.remove("choosology-theater-anim-in", "choosology-theater-anim-out");
+    }
+
+    function syncChrome(on, showExit)
+    {
         $toggle.attr("aria-pressed", on ? "true" : "false");
         $toggle.text(on ? "Exit theater" : "Theater mode");
         if ($exit.length) {
-            if (on) {
+            if (showExit) {
                 $exit.removeAttr("hidden");
             } else {
                 $exit.attr("hidden", "hidden");
@@ -200,6 +221,53 @@ function initTheaterMode()
                 sessionStorage.removeItem(STORAGE_KEY);
             }
         } catch (e) { /* ignore */ }
+    }
+
+    function setTheater(on, opts)
+    {
+        on = !!on;
+        opts = opts || {};
+        var instant = !!opts.instant || prefersReducedMotion();
+        if (animating && !instant) {
+            return;
+        }
+        if (on === isOn() && !animating) {
+            syncChrome(on, on);
+            return;
+        }
+        clearAnimTimer();
+
+        if (instant) {
+            document.body.classList.toggle("choosology-theater", on);
+            syncChrome(on, on);
+            return;
+        }
+
+        if (on) {
+            syncChrome(true, true);
+            document.body.classList.add("choosology-theater");
+            document.body.classList.add("choosology-theater-anim-in");
+            animating = true;
+            animTimer = setTimeout(function () {
+                document.body.classList.remove("choosology-theater-anim-in");
+                animating = false;
+                animTimer = null;
+            }, ANIM_MS);
+            return;
+        }
+
+        // Keep Exit visible through the leave animation, then hide.
+        syncChrome(false, true);
+        document.body.classList.add("choosology-theater-anim-out");
+        animating = true;
+        animTimer = setTimeout(function () {
+            document.body.classList.remove("choosology-theater", "choosology-theater-anim-out");
+            if ($exit.length) {
+                $exit.attr("hidden", "hidden");
+            }
+            animating = false;
+            animTimer = null;
+        }, ANIM_MS);
     }
 
     function toggleTheater()
@@ -227,7 +295,7 @@ function initTheaterMode()
     try {
         preferOn = sessionStorage.getItem(STORAGE_KEY) === "1";
     } catch (e) { /* ignore */ }
-    setTheater(preferOn);
+    setTheater(preferOn, { instant: true });
 }
 
 /** Leave theater when navigating away from the play view. */
@@ -236,6 +304,10 @@ function exitTheaterMode()
     try {
         sessionStorage.removeItem("choosology_theater_mode");
     } catch (e) { /* ignore */ }
-    document.body.classList.remove("choosology-theater");
+    document.body.classList.remove(
+        "choosology-theater",
+        "choosology-theater-anim-in",
+        "choosology-theater-anim-out"
+    );
     $(document).off("keydown.theater");
 }
