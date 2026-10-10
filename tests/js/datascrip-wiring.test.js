@@ -59,7 +59,26 @@ describe("DataScrip UI wiring", () => {
     const topIdx = src.indexOf('id="topbox"');
     expect(liteIdx).toBeGreaterThan(-1);
     expect(topIdx).toBeGreaterThan(liteIdx);
-    const topboxChunk = src.slice(topIdx, topIdx + 900);
+    const topboxChunk = src.slice(topIdx, topIdx + 1400);
     expect(topboxChunk).not.toContain("classic-lite-btn");
+  });
+
+  test("logged-in header is compact icon chrome without DataScrip word", () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, "../../index.php"),
+      "utf8"
+    );
+    const topIdx = src.indexOf('id="topbox"');
+    const clusterEnd = src.indexOf("classic-top-cluster", topIdx);
+    const end = clusterEnd > topIdx ? src.indexOf("</div>", src.indexOf("contentcontainer", topIdx)) : topIdx + 4000;
+    const topboxChunk = src.slice(topIdx, Math.max(end, topIdx + 3500));
+    expect(topboxChunk).not.toContain("DataScrip");
+    expect(topboxChunk).not.toContain("msg-login-scrip-label");
+    expect(topboxChunk).not.toContain("msg-login-notify-label");
+    expect(topboxChunk).toContain("msg-login-row--compact");
+    expect(topboxChunk).toContain("msg-login-icon-btn");
+    expect(topboxChunk).toContain("images/icons/linecons-black/clip.png");
+    expect(topboxChunk).toContain("images/icons/linecons-black/mail.png");
+    expect(topboxChunk).toContain("msg_unread_badge");
   });
 });

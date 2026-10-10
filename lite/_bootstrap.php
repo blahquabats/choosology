@@ -95,7 +95,7 @@ function choosology_lite_header(array $opts = array()): void
 	if ($user !== '') {
 		echo '<p class="lite-userbox">Signed in as <strong>' . htmlspecialchars($user, ENT_QUOTES, 'UTF-8') . '</strong>';
 		if ($scripFmt !== '') {
-			echo ' <span class="lite-scrip" title="DataScrip balance">' . $scripFmt . '</span>';
+			echo ' <span class="lite-scrip" title="Balance">' . $scripFmt . '</span>';
 		}
 		echo '<br>My Stuff extras remain in <a href="' . htmlspecialchars(choosology_classic_url('mystuff'), ENT_QUOTES, 'UTF-8') . '">Classic</a>';
 		echo '</p>' . "\n";

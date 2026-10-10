@@ -431,6 +431,31 @@ label.sel:before {
     text-align: right;
 }
 
+/* Compact logged-in account chrome (~half the prior stacked height). */
+body[data-logged-in="1"] #topbox
+{
+    padding: 2px 6px;
+    line-height: 1.2;
+    font-size: 0.85rem;
+}
+body[data-logged-in="1"] .classic-top-cluster
+{
+    align-items: center;
+}
+body[data-logged-in="1"] #litebox
+{
+    padding: 2px;
+}
+body[data-logged-in="1"] #logoutsubmit
+{
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+body[data-logged-in="1"] #logoutsubmit a
+{
+    text-decoration: none;
+}
+
 #contextlink
 {
     left: 150px;
@@ -7278,8 +7303,17 @@ h3.msg-read-title,
     gap: 8px;
     flex-wrap: wrap;
 }
+.msg-login-row--compact {
+    flex-wrap: nowrap;
+    gap: 6px;
+    min-height: 0;
+}
 .msg-login-as {
     font-size: 0.85em;
+}
+.msg-login-row--compact .msg-login-as {
+    font-size: 0.78rem;
+    white-space: nowrap;
 }
 .msg-login-notify {
     position: relative;
@@ -7302,6 +7336,20 @@ h3.msg-read-title,
     background: #fff;
     border-color: var(--clic-accent, #b45309);
 }
+.msg-login-icon-btn {
+    padding: 2px 5px;
+    letter-spacing: 0;
+    min-width: 26px;
+    min-height: 22px;
+    justify-content: center;
+}
+.msg-login-icon {
+    display: block;
+    width: 16px;
+    height: auto;
+    max-height: 14px;
+    object-fit: contain;
+}
 .msg-unread-badge {
     display: inline-block;
     min-width: 1.1rem;
@@ -7312,6 +7360,23 @@ h3.msg-read-title,
     font-size: 0.6rem;
     line-height: 1.2rem;
     text-align: center;
+}
+/* Login CLIC envelope: red unread pill (count only; no CLIC word on the button). */
+#msg_login_notify_btn .msg-unread-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 0.95rem;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 0.55rem;
+    line-height: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    box-shadow: 0 0 0 1px #fff;
 }
 .msg-unread-badge[hidden] {
     display: none !important;
@@ -8365,15 +8430,11 @@ body.clipboard-modal-open
 }
 .msg-login-scrip
 {
-    clear: both;
-    margin: 2px 0 0;
-    font-size: 0.78rem;
+    margin: 0;
+    font-size: 0.72rem;
     color: #2a4a3a;
-    line-height: 1.25;
-}
-.msg-login-scrip-label
-{
-    opacity: 0.85;
+    line-height: 1.15;
+    white-space: nowrap;
 }
 .msg-login-scrip-amt
 {
@@ -8382,8 +8443,8 @@ body.clipboard-modal-open
 }
 .msg-login-scrip-amt .datascrip-sign
 {
-    width: 12px;
-    height: 11px;
+    width: 11px;
+    height: 10px;
 }
 .ms-ledger-page
 {

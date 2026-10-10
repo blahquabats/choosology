@@ -40,7 +40,11 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
+<<<<<<< HEAD
     <link rel="stylesheet" href="style/choosology.css?v=office1" />
+=======
+    <link rel="stylesheet" href="style/choosology.css?v=loginbar1" />
+>>>>>>> 0423409 (Compact logged-in header: icon-only Clip/CLIC, drop DataScrip label)
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -143,18 +147,20 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 	        $unreadMsg = (int) getNewMessages();
 	        $unreadAttr = $unreadMsg > 0 ? (string) $unreadMsg : '0';
 	        $unreadLabel = $unreadMsg > 99 ? '99+' : (string) $unreadMsg;
-	        echo "<div class='msg-login-row'>";
+	        $clipIcon = htmlspecialchars(choosology_site_url('images/icons/linecons-black/clip.png'), ENT_QUOTES, 'UTF-8');
+	        $mailIcon = htmlspecialchars(choosology_site_url('images/icons/linecons-black/mail.png'), ENT_QUOTES, 'UTF-8');
+	        echo "<div class='msg-login-row msg-login-row--compact'>";
 	        echo "<span class='msg-login-as'>Logged in as " . htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8') . "</span>";
-	        echo "<button type='button' class='msg-login-notify ms-clipboard-btn' id='clipboard_office_btn' title='Open clipboard' aria-label='Open clipboard'>";
-	        echo "<span class='msg-login-notify-label'>Clip</span>";
+	        echo "<span class='msg-login-scrip' title='Balance'><strong class='msg-login-scrip-amt'>{$scripFmtHtml}</strong></span>";
+	        echo "<button type='button' class='msg-login-notify msg-login-icon-btn ms-clipboard-btn' id='clipboard_office_btn' title='Open clipboard' aria-label='Open clipboard'>";
+	        echo "<img class='msg-login-icon' src='{$clipIcon}' alt='' width='16' height='14' decoding='async'>";
 	        echo "</button>";
-	        echo "<button type='button' class='msg-login-notify' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";
-	        echo "<span class='msg-login-notify-label'>CLIC</span>";
+	        echo "<button type='button' class='msg-login-notify msg-login-icon-btn' id='msg_login_notify_btn' data-unread='{$unreadAttr}' title='CLIC — Choosology Labs Internal Communications' aria-label='CLIC messages'>";
+	        echo "<img class='msg-login-icon' src='{$mailIcon}' alt='' width='16' height='11' decoding='async'>";
 	        echo "<span class='msg-unread-badge' id='msg_unread_badge'" . ($unreadMsg > 0 ? '' : ' hidden') . " aria-hidden='" . ($unreadMsg > 0 ? 'false' : 'true') . "'>" . htmlspecialchars($unreadLabel, ENT_QUOTES, 'UTF-8') . "</span>";
 	        echo "</button>";
+	        echo "<span id='logoutsubmit'><a href='#'>log out</a></span>";
 	        echo "</div>";
-	        echo "<div class='msg-login-scrip' title='DataScrip balance'><span class='msg-login-scrip-label'>DataScrip</span> <strong class='msg-login-scrip-amt'>{$scripFmtHtml}</strong></div>";
-	        echo "<br/> <span id='logoutsubmit'> <a href='#'> log out </a> </span>";
 	    }
 	    ?>
 	</div>
