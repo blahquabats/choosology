@@ -119,6 +119,12 @@ $(function() {
                         ui.panel.html(
                                 "Couldn't load this tab. We'll try to fix this as soon as possible." );
                     });
+                },
+                load: function( event, ui ) {
+                    /* jQuery UI AJAX strips <script> from fragments — mount Office hub from shell JS. */
+                    if (ui.panel && $(ui.panel).find(".ms-room-page").length && window.ChoosologyOffice) {
+                        ChoosologyOffice.mount($(ui.panel).find(".ms-room-page")[0]);
+                    }
                 }
             });
             // jQuery UI needs real panel URLs here; routing hash is updated separately below.
@@ -640,6 +646,9 @@ function loadTab(loc, retryAfterShow)
     var $officePanel = tabs.find(".ui-tabs-panel").eq(which);
     var officeLoaded = $officePanel.find(".ms-room-page").length > 0;
     if (!retryAfterShow && tabs.tabs("option", "active") === which && officeLoaded) {
+        if (window.ChoosologyOffice && typeof ChoosologyOffice.mount === "function") {
+            ChoosologyOffice.mount($officePanel.find(".ms-room-page")[0]);
+        }
         if (hubLoc && hubLoc !== "office" && window.ChoosologyOffice && typeof ChoosologyOffice.openHotspot === "function") {
             ChoosologyOffice.openHotspot(hubLoc);
             window.__choosologyOfficeHotspot = null;

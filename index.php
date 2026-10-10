@@ -72,7 +72,7 @@
     <script src='scripts/index.js'></script>
     <script src='scripts/messages.js?v=clic3'></script>
     <script src='scripts/clipboard.js?v=clip4'></script>
-    <script src='scripts/office.js?v=office1'></script>
+    <script src='scripts/office.js?v=office2'></script>
     <script src='scripts/routes.js'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 

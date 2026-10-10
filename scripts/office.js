@@ -443,8 +443,13 @@
   }
 
   function mount(el) {
-    $root = el ? $(el) : $("#ms_room_page");
+    $root = el ? $(el) : $(".ms-room-page").first();
+    if (!$root.length) {
+      $root = $("#ms_room_page");
+    }
     if (!$root.length) return;
+    /* Allow remount after jQuery UI replaces panel HTML. */
+    $root.removeData("officeBound");
     bind();
     refreshState().always(function () {
       var pending =
