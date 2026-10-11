@@ -63,6 +63,8 @@ final class ChoosologyTestDb
 			'guide_seen',
 			'ending_finds',
 			'messages',
+			'comments',
+			'ratings',
 			'advscreens',
 			'advs',
 			'users',

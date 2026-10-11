@@ -5,7 +5,8 @@
  * Pages emit a feature key. Interactions (data) decide whether a mascot speaks.
  * Mascot packs own portraits, theme tokens, and dialog. The engine does not.
  *
- * Phase 1 has no admin UI. Seed rows are inserted by choosology_guide_seed_defaults().
+ * Seed rows are inserted by choosology_guide_seed_defaults(); admins edit them
+ * through My Office → RESTRICTED using lib/guide-admin-helpers.php.
  */
 
 const CHOOSOLOGY_GUIDE_COOKIE = 'choosology_guide';

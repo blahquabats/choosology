@@ -46,6 +46,7 @@ function choosology_lite_header(array $opts = array()): void
 	$browse = htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8');
 	$news = htmlspecialchars(choosology_lite_url('news.php'), ENT_QUOTES, 'UTF-8');
 	$ledger = htmlspecialchars(choosology_lite_url('ledger.php'), ENT_QUOTES, 'UTF-8');
+	$restricted = htmlspecialchars(choosology_lite_url('restricted.php'), ENT_QUOTES, 'UTF-8');
 	$login = htmlspecialchars(choosology_lite_url('login.php'), ENT_QUOTES, 'UTF-8');
 	$switchClassic = htmlspecialchars(choosology_lite_url('switch.php?to=classic'), ENT_QUOTES, 'UTF-8');
 	$user = !empty($_SESSION['user']) ? (string) $_SESSION['user'] : '';
@@ -89,6 +90,9 @@ function choosology_lite_header(array $opts = array()): void
 	echo $nav('browse', $browse, 'Browse') . "\n";
 	if ($user !== '') {
 		echo $nav('ledger', $ledger, 'Ledger') . "\n";
+		if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) {
+			echo $nav('restricted', $restricted, 'RESTRICTED') . "\n";
+		}
 		echo $nav('login', $login, 'Sign out') . "\n";
 	} else {
 		echo $nav('login', $login, 'Sign in') . "\n";

@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=guide2" />
+    <link rel="stylesheet" href="style/choosology.css?v=restricted1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -78,6 +78,7 @@
     <script src='scripts/clipboard.js?v=clip7'></script>
     <script src='scripts/office.js?v=office2'></script>
     <script src='scripts/guide.js?v=guide1'></script>
+    <script src='scripts/restricted.js?v=1'></script>
     <script src='scripts/routes.js'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
@@ -181,6 +182,9 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
         <li><a href="mystuff/ledger.php" id='mystuff-ledger' class='tabsa' data-loc='ledger'>Ledger</a></li>
         <li><a href="mystuff/degrees.php" id='mystuff-degrees' class='tabsa' data-loc='degrees'>Degrees</a></li>
         <li><a href="mystuff/account.php" id='mystuff-account' class='tabsa' data-loc='account'>My Information</a></li>
+        <?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+        <li><a href="mystuff/restricted.php" id='mystuff-restricted' class='tabsa' data-loc='restricted'>RESTRICTED</a></li>
+        <?php } ?>
     </ul>
 </div>
 <?php } ?>

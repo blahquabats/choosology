@@ -139,6 +139,7 @@ $(function() {
             $("#mystuff-ledger").attr("href", 'mystuff/ledger.php');
             $("#mystuff-degrees").attr("href", 'mystuff/degrees.php');
             $("#mystuff-account").attr("href", 'mystuff/account.php');
+            $("#mystuff-restricted").attr("href", 'mystuff/restricted.php');
             $(".tabsa").on("mousedown", function(e){
                 var loc = $(this).attr("data-loc");
                 window.location.hash = "#/mystuff/" + loc;

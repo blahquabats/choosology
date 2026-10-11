@@ -36,6 +36,9 @@ function choosology_office_layer_url(array $layers, string $slot): string
 			<button type="button" class="ms-room-btn" id="ms_room_shop" data-office-panel="shop">Shop</button>
 			<button type="button" class="ms-room-btn" id="ms_room_inventory" data-office-panel="inventory">Inventory</button>
 			<button type="button" class="ms-room-btn ms-room-btn--accent" id="ms_room_trophy" data-office-panel="trophy">Trophy Room</button>
+			<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+			<button type="button" class="ms-room-btn ms-room-btn--restricted" id="ms_room_restricted" data-hotspot="restricted">RESTRICTED</button>
+			<?php } ?>
 		</div>
 	</div>
 

@@ -9239,3 +9239,328 @@ body.clipboard-modal-open
         height: 78px;
     }
 }
+
+/* ---- My Office: RESTRICTED admin hub ---- */
+.ms-room-btn--restricted
+{
+    background: #782f36;
+    border-color: #4d171d;
+    color: #fff5e8;
+    letter-spacing: 0.08em;
+}
+.ms-room-btn--restricted:hover
+{
+    background: #9b3d46;
+}
+.restricted-page
+{
+    --restricted-red: #7c2d34;
+    --restricted-ink: #242a2f;
+    --restricted-paper: #f4f0e5;
+    --restricted-line: #a69d8c;
+    color: var(--restricted-ink);
+    font-family: Trebuchet MS, Verdana, sans-serif;
+}
+.restricted-head
+{
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    border: 2px solid var(--restricted-ink);
+    border-left: 10px solid var(--restricted-red);
+    background: var(--restricted-paper);
+    padding: 0.8rem 1rem;
+    box-shadow: 3px 3px 0 rgba(36, 42, 47, 0.22);
+}
+.restricted-eyebrow,
+.restricted-kicker
+{
+    margin: 0 0 0.2rem;
+    color: var(--restricted-red);
+    font: 700 0.68rem/1.2 Consolas, "Courier New", monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.restricted-title
+{
+    margin: 0;
+    font: 800 1.8rem/1 Trebuchet MS, Verdana, sans-serif;
+    letter-spacing: 0.12em;
+}
+.restricted-lede
+{
+    margin: 0.35rem 0 0;
+}
+.restricted-stamp
+{
+    flex: 0 0 auto;
+    border: 3px double var(--restricted-red);
+    color: var(--restricted-red);
+    padding: 0.35rem 0.55rem;
+    transform: rotate(-3deg);
+    font: 800 0.65rem/1.15 Consolas, monospace;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+.restricted-nav
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.8rem 0 0.5rem;
+}
+.restricted-nav-btn,
+.restricted-btn
+{
+    border: 1px solid #595f63;
+    border-radius: 3px;
+    background: #e9e4d8;
+    color: #20262b;
+    padding: 0.38rem 0.65rem;
+    font: 700 0.76rem/1.2 Trebuchet MS, Verdana, sans-serif;
+    cursor: pointer;
+}
+.restricted-nav-btn:hover,
+.restricted-nav-btn:focus,
+.restricted-btn:hover,
+.restricted-btn:focus
+{
+    background: #fff;
+    outline: 2px solid rgba(124, 45, 52, 0.24);
+}
+.restricted-nav-btn.is-active,
+.restricted-btn--primary
+{
+    background: #344b5e;
+    border-color: #263746;
+    color: #fff;
+}
+.restricted-btn--danger
+{
+    color: #76252d;
+    border-color: #8e555a;
+}
+.restricted-global-status
+{
+    min-height: 1.2rem;
+    margin: 0.3rem 0;
+    color: #2f5f40;
+    font-weight: 700;
+}
+.restricted-global-status.is-error
+{
+    color: #8b1d29;
+}
+.restricted-view
+{
+    display: none;
+}
+.restricted-view.is-active
+{
+    display: block;
+}
+.restricted-section-head,
+.restricted-card-head,
+.restricted-beats-head
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+}
+.restricted-section-head h3,
+.restricted-card h3,
+.restricted-card h4,
+.restricted-beats-head h5
+{
+    margin: 0;
+}
+.restricted-note
+{
+    margin: 0.35rem 0 0.65rem;
+    color: #505960;
+}
+.restricted-guide-grid
+{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: start;
+}
+.restricted-card
+{
+    border: 1px solid var(--restricted-line);
+    border-top: 5px solid #344b5e;
+    background: #fbf9f3;
+    padding: 0.75rem;
+    box-shadow: 2px 2px 0 rgba(36, 42, 47, 0.13);
+}
+.restricted-card--compact
+{
+    max-width: 38rem;
+}
+.restricted-card-picker
+{
+    display: flex;
+    gap: 0.3rem;
+}
+.restricted-card-picker select
+{
+    max-width: 15rem;
+}
+.restricted-fields
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    margin-top: 0.55rem;
+}
+.restricted-fields--two
+{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.restricted-fields--three
+{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.restricted-form label
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.16rem;
+    color: #454d53;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+.restricted-form input,
+.restricted-form select,
+.restricted-form textarea
+{
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #8f969a;
+    border-radius: 2px;
+    background: #fff;
+    color: #15191c;
+    padding: 0.35rem 0.4rem;
+    font: 0.8rem/1.3 Consolas, "Courier New", monospace;
+}
+.restricted-form textarea
+{
+    resize: vertical;
+}
+.restricted-checks
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+}
+.restricted-form .restricted-checks label,
+.restricted-form label.restricted-check
+{
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+.restricted-checks input,
+label.restricted-check input
+{
+    width: auto;
+}
+.restricted-fieldset
+{
+    margin: 0.7rem 0 0;
+    border: 1px solid #b8b0a1;
+    background: rgba(244, 240, 229, 0.52);
+}
+.restricted-fieldset legend
+{
+    color: #4b545b;
+    font: 700 0.7rem/1.2 Consolas, monospace;
+}
+.restricted-actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.65rem;
+}
+.restricted-beats-head
+{
+    margin-top: 0.7rem;
+}
+.restricted-beat
+{
+    border: 1px dashed #9e9585;
+    background: #f4f0e5;
+    padding: 0.55rem;
+    margin-top: 0.45rem;
+}
+.restricted-beat-top
+{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 0.35rem;
+    align-items: end;
+}
+.restricted-beat > label
+{
+    margin-top: 0.35rem;
+}
+.restricted-preview
+{
+    min-height: 1rem;
+    margin-top: 0.75rem;
+}
+.restricted-preview .guide-panel--classic
+{
+    position: static;
+    width: min(34rem, 100%);
+    pointer-events: auto;
+}
+.restricted-comments
+{
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+}
+.restricted-comment
+{
+    border: 1px solid #aaa18f;
+    border-left: 5px solid var(--restricted-red);
+    background: #fbf9f3;
+    padding: 0.6rem 0.7rem;
+}
+.restricted-comment-meta
+{
+    margin: 0 0 0.3rem;
+    color: #62696e;
+    font: 0.68rem/1.2 Consolas, monospace;
+}
+.restricted-comment-text
+{
+    margin: 0;
+    white-space: pre-wrap;
+}
+.restricted-empty
+{
+    border: 1px dashed #8c948f;
+    padding: 1rem;
+    color: #59635e;
+    text-align: center;
+}
+@media (max-width: 850px)
+{
+    .restricted-guide-grid,
+    .restricted-fields--two,
+    .restricted-fields--three
+    {
+        grid-template-columns: 1fr;
+    }
+    .restricted-beat-top
+    {
+        grid-template-columns: 1fr 1fr;
+    }
+}
