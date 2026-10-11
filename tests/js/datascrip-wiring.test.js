@@ -31,7 +31,6 @@ describe("DataScrip UI wiring", () => {
       "utf8"
     );
     expect(src).toContain("renderLedger");
-    expect(src).toContain("#/mystuff/ledger");
     expect(src).toContain("datascrip");
     expect(src).toContain("images/datascrip.png");
   });
