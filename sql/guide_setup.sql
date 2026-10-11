@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS guide_mascots (
   display_name varchar(80) NOT NULL,
   enabled tinyint(1) NOT NULL DEFAULT 1,
   is_default tinyint(1) NOT NULL DEFAULT 0,
+  availability varchar(16) NOT NULL DEFAULT 'global',
   theme_json text NOT NULL,
   lines_json mediumtext NOT NULL,
   portraits_json text NOT NULL,
@@ -19,6 +20,8 @@ CREATE TABLE IF NOT EXISTS guide_mascots (
   PRIMARY KEY (id),
   UNIQUE KEY guide_mascots_key (mascot_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Existing databases pick up `availability` from choosology_guide_ensure_schema().
 
 CREATE TABLE IF NOT EXISTS guide_interactions (
   id int unsigned NOT NULL AUTO_INCREMENT,

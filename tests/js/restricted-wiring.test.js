@@ -16,6 +16,7 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(office).toContain('data-hotspot="restricted"');
     expect(office).toContain("RESTRICTED");
     expect(officeJs).toContain('restricted: "mystuff/restricted.php"');
+    expect(officeJs).toContain("ms-room-overlay--full");
   });
 
   test("restricted client supports all requested admin tools", () => {
@@ -26,6 +27,16 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(src).toContain("award_degree");
     expect(src).toContain("award_scrip");
     expect(src).toContain("moderate_comment");
+    expect(src).toContain("restricted_preview_mascot");
+    expect(src).toContain("scan_poses");
+    expect(src).toContain('.val("__new")');
+    expect(src).toContain("availability");
+    const page = read("mystuff/restricted.php");
+    expect(page).toContain("Mascot Packs");
+    expect(page).toContain("Dialog Beats");
+    expect(page).toContain("restricted_mascot_availability");
+    expect(page).not.toContain("restricted_interaction_mascot");
+    expect(page).not.toContain("restricted_portrait_idle");
   });
 
   test("JSON endpoint enforces admin access", () => {

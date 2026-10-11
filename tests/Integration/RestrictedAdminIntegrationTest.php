@@ -20,6 +20,7 @@ final class RestrictedAdminIntegrationTest extends TestCase
 		$_SESSION = array('user' => 'adminuser', 'usertype' => 1);
 		@mysqli_query($this->db, "DELETE FROM guide_interactions WHERE interaction_key='admin_test_interaction'");
 		@mysqli_query($this->db, "DELETE FROM guide_mascots WHERE mascot_key='admin_test_guide'");
+		$this->clearPoseFiles();
 	}
 
 	protected function tearDown(): void
@@ -28,13 +29,27 @@ final class RestrictedAdminIntegrationTest extends TestCase
 			@mysqli_query($this->db, "DELETE FROM guide_interactions WHERE interaction_key='admin_test_interaction'");
 			@mysqli_query($this->db, "DELETE FROM guide_mascots WHERE mascot_key='admin_test_guide'");
 		}
+		$this->clearPoseFiles();
 	}
 
 	public function testAdminCanCreatePreviewAndDeleteGuideContent(): void
 	{
+		$dir = dirname(__DIR__, 2) . '/images/mascots/admin_test_guide';
+		if (!is_dir($dir)) {
+			mkdir($dir, 0777, true);
+		}
+		file_put_contents($dir . '/idle.png', 'png');
+		file_put_contents($dir . '/notes.txt', 'no');
+		file_put_contents($dir . '/Bad Name.png', 'no');
 		$mascot = $this->mascot();
 		$savedMascot = choosology_guide_admin_save_mascot($this->db, $mascot);
 		$this->assertTrue($savedMascot['ok']);
+		$this->assertSame('earned', $savedMascot['mascot']['availability']);
+		$this->assertSame(
+			'images/mascots/admin_test_guide/idle.png',
+			$savedMascot['mascot']['portraits']['idle']
+		);
+		$this->assertArrayNotHasKey('offer', $savedMascot['mascot']['portraits']);
 
 		$interaction = $this->interaction();
 		$savedInteraction = choosology_guide_admin_save_interaction($this->db, $interaction);
@@ -113,6 +128,15 @@ final class RestrictedAdminIntegrationTest extends TestCase
 		$this->assertCount(0, choosology_restricted_pending_comments($this->db));
 	}
 
+	private function clearPoseFiles(): void
+	{
+		$dir = dirname(__DIR__, 2) . '/images/mascots/admin_test_guide';
+		foreach (array('idle.png', 'notes.txt', 'Bad Name.png') as $file) {
+			@unlink($dir . '/' . $file);
+		}
+		@rmdir($dir);
+	}
+
 	private function countRows(string $table): int
 	{
 		$r = mysqli_query($this->db, "SELECT COUNT(*) AS c FROM `$table`");
@@ -128,6 +152,7 @@ final class RestrictedAdminIntegrationTest extends TestCase
 			'display_name' => 'Admin Test Guide',
 			'enabled' => true,
 			'is_default' => false,
+			'availability' => 'earned',
 			'sort_order' => 50,
 			'theme' => array('accent' => '#123456', 'paper' => '#ffffff', 'ink' => '#111111'),
 			'portraits' => array(
