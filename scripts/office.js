@@ -109,7 +109,8 @@
   function closeOverlay() {
     if (!$root) return;
     var $ov = $root.find("#ms_room_overlay");
-    $ov.addClass("ms-room-overlay--hidden").attr("aria-hidden", "true");
+    $ov.removeClass("ms-room-overlay--full").addClass("ms-room-overlay--hidden").attr("aria-hidden", "true");
+    $root.find("#restricted_dock").remove();
     $root.find("#ms_room_panel_body").empty();
   }
 
@@ -358,6 +359,7 @@
     }
     closeTrophy();
     openOverlay(HOTSPOT_TITLES[name] || name, url, true);
+    $root.find("#ms_room_overlay").toggleClass("ms-room-overlay--full", name === "restricted");
     if (name === "results" && window.ChoosologyClipboard) {
       /* results_analyst awarded by results.php itself */
     }
