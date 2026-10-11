@@ -17,6 +17,7 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(office).toContain("RESTRICTED");
     expect(officeJs).toContain('restricted: "mystuff/restricted.php"');
     expect(officeJs).toContain("ms-room-overlay--full");
+    expect(officeJs).toContain('closest(".minicolors")');
   });
 
   test("restricted client supports all requested admin tools", () => {
@@ -31,6 +32,11 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(src).toContain("scan_poses");
     expect(src).toContain('.val("__new")');
     expect(src).toContain("availability");
+    expect(src).toContain("minicolors");
+    expect(src).toContain('setProperty("--guide-accent"');
+    const css = read("style/choosology.css");
+    expect(css).toContain(".restricted-btn--primary:hover");
+    expect(css).toContain("color: #1c2833");
     const page = read("mystuff/restricted.php");
     expect(page).toContain("Mascot Packs");
     expect(page).toContain("Dialog Beats");

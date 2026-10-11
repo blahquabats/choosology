@@ -73,10 +73,10 @@ if (!choosology_restricted_is_admin()) {
 					</div>
 					<fieldset class="restricted-fieldset">
 						<legend>Theme tokens</legend>
-						<div class="restricted-fields restricted-fields--three">
-							<label>Accent <input id="restricted_theme_accent" value="#c4a35a" maxlength="7"></label>
-							<label>Paper <input id="restricted_theme_paper" value="#f4ecd8" maxlength="7"></label>
-							<label>Ink <input id="restricted_theme_ink" value="#1c1a16" maxlength="7"></label>
+						<div class="restricted-fields restricted-fields--three restricted-colors">
+							<label>Accent <input id="restricted_theme_accent" class="adv-color" value="#c4a35a" maxlength="7"></label>
+							<label>Paper <input id="restricted_theme_paper" class="adv-color" value="#f4ecd8" maxlength="7"></label>
+							<label>Ink <input id="restricted_theme_ink" class="adv-color" value="#1c1a16" maxlength="7"></label>
 						</div>
 					</fieldset>
 					<fieldset class="restricted-fieldset">
