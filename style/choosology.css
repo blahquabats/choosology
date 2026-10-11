@@ -9349,6 +9349,15 @@ body.clipboard-modal-open
     border-color: #263746;
     color: #fff;
 }
+.restricted-btn--primary:hover,
+.restricted-btn--primary:focus,
+.restricted-nav-btn.is-active:hover,
+.restricted-nav-btn.is-active:focus
+{
+    background: #fff;
+    border-color: #263746;
+    color: #1c2833;
+}
 .restricted-btn--danger
 {
     color: #76252d;
@@ -9540,6 +9549,43 @@ body.clipboard-modal-open
 .restricted-fields--three
 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.restricted-colors .minicolors.minicolors-theme-default
+{
+    display: block;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+.restricted-colors .minicolors-theme-default .minicolors-input
+{
+    display: block;
+    width: 100% !important;
+    max-width: 100%;
+    height: 2.05rem;
+    line-height: 2.05rem;
+    padding: 0 0.45rem 0 2.45rem;
+    margin: 0;
+    box-sizing: border-box;
+}
+.restricted-colors .minicolors-theme-default .minicolors-swatch
+{
+    position: absolute;
+    left: 0.45rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.45rem;
+    height: 1.45rem;
+    margin: 0 !important;
+    border-radius: 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.restricted-colors .minicolors-theme-default .minicolors-swatch-color
+{
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 1px;
 }
 .restricted-form label
 {
