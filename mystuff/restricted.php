@@ -50,6 +50,10 @@ if (!choosology_restricted_is_admin()) {
 				</div>
 			</div>
 			<div class="restricted-mascot-layout">
+				<fieldset class="restricted-fieldset">
+					<legend>Pose images</legend>
+					<div id="restricted_pose_gallery" class="restricted-pose-gallery"></div>
+				</fieldset>
 				<div>
 					<div class="restricted-fields restricted-fields--two">
 						<label>Stable key <input id="restricted_mascot_key" maxlength="64" pattern="[a-z0-9_]+"></label>
@@ -94,10 +98,6 @@ if (!choosology_restricted_is_admin()) {
 						</div>
 					</fieldset>
 				</div>
-				<fieldset class="restricted-fieldset">
-					<legend>Pose images</legend>
-					<div id="restricted_pose_gallery" class="restricted-pose-gallery"></div>
-				</fieldset>
 			</div>
 			<div class="restricted-actions">
 				<button type="button" class="restricted-btn restricted-btn--primary" id="restricted_mascot_save">Save mascot</button>
@@ -116,6 +116,10 @@ if (!choosology_restricted_is_admin()) {
 			<button type="button" class="restricted-btn" id="restricted_reset_progress">Reset my guide progress</button>
 		</div>
 		<p class="restricted-note">These interactions are shared by every mascot. At runtime the site default pack speaks them. Choose a pack only when previewing.</p>
+		<div class="restricted-actions restricted-preview-bar">
+			<label>Preview mascot <select id="restricted_preview_mascot" aria-label="Preview mascot"></select></label>
+			<button type="button" class="restricted-btn" id="restricted_interaction_preview">Preview</button>
+		</div>
 		<form class="restricted-card restricted-form" id="restricted_interaction_form" onsubmit="return false;">
 			<div class="restricted-card-head">
 				<h4>Interaction</h4>
@@ -151,9 +155,7 @@ if (!choosology_restricted_is_admin()) {
 				<button type="button" class="restricted-btn" id="restricted_beat_add">Add beat</button>
 			</div>
 			<div id="restricted_beats" class="restricted-beats"></div>
-			<div class="restricted-actions restricted-preview-bar">
-				<label>Preview mascot <select id="restricted_preview_mascot" aria-label="Preview mascot"></select></label>
-				<button type="button" class="restricted-btn" id="restricted_interaction_preview">Preview</button>
+			<div class="restricted-actions">
 				<button type="button" class="restricted-btn restricted-btn--primary" id="restricted_interaction_save">Save interaction</button>
 				<button type="button" class="restricted-btn" id="restricted_interaction_reset">Reset built-in</button>
 				<button type="button" class="restricted-btn restricted-btn--danger" id="restricted_interaction_delete">Delete custom</button>
