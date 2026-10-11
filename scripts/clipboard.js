@@ -358,6 +358,9 @@
 		showLoadingState();
 		$("#clipboard_modal").removeClass("clip-modal--hidden").attr("aria-hidden", "false");
 		$("body").addClass("clipboard-modal-open");
+		if (window.ChoosologyGuide) {
+			window.ChoosologyGuide.signal("clipboard");
+		}
 		var openedAt = Date.now();
 		/* Keep the spinner visible briefly so the expand animation can read on fast local loads. */
 		var MIN_LOAD_MS = prefersReducedMotion() ? 0 : 320;

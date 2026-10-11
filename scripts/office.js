@@ -12,6 +12,7 @@
     degrees: "Degrees",
     account: "My Information",
     results: "Experiment Results",
+    restricted: "RESTRICTED",
     shop: "Office Shop",
     inventory: "Inventory"
   };
@@ -23,7 +24,8 @@
     ledger: "mystuff/ledger.php",
     degrees: "mystuff/degrees.php",
     account: "mystuff/account.php",
-    results: "mystuff/results.php"
+    results: "mystuff/results.php",
+    restricted: "mystuff/restricted.php"
   };
 
   var state = null;

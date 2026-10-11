@@ -8,11 +8,13 @@ if (empty($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../lib/date-format-helpers.php';
+require_once __DIR__ . '/../lib/guide-helpers.php';
 choosology_date_format_ensure_schema($db);
+choosology_guide_ensure_schema($db);
 
 $user = (string) $_SESSION['user'];
 $escUser = mysqli_real_escape_string($db, $user);
-$rows = runquery_assoc("SELECT name, email, about, pic, view_restricted, date_format FROM users WHERE name = '$escUser' LIMIT 1");
+$rows = runquery_assoc("SELECT name, email, about, pic, view_restricted, date_format, guide_enabled FROM users WHERE name = '$escUser' LIMIT 1");
 if (!is_array($rows) || !isset($rows[0])) {
 	echo "<div class='intabs'><p class='error'>Could not load your account.</p></div>";
 	return;
@@ -25,6 +27,7 @@ $pic = trim((string) ($account['pic'] ?? ''));
 $picUrl = ($pic !== '' && ctype_digit($pic)) ? getPicUrl((int) $pic, true) : '';
 $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
 $dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ?? CHOOSOLOGY_DATE_FMT_MDY));
+$guideOn = choosology_guide_flag_on($account['guide_enabled'] ?? 1);
 ?>
 <div class="intabs ms-account-page">
 	<form id="ms-account-form" class="ms-account-paper" onsubmit="return false;">
@@ -76,6 +79,11 @@ $dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ??
 						<span>dd/mm/yyyy</span>
 					</label>
 				</fieldset>
+
+				<label class="ms-account-check">
+					<input type="checkbox" id="acct_guide_enabled"<?php echo $guideOn ? ' checked' : ''; ?>>
+					<span>Lab guide offers help the first time I open a tool</span>
+				</label>
 
 				<label class="ms-account-label" for="acct_email">Email address</label>
 				<input type="email" id="acct_email" value="<?php echo $email; ?>" readonly>
@@ -151,6 +159,7 @@ $dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ??
 			about: accountAboutHtml(),
 			viewRestricted: $("#acct_view_restricted").is(":checked") ? "1" : "0",
 			dateFormat: String($("input[name='acct_date_format']:checked").val() || "mdy"),
+			guideEnabled: $("#acct_guide_enabled").is(":checked") ? "1" : "0",
 			currentPassword: $("#acct_current_password").val() || "",
 			newPassword: $("#acct_new_password").val() || "",
 			confirmPassword: $("#acct_confirm_password").val() || ""
@@ -367,6 +376,7 @@ $dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ??
 			about: $("#acct_about").val(),
 			view_restricted: $("#acct_view_restricted").is(":checked") ? 1 : 0,
 			date_format: $("input[name='acct_date_format']:checked").val() || "mdy",
+			guide_enabled: $("#acct_guide_enabled").is(":checked") ? 1 : 0,
 			current_password: $("#acct_current_password").val(),
 			new_password: $("#acct_new_password").val(),
 			confirm_password: $("#acct_confirm_password").val()
@@ -385,6 +395,12 @@ $dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ??
 				$("#acct_status").text(res.passwordChanged ? "Saved. Password updated." : "Saved.");
 				if (res.date_format) {
 					window.CHOOSOLOGY_DATE_FMT = res.date_format;
+				}
+				if (typeof res.guide_enabled !== "undefined") {
+					window.CHOOSOLOGY_GUIDE = res.guide_enabled ? 1 : 0;
+					if (!res.guide_enabled && window.ChoosologyGuide) {
+						window.ChoosologyGuide.close();
+					}
 				}
 				if (window.tinymce && tinymce.get("acct_about")) {
 					tinymce.get("acct_about").save();

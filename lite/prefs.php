@@ -8,8 +8,13 @@ choosology_lite_bootstrap();
 global $db;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	$fmt = choosology_date_format_normalize((string) ($_POST['date_format'] ?? 'mdy'));
-	choosology_date_format_save($db, $fmt);
+	if (isset($_POST['date_format'])) {
+		$fmt = choosology_date_format_normalize((string) $_POST['date_format']);
+		choosology_date_format_save($db, $fmt);
+	}
+	if (isset($_POST['guide_enabled'])) {
+		choosology_guide_set_enabled($db, (string) $_POST['guide_enabled'] !== '0');
+	}
 }
 
 $next = (string) ($_POST['next'] ?? $_GET['next'] ?? 'index.php');

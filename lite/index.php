@@ -104,4 +104,5 @@ choosology_lite_header(array('title' => 'Home', 'active' => 'home'));
 	<?php } ?>
 </fieldset>
 <?php
+choosology_lite_guide_form('index.php');
 choosology_lite_footer();
