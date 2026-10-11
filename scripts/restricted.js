@@ -155,6 +155,7 @@
 				$("<span>").addClass("restricted-pose-missing").text("missing").appendTo($tile);
 			}
 			$("<figcaption>").text(pose).appendTo($tile);
+			$gallery.append($tile);
 		});
 	}
 
