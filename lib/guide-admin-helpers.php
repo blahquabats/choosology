@@ -14,18 +14,6 @@ function choosology_guide_admin_plain($value, int $max): string
 	return substr($text, 0, $max);
 }
 
-function choosology_guide_admin_portrait_path_ok(string $path): bool
-{
-	$path = trim(str_replace('\\', '/', $path));
-	if ($path === '') {
-		return true;
-	}
-	return strlen($path) <= 255
-		&& strpos($path, '..') === false
-		&& !preg_match('#^(https?:)?//#i', $path)
-		&& (bool) preg_match('#^images/mascots/[a-z0-9_/-]+\.(png|gif|jpe?g|webp)$#i', $path);
-}
-
 /**
  * @return array{ok:bool,errors:list<string>,value?:array<string,mixed>}
  */
@@ -49,19 +37,13 @@ function choosology_guide_admin_validate_mascot(array $input): array
 		}
 	}
 	$theme = choosology_guide_theme_tokens($themeInput);
-
-	$portraits = array();
-	$portraitInput = is_array($input['portraits'] ?? null) ? $input['portraits'] : array();
-	foreach (array('idle', 'offer', 'explain', 'done') as $pose) {
-		$path = trim(str_replace('\\', '/', (string) ($portraitInput[$pose] ?? '')));
-		if (!choosology_guide_admin_portrait_path_ok($path)) {
-			$errors[] = ucfirst($pose) . ' portrait must be under images/mascots/.';
-		}
-		$portraits[$pose] = $path;
+	$availability = choosology_guide_availability_normalize((string) ($input['availability'] ?? 'global'));
+	if ($availability === '') {
+		$errors[] = 'Availability must be global, purchased, or earned.';
 	}
-	if ($portraits['idle'] === '') {
-		$errors[] = 'An idle portrait is required.';
-	}
+	$portraits = $key !== '' && choosology_guide_key_ok($key)
+		? choosology_guide_mascot_scan_portraits($key)
+		: array();
 
 	$lines = array();
 	$lineInput = is_array($input['lines'] ?? null) ? $input['lines'] : array();
@@ -104,6 +86,7 @@ function choosology_guide_admin_validate_mascot(array $input): array
 			'display_name' => $name,
 			'enabled' => !empty($input['enabled']),
 			'is_default' => !empty($input['is_default']),
+			'availability' => $availability,
 			'sort_order' => max(-9999, min(9999, (int) ($input['sort_order'] ?? 0))),
 			'theme' => $theme,
 			'portraits' => $portraits,
@@ -145,7 +128,7 @@ function choosology_guide_admin_validate_interaction(array $input, array $mascot
 	if (!in_array($audience, array('both', 'logged_in', 'anonymous'), true)) {
 		$errors[] = 'Choose a valid audience.';
 	}
-	if ($mascot === '' || !in_array($mascot, $mascotKeys, true)) {
+	if ($mascot !== '' && !in_array($mascot, $mascotKeys, true)) {
 		$errors[] = 'Choose an existing mascot.';
 	}
 
@@ -240,6 +223,7 @@ function choosology_guide_admin_save_mascot(mysqli $db, array $input): array
 	), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 	$enabled = $m['enabled'] ? 1 : 0;
 	$isDefault = $m['is_default'] ? 1 : 0;
+	$availability = mysqli_real_escape_string($db, (string) $m['availability']);
 	$sort = (int) $m['sort_order'];
 	choosology_guide_ensure_schema($db);
 	if ($isDefault) {
@@ -248,10 +232,10 @@ function choosology_guide_admin_save_mascot(mysqli $db, array $input): array
 	$ok = mysqli_query(
 		$db,
 		"INSERT INTO guide_mascots
-			(mascot_key, display_name, enabled, is_default, theme_json, lines_json, portraits_json, sort_order)
-		 VALUES ('$key', '$name', $enabled, $isDefault, '$theme', '$dialog', '$portraits', $sort)
+			(mascot_key, display_name, enabled, is_default, availability, theme_json, lines_json, portraits_json, sort_order)
+		 VALUES ('$key', '$name', $enabled, $isDefault, '$availability', '$theme', '$dialog', '$portraits', $sort)
 		 ON DUPLICATE KEY UPDATE
-			display_name='$name', enabled=$enabled, is_default=$isDefault,
+			display_name='$name', enabled=$enabled, is_default=$isDefault, availability='$availability',
 			theme_json='$theme', lines_json='$dialog', portraits_json='$portraits', sort_order=$sort"
 	);
 	return $ok
@@ -379,7 +363,8 @@ function choosology_guide_admin_reset_interaction(mysqli $db, string $key): arra
 function choosology_guide_admin_preview(
 	mysqli $db,
 	array $interactionInput,
-	string $beatId = ''
+	string $beatId = '',
+	string $previewMascot = ''
 ): array {
 	$mascots = choosology_guide_load_mascots($db);
 	$keys = array_map(static function (array $m): string {
@@ -390,9 +375,13 @@ function choosology_guide_admin_preview(
 		return array('ok' => false, 'error' => implode(' ', $validated['errors']));
 	}
 	$interaction = $validated['value'];
-	$mascot = choosology_guide_pick_mascot($mascots, (string) $interaction['mascot_key']);
-	if (!$mascot) {
+	$preferred = trim($previewMascot) !== '' ? trim($previewMascot) : (string) $interaction['mascot_key'];
+	if ($preferred !== '' && !in_array($preferred, $keys, true)) {
 		return array('ok' => false, 'error' => 'Mascot not found.');
+	}
+	$mascot = choosology_guide_pick_mascot($mascots, $preferred);
+	if (!$mascot) {
+		return array('ok' => false, 'error' => 'Choose a mascot to preview.');
 	}
 	$feature = (string) $interaction['feature_key'];
 	$offer = choosology_guide_present(
@@ -410,9 +399,94 @@ function choosology_guide_admin_preview(
 	if (!$offer) {
 		return array('ok' => false, 'error' => 'Preview could not be rendered.');
 	}
+	$html = choosology_guide_render_panel($offer, 'classic');
+	$html = str_replace(
+		array('id="guide_panel"', 'data-guide-choice='),
+		array('id="guide_preview_panel"', 'data-guide-preview-choice='),
+		$html
+	);
 	return array(
 		'ok' => true,
 		'offer' => $offer,
-		'html' => choosology_guide_render_panel($offer, 'classic'),
+		'html' => $html,
+	);
+}
+
+/**
+ * Pose names already used by beats, plus the standard set and any png on disk.
+ *
+ * @return list<string>
+ */
+function choosology_guide_admin_expected_poses(mysqli $db): array
+{
+	$poses = array(
+		'done' => true,
+		'explain' => true,
+		'idle' => true,
+		'offer' => true,
+	);
+	foreach (choosology_guide_load_interactions($db) as $interaction) {
+		$beats = $interaction['beats'] ?? array();
+		if (!is_array($beats)) {
+			continue;
+		}
+		foreach ($beats as $beat) {
+			if (!is_array($beat)) {
+				continue;
+			}
+			$pose = strtolower(trim((string) ($beat['pose'] ?? '')));
+			if (choosology_guide_key_ok($pose)) {
+				$poses[$pose] = true;
+			}
+		}
+	}
+	$root = dirname(__DIR__) . '/images/mascots';
+	if (is_dir($root)) {
+		$entries = scandir($root);
+		if (is_array($entries)) {
+			foreach ($entries as $entry) {
+				if ($entry === '.' || $entry === '..' || !choosology_guide_key_ok((string) $entry)) {
+					continue;
+				}
+				foreach (array_keys(choosology_guide_mascot_scan_portraits((string) $entry)) as $pose) {
+					$poses[$pose] = true;
+				}
+			}
+		}
+	}
+	$list = array_keys($poses);
+	sort($list);
+	return $list;
+}
+
+/**
+ * @param list<string> $expectedPoses
+ * @return array{found:array<string,string>,missing:list<string>,poses:list<string>}
+ */
+function choosology_guide_pose_inventory(string $key, array $expectedPoses, ?string $baseDir = null): array
+{
+	$found = choosology_guide_mascot_scan_portraits($key, $baseDir);
+	$poses = array();
+	foreach ($expectedPoses as $pose) {
+		$pose = strtolower(trim((string) $pose));
+		if (choosology_guide_key_ok($pose)) {
+			$poses[$pose] = true;
+		}
+	}
+	foreach (array_keys($found) as $pose) {
+		$poses[$pose] = true;
+	}
+	$list = array_keys($poses);
+	sort($list);
+	$missing = array();
+	foreach ($list as $pose) {
+		if (!isset($found[$pose])) {
+			$missing[] = $pose;
+		}
+	}
+	return array(
+		'found' => $found,
+		'missing' => $missing,
+		'poses' => $list,
 	);
 }

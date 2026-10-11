@@ -49,6 +49,13 @@ $action = trim((string) ($data['action'] ?? 'state'));
 $admin = (string) $_SESSION['user'];
 
 if ($action === 'state') {
+	$poses = choosology_guide_admin_expected_poses($db);
+	$mascots = choosology_guide_load_mascots($db);
+	foreach ($mascots as $index => $mascot) {
+		$inventory = choosology_guide_pose_inventory((string) $mascot['key'], $poses);
+		$mascots[$index]['pose_files'] = $inventory['found'];
+		$mascots[$index]['pose_missing'] = $inventory['missing'];
+	}
 	choosology_restricted_json(array(
 		'ok' => 1,
 		'users' => choosology_restricted_usernames($db),
@@ -56,8 +63,21 @@ if ($action === 'state') {
 		'comments' => choosology_restricted_pending_comments($db),
 		'events' => choosology_guide_event_registry(),
 		'features' => choosology_guide_feature_registry(),
-		'mascots' => choosology_guide_load_mascots($db),
+		'poses' => $poses,
+		'mascots' => $mascots,
 		'interactions' => choosology_guide_load_interactions($db),
+	));
+}
+
+if ($action === 'scan_poses') {
+	$key = strtolower(trim((string) ($data['key'] ?? '')));
+	$poses = choosology_guide_admin_expected_poses($db);
+	$inventory = choosology_guide_pose_inventory($key, $poses);
+	choosology_restricted_json(array(
+		'ok' => 1,
+		'poses' => $inventory['poses'],
+		'found' => $inventory['found'],
+		'missing' => $inventory['missing'],
 	));
 }
 
@@ -134,7 +154,8 @@ if ($action === 'preview_interaction') {
 	choosology_restricted_json(choosology_guide_admin_preview(
 		$db,
 		is_array($data['interaction'] ?? null) ? $data['interaction'] : array(),
-		(string) ($data['beat_id'] ?? '')
+		(string) ($data['beat_id'] ?? ''),
+		(string) ($data['mascot_key'] ?? '')
 	));
 }
 if ($action === 'reset_my_guide_progress') {

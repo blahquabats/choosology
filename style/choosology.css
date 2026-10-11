@@ -8900,6 +8900,18 @@ body.clipboard-modal-open
     border: 2px solid var(--ms-room-slate);
     box-shadow: 0 10px 28px rgba(0,0,0,0.28);
 }
+.ms-room-overlay--full .ms-room-overlay-backdrop
+{
+    display: none;
+}
+.ms-room-overlay--full .ms-room-overlay-panel
+{
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    box-shadow: none;
+}
 .ms-room-overlay-head
 {
     display: flex;
@@ -9381,12 +9393,100 @@ body.clipboard-modal-open
     margin: 0.35rem 0 0.65rem;
     color: #505960;
 }
-.restricted-guide-grid
+.restricted-mascot-layout
 {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.8fr);
+    gap: 0.85rem;
     align-items: start;
+}
+.restricted-preview-bar
+{
+    align-items: end;
+}
+.restricted-preview-bar > label
+{
+    min-width: 14rem;
+}
+.restricted-pose-control
+{
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+}
+.restricted-pose-control .restricted-beat-pose-custom
+{
+    min-width: 7rem;
+}
+.restricted-pose-gallery
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+    gap: 0.45rem;
+}
+.restricted-pose
+{
+    margin: 0;
+    border: 1px solid #aaa18f;
+    background: #fffdf8;
+    text-align: center;
+    padding: 0.35rem;
+}
+.restricted-pose img,
+.restricted-pose-missing
+{
+    display: block;
+    width: 100%;
+    height: 4.6rem;
+    object-fit: contain;
+}
+.restricted-pose-missing
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: repeating-linear-gradient(-45deg, #f3efe4, #f3efe4 6px, #e7e0d2 6px, #e7e0d2 12px);
+    color: #8b1d29;
+    font: 700 0.68rem/1 Consolas, monospace;
+    text-transform: uppercase;
+}
+.restricted-pose figcaption
+{
+    margin-top: 0.25rem;
+    font: 700 0.68rem/1.2 Consolas, monospace;
+}
+.restricted-pose.is-missing
+{
+    border-style: dashed;
+    border-color: #8b1d29;
+}
+.restricted-dock
+{
+    position: absolute;
+    right: 28px;
+    bottom: 28px;
+    z-index: 5;
+    width: min(24rem, calc(100% - 40px));
+    pointer-events: none;
+}
+.restricted-dock .guide-panel--classic
+{
+    position: static;
+    width: 100%;
+    pointer-events: none;
+}
+.restricted-dock .guide-panel--classic .guide-portrait,
+.restricted-dock .guide-panel--classic .guide-bubble
+{
+    pointer-events: auto;
+}
+.restricted-dock #guide_mascot_preview .guide-choice
+{
+    cursor: default;
+}
+.restricted-dock #guide_mascot_preview .guide-choice:hover
+{
+    background: #fffdf8;
 }
 .restricted-card
 {
@@ -9509,17 +9609,6 @@ label.restricted-check input
 {
     margin-top: 0.35rem;
 }
-.restricted-preview
-{
-    min-height: 1rem;
-    margin-top: 0.75rem;
-}
-.restricted-preview .guide-panel--classic
-{
-    position: static;
-    width: min(34rem, 100%);
-    pointer-events: auto;
-}
 .restricted-comments
 {
     display: grid;
@@ -9553,7 +9642,7 @@ label.restricted-check input
 }
 @media (max-width: 850px)
 {
-    .restricted-guide-grid,
+    .restricted-mascot-layout,
     .restricted-fields--two,
     .restricted-fields--three
     {

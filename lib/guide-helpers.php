@@ -72,6 +72,59 @@ function choosology_guide_key_ok(string $key): bool
 	return (bool) preg_match('/^[a-z0-9_]{1,64}$/', $key);
 }
 
+function choosology_guide_availability_normalize(string $value): string
+{
+	$value = strtolower(trim($value));
+	return in_array($value, array('global', 'purchased', 'earned'), true) ? $value : '';
+}
+
+/**
+ * Pose portraits are files named {pose}.png inside images/mascots/{mascot key}/.
+ *
+ * @return array<string, string> pose => site-relative path
+ */
+function choosology_guide_mascot_scan_portraits(string $key, ?string $baseDir = null): array
+{
+	$key = strtolower(trim($key));
+	if (!choosology_guide_key_ok($key)) {
+		return array();
+	}
+	$base = $baseDir ?? (dirname(__DIR__) . '/images/mascots');
+	if (!is_dir($base)) {
+		return array();
+	}
+	$baseReal = realpath($base);
+	if ($baseReal === false) {
+		return array();
+	}
+	$dir = $baseReal . DIRECTORY_SEPARATOR . $key;
+	if (!is_dir($dir)) {
+		return array();
+	}
+	$dirReal = realpath($dir);
+	$prefix = rtrim($baseReal, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+	if ($dirReal === false || strpos($dirReal, $prefix) !== 0) {
+		return array();
+	}
+	$files = scandir($dirReal);
+	if ($files === false) {
+		return array();
+	}
+	$found = array();
+	foreach ($files as $file) {
+		if (!preg_match('/^([a-z0-9_]{1,64})\.png$/', strtolower((string) $file), $match)) {
+			continue;
+		}
+		$pose = $match[1];
+		if (!choosology_guide_key_ok($pose) || !is_file($dirReal . DIRECTORY_SEPARATOR . $file)) {
+			continue;
+		}
+		$found[$pose] = 'images/mascots/' . $key . '/' . $pose . '.png';
+	}
+	ksort($found);
+	return $found;
+}
+
 /**
  * @return list<array<string, mixed>>
  */
@@ -83,6 +136,7 @@ function choosology_guide_mascot_seed(): array
 			'display_name' => 'Lab Guide',
 			'enabled' => 1,
 			'is_default' => 1,
+			'availability' => 'global',
 			'sort_order' => 0,
 			'theme' => array(
 				'accent' => '#c4a35a',
@@ -108,6 +162,37 @@ function choosology_guide_mascot_seed(): array
 				'next' => 'Next',
 			),
 		),
+		array(
+			'key' => 'specimen_scout',
+			'display_name' => 'Specimen Scout',
+			'enabled' => 1,
+			'is_default' => 0,
+			'availability' => 'earned',
+			'sort_order' => 10,
+			'theme' => array(
+				'accent' => '#e8a84a',
+				'paper' => '#e7f2ef',
+				'ink' => '#14221f',
+			),
+			'portraits' => array(
+				'idle' => 'images/mascots/specimen_scout/idle.png',
+				'offer' => 'images/mascots/specimen_scout/offer.png',
+				'explain' => 'images/mascots/specimen_scout/explain.png',
+				'done' => 'images/mascots/specimen_scout/done.png',
+			),
+			'lines' => array(
+				'offer_help' => array('Specimen Scout here. First time in {feature}? I can walk you through it.'),
+				'explain' => array('{body}'),
+				'done' => array('Logged and filed. Carry on.'),
+			),
+			'choices' => array(
+				'accept' => 'Walk me through it',
+				'decline' => 'I have this',
+				'later' => 'Not now',
+				'done' => 'Filed',
+				'next' => 'Continue',
+			),
+		),
 	);
 }
 
@@ -124,7 +209,7 @@ function choosology_guide_interaction_seed(): array
 			'feature_key' => 'graph_editor',
 			'surface' => 'classic',
 			'audience' => 'both',
-			'mascot_key' => 'lab_guide',
+			'mascot_key' => '',
 			'frequency' => 'once',
 			'priority' => 100,
 			'enabled' => 1,
@@ -163,6 +248,7 @@ function choosology_guide_ensure_schema(mysqli $db): void
 			display_name varchar(80) NOT NULL,
 			enabled tinyint(1) NOT NULL DEFAULT 1,
 			is_default tinyint(1) NOT NULL DEFAULT 0,
+			availability varchar(16) NOT NULL DEFAULT \'global\',
 			theme_json text NOT NULL,
 			lines_json mediumtext NOT NULL,
 			portraits_json text NOT NULL,
@@ -226,6 +312,13 @@ function choosology_guide_ensure_schema(mysqli $db): void
 	} catch (Throwable $e) {
 		/* users table may be absent in a partial install */
 	}
+	$availability = mysqli_query($db, "SHOW COLUMNS FROM guide_mascots LIKE 'availability'");
+	if ($availability && mysqli_num_rows($availability) === 0) {
+		mysqli_query(
+			$db,
+			"ALTER TABLE guide_mascots ADD COLUMN availability varchar(16) NOT NULL DEFAULT 'global' AFTER is_default"
+		);
+	}
 
 	choosology_guide_seed_defaults($db);
 	$done = true;
@@ -258,13 +351,17 @@ function choosology_guide_seed_defaults(mysqli $db): void
 		$name = mysqli_real_escape_string($db, (string) $mascot['display_name']);
 		$enabled = !empty($mascot['enabled']) ? 1 : 0;
 		$isDefault = !empty($mascot['is_default']) ? 1 : 0;
+		$availability = mysqli_real_escape_string(
+			$db,
+			choosology_guide_availability_normalize((string) ($mascot['availability'] ?? 'global')) ?: 'global'
+		);
 		$sort = (int) ($mascot['sort_order'] ?? 0);
 		@mysqli_query(
 			$db,
 			"INSERT INTO guide_mascots
-				(mascot_key, display_name, enabled, is_default, theme_json, lines_json, portraits_json, sort_order)
+				(mascot_key, display_name, enabled, is_default, availability, theme_json, lines_json, portraits_json, sort_order)
 			 VALUES
-				('$esc', '$name', $enabled, $isDefault, '" . mysqli_real_escape_string($db, $theme) . "',
+				('$esc', '$name', $enabled, $isDefault, '$availability', '" . mysqli_real_escape_string($db, $theme) . "',
 				 '" . mysqli_real_escape_string($db, $dialog) . "',
 				 '" . mysqli_real_escape_string($db, $portraits) . "', $sort)"
 		);
@@ -900,11 +997,14 @@ function choosology_guide_load_mascots(mysqli $db): array
 		if (!is_array($dialog)) {
 			$dialog = array();
 		}
+		$availability = choosology_guide_availability_normalize((string) ($row['availability'] ?? 'global'));
 		$out[] = array(
 			'key' => (string) ($row['mascot_key'] ?? ''),
 			'display_name' => (string) ($row['display_name'] ?? ''),
 			'enabled' => (int) ($row['enabled'] ?? 0) === 1,
 			'is_default' => (int) ($row['is_default'] ?? 0) === 1,
+			'availability' => $availability !== '' ? $availability : 'global',
+			'sort_order' => (int) ($row['sort_order'] ?? 0),
 			'theme' => is_array($theme) ? $theme : array(),
 			'lines' => is_array($dialog['lines'] ?? null) ? $dialog['lines'] : array(),
 			'choices' => is_array($dialog['choices'] ?? null) ? $dialog['choices'] : array(),
