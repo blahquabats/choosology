@@ -45,6 +45,41 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(page).not.toContain("restricted_portrait_idle");
   });
 
+  test("News Desk and Degree records live in the hub", () => {
+    const src = read("scripts/restricted.js");
+    expect(src).toContain("save_news");
+    expect(src).toContain("delete_news");
+    expect(src).toContain("degree_record");
+    expect(src).toContain("ChoosologyRestrictedFocus");
+    const page = read("mystuff/restricted.php");
+    expect(page).toContain('data-restricted-view="news"');
+    expect(page).toContain("News Desk");
+    expect(page).toContain("restricted_news_form");
+    expect(page).toContain("restricted_degree_catalog");
+    expect(page).toContain("restricted_record_form");
+    const api = read("ajax/restricted.php");
+    expect(api).toContain("'save_news'");
+    expect(api).toContain("'delete_news'");
+    expect(api).toContain("'degree_record'");
+    expect(api).toContain("degree_counts");
+  });
+
+  test("admin tools outside the hub use the shared role gate, not a username", () => {
+    const root = path.join(__dirname, "../..");
+    ["news.php", "labfeed.php", "ajax/fetchcomments.php", "scripts/index.js", "lite/news.php"].forEach((rel) => {
+      expect(read(rel)).not.toContain("Grasssmith");
+    });
+    expect(read("news.php")).toContain("choosology_restricted_is_admin()");
+    expect(read("ajax/fetchcomments.php")).toContain("choosology_restricted_is_admin()");
+    expect(fs.existsSync(path.join(root, "ajax/addnews.php"))).toBe(false);
+    expect(fs.existsSync(path.join(root, "ajax/managenews.php"))).toBe(false);
+    const shell = read("scripts/index.js");
+    expect(shell).not.toContain("news-add-form");
+    expect(shell).not.toContain("managenews.php");
+    expect(shell).toContain("news-admin-desk-link");
+    expect(read("news.php")).toContain('href="#/mystuff/restricted"');
+  });
+
   test("JSON endpoint enforces admin access", () => {
     const src = read("ajax/restricted.php");
     expect(src).toContain("choosology_restricted_is_admin");
@@ -62,5 +97,9 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(page).toContain("Grant Degree");
     expect(page).toContain("Award DataScrip");
     expect(page).toContain("Comment review");
+    expect(page).toContain("News desk");
+    expect(page).toContain("choosology_news_admin_save");
+    expect(page).toContain("choosology_restricted_degree_record");
+    expect(read("lite/news.php")).toContain("restricted.php?news=news:");
   });
 });

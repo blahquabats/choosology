@@ -83,6 +83,28 @@ function choosology_undo_connect_string_mutation(string $value): string
 }
 
 /**
+ * Parse an urlencoded form body or query string into plain string fields.
+ *
+ * connect.php rewrites $_POST/$_GET with SQL and HTML escaping, which corrupts
+ * multi-line text and markup. Pages that store what was typed read the
+ * original request through this instead; callers must still escape for SQL/HTML.
+ *
+ * @return array<string,string>
+ */
+function choosology_raw_form_fields(string $raw): array
+{
+	$parsed = array();
+	parse_str($raw, $parsed);
+	$out = array();
+	foreach ($parsed as $key => $value) {
+		if (is_string($value)) {
+			$out[(string) $key] = $value;
+		}
+	}
+	return $out;
+}
+
+/**
  * Whether an <img src> is allowed in saved screen HTML.
  */
 function choosology_screen_html_img_src_allowed(string $src): bool

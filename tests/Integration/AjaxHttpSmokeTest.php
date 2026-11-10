@@ -51,6 +51,33 @@ final class AjaxHttpSmokeTest extends TestCase
 		$this->assertSame('2', trim($body));
 	}
 
+	public function testAdminToolsRefuseAnonymousVisitors(): void
+	{
+		[$code, $body] = $this->httpPostForm('/ajax/restricted.php', array('action' => 'save_news'));
+		$this->assertSame(403, $code);
+		$this->assertStringContainsString('Admin access required.', $body);
+
+		[$code, $body] = $this->httpGet('/mystuff/restricted.php');
+		$this->assertSame(403, $code);
+		$this->assertStringNotContainsString('restricted_news_form', $body);
+
+		[$code, $body] = $this->httpGet('/lite/restricted.php?news=news:0');
+		$this->assertSame(403, $code);
+		$this->assertStringNotContainsString('name="headline"', $body);
+	}
+
+	public function testNewsPageHasNoInlineAdminForAnonymousVisitors(): void
+	{
+		[$code, $body] = $this->httpGet('/news.php');
+		$this->assertSame(200, $code);
+		$this->assertStringNotContainsString('news-admin-desk-link', $body);
+		$this->assertStringNotContainsString('news-add-form', $body);
+
+		/* The old owner-only endpoints are gone; the News Desk replaced them. */
+		$this->assertSame(404, $this->httpGet('/ajax/addnews.php')[0]);
+		$this->assertSame(404, $this->httpGet('/ajax/managenews.php')[0]);
+	}
+
 	/**
 	 * @return array{0:int,1:string}
 	 */

@@ -317,6 +317,19 @@ button.lite-btn:active {
 	background: #fff;
 }
 
+.lite-form textarea {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	font: 0.95rem/1.35 var(--lite-font);
+	padding: 0.25rem;
+	border: 1px solid var(--lite-shadow);
+	background: #fff;
+	resize: vertical;
+}
+
+.lite-inline-form { display: inline; }
+
 .lite-form .lite-check {
 	display: flex;
 	align-items: center;
