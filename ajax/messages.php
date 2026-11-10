@@ -64,39 +64,18 @@ if ($action === 'unread') {
 }
 
 if ($action === 'recent') {
-	$limit = isset($data['limit']) ? (int) $data['limit'] : 8;
+	$limit = isset($data['limit']) ? (int) $data['limit'] : 12;
 	if ($limit < 1) {
-		$limit = 8;
+		$limit = 12;
 	}
-	if ($limit > 20) {
-		$limit = 20;
+	if ($limit > 50) {
+		$limit = 50;
 	}
-	$res = mysqli_query(
-		$db,
-		"SELECT id, from_user, title, body, sent_date, seen, message_type
-		 FROM messages
-		 WHERE to_user = '$userEsc' AND IFNULL(to_deleted,0) = 0
-		 ORDER BY sent_date DESC, id DESC
-		 LIMIT $limit"
-	);
-	$items = array();
-	if ($res) {
-		while ($row = mysqli_fetch_assoc($res)) {
-			$items[] = array(
-				'id' => (int) $row['id'],
-				'from' => (string) $row['from_user'],
-				'title' => (string) $row['title'],
-				'preview' => substr(trim(strip_tags(html_entity_decode((string) $row['body']))), 0, 120),
-				'sent' => (string) $row['sent_date'],
-				'seen' => (int) $row['seen'] === 1,
-				'type' => (string) $row['message_type'],
-			);
-		}
-	}
+	$unreadOnly = !empty($data['unread_only']);
 	choosology_messages_json(array(
 		'ok' => 1,
 		'unread' => choosology_unread_message_count($user),
-		'items' => $items,
+		'items' => choosology_recent_messages($user, $limit, $unreadOnly),
 	), $jsonFlags);
 }
 
@@ -195,12 +174,12 @@ if ($action === 'get') {
 
 if ($action === 'mark_seen') {
 	$id = isset($data['id']) ? (int) $data['id'] : 0;
-	if ($id > 0) {
-		mysqli_query($db, "UPDATE messages SET seen = 1 WHERE id = $id AND to_user = '$userEsc' LIMIT 1");
-	} else {
-		mysqli_query($db, "UPDATE messages SET seen = 1 WHERE to_user = '$userEsc' AND seen = 0");
-	}
-	choosology_messages_json(array('ok' => 1, 'unread' => choosology_unread_message_count($user)), $jsonFlags);
+	$marked = choosology_mark_message_seen($user, $id);
+	choosology_messages_json(array(
+		'ok' => 1,
+		'marked' => $marked,
+		'unread' => choosology_unread_message_count($user),
+	), $jsonFlags);
 }
 
 if ($action === 'send') {

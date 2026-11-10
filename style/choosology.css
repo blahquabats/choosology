@@ -7216,6 +7216,17 @@ h3.msg-read-title,
 .msg-quick[data-clic-theme="slate"] .msg-quick-title {
     color: #f8fafc;
 }
+.msg-quick[data-clic-theme="slate"] .msg-compose-x {
+    color: #cbd5e1;
+}
+.msg-quick[data-clic-theme="slate"] .msg-quick-mark-all {
+    color: #e2e8f0;
+}
+.msg-quick[data-clic-theme="slate"] .msg-quick-mark-all:hover,
+.msg-quick[data-clic-theme="slate"] .msg-quick-mark-all:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
 
 #tabswindow .ui-tabs-nav .ui-state-active a#mystuff-messages,
 #tabswindow .ui-tabs-nav li.clic-tab.ui-state-active a
@@ -7715,11 +7726,40 @@ body.msg-quick-open {
 }
 .msg-quick-header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 8px;
     padding: 10px 12px;
     border-bottom: 1px solid var(--clic-panel-border, #e7c9a8);
     background: var(--clic-header-bg, linear-gradient(165deg, rgba(180, 83, 9, 0.14) 0%, #fffdf8 100%));
+}
+.msg-quick-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.msg-quick-mark-all {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--clic-accent-dark, #92400e);
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.msg-quick-mark-all:hover,
+.msg-quick-mark-all:focus-visible {
+    background: var(--clic-accent-soft, rgba(180, 83, 9, 0.12));
+    text-decoration: none;
+}
+.msg-quick-mark-all[hidden] {
+    display: none !important;
 }
 .msg-quick-title {
     margin: 0;
@@ -7730,6 +7770,10 @@ body.msg-quick-open {
     overflow: auto;
     flex: 1;
     padding: 0;
+}
+.msg-quick-empty {
+    margin: 0;
+    padding: 14px 12px;
 }
 .msg-quick-list {
     list-style: none;
@@ -7742,6 +7786,17 @@ body.msg-quick-open {
 }
 .msg-quick-item.is-unread {
     background: var(--clic-unread-bg, #fef3c7);
+    border-left: 3px solid var(--clic-accent, #b45309);
+    padding-left: 9px;
+    cursor: pointer;
+}
+.msg-quick-item.is-unread:hover {
+    box-shadow: inset 0 0 0 999px rgba(15, 23, 42, 0.04);
+}
+.msg-quick-item-main:focus-visible {
+    outline: 2px solid var(--clic-accent, #b45309);
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 .msg-quick-item-top {
     display: flex;

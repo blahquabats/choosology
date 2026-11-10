@@ -330,8 +330,9 @@
     });
   }
 
-  function openHotspot(name) {
-    if (!name) return;
+  function openHotspot(rawName) {
+    if (!rawName) return;
+    var name = String(rawName).split("?")[0].split("/")[0];
     if (name === "office" || name === "") {
       closeOverlay();
       closeTrophy();

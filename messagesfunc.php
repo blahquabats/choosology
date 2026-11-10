@@ -100,6 +100,82 @@ function choosology_unread_message_count(?string $user = null): int
 	return (int) ($row['c'] ?? 0);
 }
 
+/**
+ * Recent inbox messages for the header notification dropdown.
+ *
+ * @return list<array{id:int,from:string,title:string,preview:string,sent:string,seen:bool,type:string}>
+ */
+function choosology_recent_messages(string $user, int $limit = 12, bool $unreadOnly = false): array
+{
+	global $db;
+	$user = trim($user);
+	if ($user === '') {
+		return array();
+	}
+	$limit = max(1, min(50, $limit));
+	$userEsc = mysqli_real_escape_string($db, $user);
+	$seenClause = $unreadOnly ? ' AND seen = 0' : '';
+	$res = mysqli_query(
+		$db,
+		"SELECT id, from_user, title, body, sent_date, seen, message_type
+		 FROM messages
+		 WHERE to_user = '$userEsc' AND IFNULL(to_deleted,0) = 0$seenClause
+		 ORDER BY seen ASC, sent_date DESC, id DESC
+		 LIMIT $limit"
+	);
+	$items = array();
+	if (!$res) {
+		return $items;
+	}
+	while ($row = mysqli_fetch_assoc($res)) {
+		$spaced = preg_replace('#<br\s*/?>|</(?:p|div|li|ul|ol|blockquote|h[1-6])>#i', ' ', (string) $row['body']);
+		$decoded = html_entity_decode(is_string($spaced) ? $spaced : (string) $row['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$plain = preg_replace('/\s+/u', ' ', strip_tags($decoded));
+		$plain = trim(is_string($plain) ? $plain : strip_tags($decoded));
+		$preview = function_exists('mb_substr')
+			? mb_substr($plain, 0, 120, 'UTF-8')
+			: substr($plain, 0, 120);
+		$items[] = array(
+			'id' => (int) $row['id'],
+			'from' => (string) $row['from_user'],
+			'title' => (string) $row['title'],
+			'preview' => $preview,
+			'sent' => (string) $row['sent_date'],
+			'seen' => (int) $row['seen'] === 1,
+			'type' => (string) $row['message_type'],
+		);
+	}
+	return $items;
+}
+
+/**
+ * Mark one inbox message ($id > 0) or all unread inbox messages ($id <= 0) as seen for $user.
+ */
+function choosology_mark_message_seen(string $user, int $id = 0): int
+{
+	global $db;
+	$user = trim($user);
+	if ($user === '') {
+		return 0;
+	}
+	$userEsc = mysqli_real_escape_string($db, $user);
+	if ($id > 0) {
+		mysqli_query(
+			$db,
+			"UPDATE messages SET seen = 1
+			 WHERE id = $id AND to_user = '$userEsc' AND seen = 0 AND IFNULL(to_deleted,0) = 0
+			 LIMIT 1"
+		);
+	} else {
+		mysqli_query(
+			$db,
+			"UPDATE messages SET seen = 1
+			 WHERE to_user = '$userEsc' AND seen = 0 AND IFNULL(to_deleted,0) = 0"
+		);
+	}
+	return max(0, (int) mysqli_affected_rows($db));
+}
+
 /** Admin usernames (usertype >= 1). */
 function choosology_admin_usernames(): array
 {

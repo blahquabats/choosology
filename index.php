@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=restricted5" />
+    <link rel="stylesheet" href="style/choosology.css?v=clic4" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -67,16 +67,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle/3.0.3/jquery.cycle.all.min.js"></script>
     <script src="scripts/jquery-dateFormat.js"></script>
     <script src="scripts/jquery-minicolors/jquery.minicolors.min.js"></script>
-    <script src="scripts/lib/choosology-utils.js"></script>
+    <script src="scripts/lib/choosology-utils.js?v=clic4"></script>
     <script src="scripts/choosology.js"></script>
     <!-- Konva 10.3.0 UMD (official npm konva.min.js). jsDelivr mirrors npm; cdnjs /ajax/libs/konva/10.x/konva.min.js was 404 when checked — swap to cdnjs when they publish this version. -->
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
     <script src='scripts/index.js?v=newsdesk2'></script>
-    <script src='scripts/messages.js?v=clic3'></script>
+    <script src='scripts/messages.js?v=clic4'></script>
     <script src='scripts/clipboard.js?v=clip7'></script>
-    <script src='scripts/office.js?v=office3'></script>
+    <script src='scripts/office.js?v=office4'></script>
     <script src='scripts/guide.js?v=guide1'></script>
     <script src='scripts/restricted.js?v=4'></script>
     <script src='scripts/routes.js?v=newsdesk2'></script>
