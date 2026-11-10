@@ -41,7 +41,7 @@ function choosology_lite_header(array $opts = array()): void
 	$title = (string) ($opts['title'] ?? 'Choosology 3.1');
 	$active = (string) ($opts['active'] ?? '');
 	$pageTitle = $title === 'Choosology 3.1' ? $title : ($title . ' — Choosology 3.1');
-	$css = htmlspecialchars(choosology_site_url('lite/style.css?v=guide1'), ENT_QUOTES, 'UTF-8');
+	$css = htmlspecialchars(choosology_site_url('lite/style.css?v=desk1'), ENT_QUOTES, 'UTF-8');
 	$home = htmlspecialchars(choosology_lite_url('index.php'), ENT_QUOTES, 'UTF-8');
 	$browse = htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8');
 	$news = htmlspecialchars(choosology_lite_url('news.php'), ENT_QUOTES, 'UTF-8');
