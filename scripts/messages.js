@@ -515,7 +515,9 @@
 		quickState.items = result.items;
 		quickState.unread = Math.max(0, (parseInt(quickState.unread, 10) || 0) - 1);
 		updateBadges(quickState.unread);
-		renderQuickModal();
+		if (!opts.closing) {
+			renderQuickModal();
+		}
 		post("mark_seen", { id: targetId }).done(function (res) {
 			if (!res || !res.ok) {
 				if (!opts.closing) {
