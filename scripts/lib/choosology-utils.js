@@ -86,6 +86,31 @@
     return String(title || "").trim().length > 0;
   }
 
+  function filterUnreadQuickItems(items) {
+    if (!Array.isArray(items)) {
+      return [];
+    }
+    return items.filter(function (it) {
+      return it && !it.seen;
+    });
+  }
+
+  function removeQuickItemById(items, id) {
+    var target = parseInt(id, 10) || 0;
+    if (!Array.isArray(items) || target < 1) {
+      return { items: Array.isArray(items) ? items.slice() : [], removed: false };
+    }
+    var removed = false;
+    var next = items.filter(function (it) {
+      if (it && (parseInt(it.id, 10) || 0) === target) {
+        removed = true;
+        return false;
+      }
+      return true;
+    });
+    return { items: next, removed: removed };
+  }
+
   return {
     CLIC_THEMES: CLIC_THEMES.slice(),
     count: count,
@@ -96,6 +121,8 @@
     choosologyUrlSafeGlobal: urlSafe,
     normalizeClicTheme: normalizeClicTheme,
     formatUnreadBadge: formatUnreadBadge,
-    isValidExperimentTitle: isValidExperimentTitle
+    isValidExperimentTitle: isValidExperimentTitle,
+    filterUnreadQuickItems: filterUnreadQuickItems,
+    removeQuickItemById: removeQuickItemById
   };
 });

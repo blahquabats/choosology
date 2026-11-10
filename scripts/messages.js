@@ -102,6 +102,14 @@
 		});
 	}
 
+	var activeCenter = null;
+
+	function refreshMountedCenter() {
+		if (activeCenter && activeCenter.root && $.contains(document.documentElement, activeCenter.root)) {
+			activeCenter.reload();
+		}
+	}
+
 	/* ---------- Full Messages center (My Office / CLIC) ---------- */
 	function initCenter(root) {
 		if (!root || root.getAttribute("data-msg-bound") === "1") {
@@ -175,7 +183,7 @@
 			$("#msg_report_btn").toggle(!!msg.can_report);
 		}
 
-		function openMessage(id) {
+		function openMessage(id, andReport) {
 			state.selectedId = id;
 			post("get", { id: id }).done(function (res) {
 				if (!res || !res.ok) {
@@ -186,6 +194,9 @@
 				}
 				updateBadges(res.unread);
 				showRead(res.message);
+				if (andReport && res.message && res.message.can_report) {
+					openReport(id);
+				}
 				loadList();
 			});
 		}
@@ -378,17 +389,179 @@
 
 		// Deep-link ?id= / hash query
 		var m = (window.location.hash || "").match(/[?&]id=(\d+)/);
+		var wantReport = /[?&]report=1(?:&|$)/.test(window.location.hash || "");
 		if (m) {
 			state.selectedId = parseInt(m[1], 10) || 0;
 		}
 
+		activeCenter = {
+			root: root,
+			reload: loadList,
+			openMessage: openMessage
+		};
+
 		loadList();
 		if (state.selectedId) {
-			openMessage(state.selectedId);
+			openMessage(state.selectedId, wantReport);
 		}
 	}
 
-	/* ---------- Slim modal ---------- */
+	/* ---------- Slim notification dropdown ---------- */
+	var QUICK_LIMIT = 20;
+	var quickState = {
+		items: [],
+		unread: 0
+	};
+
+	function syncQuickHeader() {
+		var n = parseInt(quickState.unread, 10) || 0;
+		$("#msg_quick_title").text(n > 0 ? ("New (" + n + ")") : "New");
+		var $markAll = $("#msg_quick_mark_all");
+		if (n > 0) {
+			$markAll.removeAttr("hidden").prop("disabled", false);
+		} else {
+			$markAll.attr("hidden", "hidden").prop("disabled", true);
+		}
+	}
+
+	function renderQuickModal() {
+		syncQuickHeader();
+		var $body = $("#msg_quick_body");
+		if (!$body.length) {
+			return;
+		}
+		var items = quickState.items || [];
+		if (!items.length) {
+			$body.html("<p class='msg-hint msg-quick-empty'>No new notifications.</p>");
+			return;
+		}
+		var prevScroll = $body.scrollTop();
+		var $list = $("<ul class='msg-quick-list' id='msg_quick_list'/>");
+		items.forEach(function (it) {
+			var id = parseInt(it.id, 10) || 0;
+			var isReplyable = !it.type || it.type === "normal";
+			var canReport = it.from && it.from !== "Choosology";
+			var $li = $("<li class='msg-quick-item is-unread'/>").attr("data-id", String(id));
+			var $main = $("<div class='msg-quick-item-main' role='button' tabindex='0' title='Click to mark as read'/>");
+			$main.append($("<div class='msg-quick-item-top'/>")
+				.append($("<strong/>").text(it.from))
+				.append($("<time/>").text(it.sent || "")));
+			$main.append($("<div class='msg-quick-item-title'/>").text(it.title || "(no subject)"));
+			$main.append($("<div class='msg-quick-item-preview'/>").text(it.preview || ""));
+			$li.append($main);
+			var $actions = $("<div class='msg-quick-item-actions'/>");
+			$actions.append(
+				$("<a class='msg-quick-link'/>")
+					.attr("href", "#/mystuff/messages?id=" + id)
+					.attr("data-quick-nav", "open")
+					.text(isReplyable ? "Open / reply" : "Open")
+			);
+			if (canReport) {
+				$actions.append($("<span class='msg-quick-sep'/>").text("·"));
+				$actions.append(
+					$("<a class='msg-quick-link msg-quick-link--danger'/>")
+						.attr("href", "#/mystuff/messages?id=" + id + "&report=1")
+						.attr("data-quick-nav", "report")
+						.text("Report")
+				);
+			}
+			$li.append($actions);
+			$list.append($li);
+		});
+		$body.empty().append($list);
+		$body.scrollTop(prevScroll);
+	}
+
+	function loadQuickItems() {
+		return post("recent", { limit: QUICK_LIMIT, unread_only: 1 }).done(function (res) {
+			if (!res || !res.ok) {
+				$("#msg_quick_body").html("<p class='msg-hint msg-quick-empty'>" + esc((res && res.error) || "Could not load.") + "</p>");
+				return;
+			}
+			var rawItems = res.items || [];
+			quickState.items = (window.ChoosologyUtils && window.ChoosologyUtils.filterUnreadQuickItems)
+				? window.ChoosologyUtils.filterUnreadQuickItems(rawItems)
+				: rawItems.filter(function (it) { return it && !it.seen; });
+			quickState.unread = parseInt(res.unread, 10) || 0;
+			updateBadges(quickState.unread);
+			renderQuickModal();
+		}).fail(function () {
+			$("#msg_quick_body").html("<p class='msg-hint msg-quick-empty'>Network error.</p>");
+		});
+	}
+
+	function dismissQuickItem(id, opts) {
+		opts = opts || {};
+		var targetId = parseInt(id, 10) || 0;
+		if (targetId < 1) {
+			return;
+		}
+		var result = (window.ChoosologyUtils && window.ChoosologyUtils.removeQuickItemById)
+			? window.ChoosologyUtils.removeQuickItemById(quickState.items, targetId)
+			: (function () {
+				var removed = false;
+				var next = (quickState.items || []).filter(function (it) {
+					if (it && (parseInt(it.id, 10) || 0) === targetId) {
+						removed = true;
+						return false;
+					}
+					return true;
+				});
+				return { items: next, removed: removed };
+			})();
+		if (!result.removed) {
+			return;
+		}
+		quickState.items = result.items;
+		quickState.unread = Math.max(0, (parseInt(quickState.unread, 10) || 0) - 1);
+		updateBadges(quickState.unread);
+		renderQuickModal();
+		post("mark_seen", { id: targetId }).done(function (res) {
+			if (!res || !res.ok) {
+				if (!opts.closing) {
+					loadQuickItems();
+				}
+				return;
+			}
+			quickState.unread = parseInt(res.unread, 10) || 0;
+			updateBadges(quickState.unread);
+			if (!opts.closing) {
+				if (!quickState.items.length && quickState.unread > 0) {
+					loadQuickItems();
+				} else {
+					syncQuickHeader();
+				}
+			}
+			refreshMountedCenter();
+		}).fail(function () {
+			if (!opts.closing) {
+				loadQuickItems();
+			}
+		});
+	}
+
+	function markAllQuickSeen() {
+		if ((parseInt(quickState.unread, 10) || 0) < 1 && !quickState.items.length) {
+			return;
+		}
+		quickState.items = [];
+		quickState.unread = 0;
+		updateBadges(0);
+		renderQuickModal();
+		post("mark_seen", {}).done(function (res) {
+			if (!res || !res.ok) {
+				loadQuickItems();
+				return;
+			}
+			quickState.unread = parseInt(res.unread, 10) || 0;
+			updateBadges(quickState.unread);
+			syncQuickHeader();
+			refreshMountedCenter();
+		}).fail(function () {
+			loadQuickItems();
+		});
+	}
+
 	function ensureModal() {
 		if ($("#msg_quick_modal").length) {
 			return;
@@ -399,8 +572,11 @@
 			'  <div class="msg-quick-panel" role="dialog" aria-modal="true" aria-labelledby="msg_quick_title">' +
 			'    <div class="msg-quick-header">' +
 			'      <div><p class="clic-legend clic-legend--compact">CLIC</p>' +
-			'      <p class="msg-quick-title" id="msg_quick_title" role="heading" aria-level="2">Recent</p></div>' +
-			'      <button type="button" class="msg-compose-x" id="msg_quick_close" aria-label="Close">&times;</button>' +
+			'      <p class="msg-quick-title" id="msg_quick_title" role="heading" aria-level="2">New</p></div>' +
+			'      <div class="msg-quick-header-actions">' +
+			'        <button type="button" class="msg-quick-mark-all" id="msg_quick_mark_all" hidden>Mark all as read</button>' +
+			'        <button type="button" class="msg-compose-x" id="msg_quick_close" aria-label="Close">&times;</button>' +
+			'      </div>' +
 			'    </div>' +
 			'    <div class="msg-quick-body" id="msg_quick_body"></div>' +
 			'    <div class="msg-quick-footer">' +
@@ -409,7 +585,41 @@
 			'  </div>' +
 			'</div>';
 		$("body").append(html);
-		$("#msg_quick_close, #msg_quick_modal .msg-quick-backdrop").on("click", closeModal);
+		$("#msg_quick_close, #msg_quick_modal .msg-quick-backdrop, #msg_quick_inbox").on("click", closeModal);
+		$("#msg_quick_mark_all").on("click", function (e) {
+			e.preventDefault();
+			markAllQuickSeen();
+		});
+		$("#msg_quick_body")
+			.on("click", ".msg-quick-item", function (e) {
+				if ($(e.target).closest(".msg-quick-item-actions a").length) {
+					return;
+				}
+				var id = parseInt($(this).attr("data-id"), 10) || 0;
+				dismissQuickItem(id);
+			})
+			.on("keydown", ".msg-quick-item-main", function (e) {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					var id = parseInt($(this).closest(".msg-quick-item").attr("data-id"), 10) || 0;
+					dismissQuickItem(id);
+				}
+			})
+			.on("click", "[data-quick-nav]", function () {
+				var $link = $(this);
+				var targetHash = String($link.attr("href") || "");
+				var id = parseInt($link.closest(".msg-quick-item").attr("data-id"), 10) || 0;
+				var wantReport = $link.attr("data-quick-nav") === "report";
+				dismissQuickItem(id, { closing: true });
+				closeModal();
+				if (targetHash && window.location.hash === targetHash) {
+					if (activeCenter && activeCenter.root && $.contains(document.documentElement, activeCenter.root)) {
+						activeCenter.openMessage(id, wantReport);
+					} else if (typeof window.loadTab === "function") {
+						window.loadTab("messages");
+					}
+				}
+			});
 		$(document).on("keydown.msgQuick", function (e) {
 			if (e.key === "Escape" && !$("#msg_quick_modal").hasClass("msg-quick--hidden")) {
 				closeModal();
@@ -420,49 +630,11 @@
 	function openModal() {
 		ensureModal();
 		applyClicTheme(getClicTheme());
-		$("#msg_quick_body").html("<p class='msg-hint'>Loading…</p>");
+		syncQuickHeader();
+		$("#msg_quick_body").html("<p class='msg-hint msg-quick-empty'>Loading…</p>");
 		$("#msg_quick_modal").removeClass("msg-quick--hidden").attr("aria-hidden", "false");
 		$("body").addClass("msg-quick-open");
-		post("recent", { limit: 8 }).done(function (res) {
-			if (!res || !res.ok) {
-				$("#msg_quick_body").html("<p class='msg-hint'>" + esc((res && res.error) || "Could not load.") + "</p>");
-				return;
-			}
-			updateBadges(res.unread);
-			var items = res.items || [];
-			if (!items.length) {
-				$("#msg_quick_body").html("<p class='msg-hint'>No messages yet.</p>");
-				return;
-			}
-			var $list = $("<ul class='msg-quick-list'/>");
-			items.forEach(function (it) {
-				var $li = $("<li class='msg-quick-item" + (it.seen ? "" : " is-unread") + "'/>");
-				$li.append($("<div class='msg-quick-item-top'/>")
-					.append($("<strong/>").text(it.from))
-					.append($("<time/>").text(it.sent || "")));
-				$li.append($("<div class='msg-quick-item-title'/>").text(it.title || "(no subject)"));
-				$li.append($("<div class='msg-quick-item-preview'/>").text(it.preview || ""));
-				var $actions = $("<div class='msg-quick-item-actions'/>");
-				$actions.append(
-					$("<a class='msg-quick-link'/>")
-						.attr("href", "#/mystuff/messages?id=" + it.id)
-						.text("Open / reply")
-						.on("click", closeModal)
-				);
-				$actions.append($("<span class='msg-quick-sep'/>").text("·"));
-				$actions.append(
-					$("<a class='msg-quick-link msg-quick-link--danger'/>")
-						.attr("href", "#/mystuff/messages?id=" + it.id)
-						.text("Report")
-						.on("click", closeModal)
-				);
-				$li.append($actions);
-				$list.append($li);
-			});
-			$("#msg_quick_body").empty().append($list);
-		}).fail(function () {
-			$("#msg_quick_body").html("<p class='msg-hint'>Network error.</p>");
-		});
+		loadQuickItems();
 	}
 
 	function closeModal() {
