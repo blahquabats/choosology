@@ -22,6 +22,7 @@ require_once CHOOSOLOGY_ROOT . '/lib/guide-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/guide-admin-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/clipboard-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/lib/restricted-helpers.php';
+require_once CHOOSOLOGY_ROOT . '/lib/news-admin-helpers.php';
 require_once CHOOSOLOGY_ROOT . '/icondefs.php';
 require_once CHOOSOLOGY_ROOT . '/tests/Support/ChoosologyTestDb.php';
 require_once CHOOSOLOGY_ROOT . '/tests/Support/WorkflowHttpClient.php';

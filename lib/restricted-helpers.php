@@ -8,6 +8,7 @@
 
 require_once __DIR__ . '/clipboard-helpers.php';
 require_once __DIR__ . '/datascrip-helpers.php';
+require_once __DIR__ . '/feed-helpers.php';
 
 function choosology_restricted_is_admin(): bool
 {
@@ -35,6 +36,66 @@ function choosology_restricted_usernames(mysqli $db): array
 }
 
 /**
+ * Resolve a typed username to the stored account name.
+ */
+function choosology_restricted_find_user(mysqli $db, string $name): ?string
+{
+	$name = trim($name);
+	if ($name === '') {
+		return null;
+	}
+	$esc = mysqli_real_escape_string($db, $name);
+	$r = mysqli_query($db, "SELECT name FROM users WHERE name='$esc' LIMIT 1");
+	$row = $r ? mysqli_fetch_assoc($r) : null;
+	return $row ? (string) $row['name'] : null;
+}
+
+/**
+ * Holder counts per Degree, in catalog order.
+ *
+ * @return array<string,int>
+ */
+function choosology_restricted_degree_counts(mysqli $db): array
+{
+	choosology_clipboard_ensure_schema($db);
+	$counts = array_fill_keys(array_keys(choosology_achievement_catalog()), 0);
+	$r = mysqli_query(
+		$db,
+		'SELECT achievement_key, COUNT(*) AS c FROM user_achievements GROUP BY achievement_key'
+	);
+	if ($r) {
+		while ($row = mysqli_fetch_assoc($r)) {
+			$key = (string) ($row['achievement_key'] ?? '');
+			if (isset($counts[$key])) {
+				$counts[$key] = (int) ($row['c'] ?? 0);
+			}
+		}
+	}
+	return $counts;
+}
+
+/**
+ * One researcher's Degree record: every catalog Degree with its earned date, if any.
+ *
+ * @return array{ok:bool,error?:string,user?:string,degrees?:list<array{key:string,label:string,blurb:string,group:string,earned_at:?string,earned_label:string}>}
+ */
+function choosology_restricted_degree_record(mysqli $db, string $target): array
+{
+	if (trim($target) === '') {
+		return array('ok' => false, 'error' => 'Researcher username required.');
+	}
+	$name = choosology_restricted_find_user($db, $target);
+	if ($name === null) {
+		return array('ok' => false, 'error' => 'Unknown researcher.');
+	}
+	$degrees = choosology_user_achievements($db, $name);
+	foreach ($degrees as $i => $degree) {
+		$degrees[$i]['earned_label'] = choosology_feed_date_label((string) ($degree['earned_at'] ?? ''));
+	}
+	return array('ok' => true, 'user' => $name, 'degrees' => $degrees);
+}
+
+/**
  * @return array{ok:bool,error?:string,already?:bool,user?:string,degree?:string,label?:string}
  */
 function choosology_restricted_grant_degree(
@@ -54,12 +115,12 @@ function choosology_restricted_grant_degree(
 		return array('ok' => false, 'error' => 'Unknown Degree.');
 	}
 	choosology_clipboard_ensure_schema($db);
-	$escTarget = mysqli_real_escape_string($db, $target);
-	$ur = mysqli_query($db, "SELECT name FROM users WHERE name='$escTarget' LIMIT 1");
-	if (!$ur || !($userRow = mysqli_fetch_assoc($ur))) {
+	$found = choosology_restricted_find_user($db, $target);
+	if ($found === null) {
 		return array('ok' => false, 'error' => 'Unknown recipient.');
 	}
-	$target = (string) $userRow['name'];
+	$target = $found;
+	$escTarget = mysqli_real_escape_string($db, $target);
 	$escDegree = mysqli_real_escape_string($db, $degreeKey);
 	$earned = mysqli_query(
 		$db,
