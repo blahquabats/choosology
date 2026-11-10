@@ -440,6 +440,9 @@
       .off("keydown.choosologyOffice")
       .on("keydown.choosologyOffice", function (e) {
         if (e.key === "Escape" || e.keyCode === 27) {
+          if ($(e.target).closest(".minicolors").length) {
+            return;
+          }
           if ($root && !$root.find("#ms_trophy_view").hasClass("ms-trophy-view--hidden")) {
             closeTrophy();
           } else {

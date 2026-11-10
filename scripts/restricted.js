@@ -9,6 +9,7 @@
 	var state = null;
 	var poseFiles = {};
 	var scanTimer = null;
+	var suppressPreview = false;
 
 	function $dock() {
 		return dock && dock.length ? dock : root.find("#restricted_dock");
@@ -176,12 +177,11 @@
 		var idle = poseFiles.idle || "";
 		var $panel = $("<aside>")
 			.attr({ id: "guide_mascot_preview", role: "region", "aria-label": name })
-			.addClass("guide-panel guide-panel--classic")
-			.css({
-				"--guide-accent": hexColor(theme.accent, "#c4a35a"),
-				"--guide-paper": hexColor(theme.paper, "#f4ecd8"),
-				"--guide-ink": hexColor(theme.ink, "#1c1a16")
-			});
+			.addClass("guide-panel guide-panel--classic");
+		var panelNode = $panel.get(0);
+		panelNode.style.setProperty("--guide-accent", hexColor(theme.accent, "#c4a35a"));
+		panelNode.style.setProperty("--guide-paper", hexColor(theme.paper, "#f4ecd8"));
+		panelNode.style.setProperty("--guide-ink", hexColor(theme.ink, "#1c1a16"));
 		if (idle) {
 			$("<img>").addClass("guide-portrait").attr({ src: assetUrl(idle), alt: "", width: 88, height: 106 }).appendTo($panel);
 		} else {
@@ -209,7 +209,7 @@
 		root.find("#restricted_mascot_enabled").prop("checked", !!mascot.enabled);
 		root.find("#restricted_mascot_default").prop("checked", !!mascot.is_default);
 		["accent", "paper", "ink"].forEach(function (token) {
-			root.find("#restricted_theme_" + token).val((mascot.theme || {})[token] || "");
+			setThemeColor(root.find("#restricted_theme_" + token), (mascot.theme || {})[token] || "");
 		});
 		renderPoseGallery(mascot.pose_files || {}, mascot.pose_missing || blankMascot().pose_missing);
 		root.find("#restricted_lines_offer").val(((mascot.lines || {}).offer_help || []).join("\n"));
@@ -489,6 +489,27 @@
 		});
 	}
 
+	function setThemeColor($input, color) {
+		var next = color || "";
+		if ($input.data("minicolors-initialized")) {
+			suppressPreview = true;
+			$input.minicolors("value", next);
+			suppressPreview = false;
+			return;
+		}
+		$input.val(next);
+	}
+
+	function initThemePickers() {
+		if (!root || typeof $.fn.minicolors !== "function") return;
+		root.find("#restricted_mascot_form .adv-color").minicolors({
+			change: function () {
+				if (!suppressPreview) updateMascotPreview();
+			},
+			theme: "default"
+		});
+	}
+
 	function mountDock() {
 		dock = root.find("#restricted_dock");
 		var $panel = root.closest(".ms-room-overlay-panel");
@@ -527,7 +548,7 @@
 			}, 250);
 		});
 		root.on("input.restricted change.restricted", "#restricted_mascot_form input, #restricted_mascot_form textarea, #restricted_mascot_form select", function () {
-			if ($(this).is("#restricted_mascot_select")) return;
+			if (suppressPreview || $(this).is("#restricted_mascot_select")) return;
 			updateMascotPreview();
 		});
 		root.on("click.restricted", "#restricted_mascot_save", function () {
@@ -660,6 +681,7 @@
 		root = $(node);
 		if (!root.length) return;
 		mountDock();
+		initThemePickers();
 		bind();
 		reload();
 	}
