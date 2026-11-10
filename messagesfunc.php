@@ -128,7 +128,8 @@ function choosology_recent_messages(string $user, int $limit = 12, bool $unreadO
 		return $items;
 	}
 	while ($row = mysqli_fetch_assoc($res)) {
-		$decoded = html_entity_decode((string) $row['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$spaced = preg_replace('#<br\s*/?>|</(?:p|div|li|ul|ol|blockquote|h[1-6])>#i', ' ', (string) $row['body']);
+		$decoded = html_entity_decode(is_string($spaced) ? $spaced : (string) $row['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
 		$plain = preg_replace('/\s+/u', ' ', strip_tags($decoded));
 		$plain = trim(is_string($plain) ? $plain : strip_tags($decoded));
 		$preview = function_exists('mb_substr')

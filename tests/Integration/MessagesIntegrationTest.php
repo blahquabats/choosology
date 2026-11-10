@@ -50,7 +50,7 @@ final class MessagesIntegrationTest extends TestCase
 	{
 		$first = choosology_send_message('testuser', 'Choosology', 'Degree awarded', 'Lab Initiate', 'system');
 		$second = choosology_send_message('testuser', 'adminuser', 'Hello', 'First note', 'normal');
-		$third = choosology_send_message('testuser', 'Choosology', 'DataScrip award', 'Received 10', 'system');
+		$third = choosology_send_message('testuser', 'Choosology', 'DataScrip award', 'Received 10<br><span>Awarded by admin</span>', 'system');
 		$otherUserMsg = choosology_send_message('adminuser', 'testuser', 'Ping', 'Admin copy', 'normal');
 
 		$this->assertSame(3, choosology_unread_message_count('testuser'));
@@ -58,6 +58,7 @@ final class MessagesIntegrationTest extends TestCase
 
 		$unreadList = choosology_recent_messages('testuser', 20, true);
 		$this->assertCount(3, $unreadList);
+		$this->assertSame('Received 10 Awarded by admin', $unreadList[0]['preview']);
 
 		// Another user cannot mark testuser's message as read.
 		$this->assertSame(0, choosology_mark_message_seen('adminuser', $first));
