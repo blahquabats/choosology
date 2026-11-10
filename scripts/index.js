@@ -421,7 +421,8 @@ function loadTab(loc, retryAfterShow)
         if (window.ChoosologyOffice && typeof ChoosologyOffice.mount === "function") {
             ChoosologyOffice.mount($officePanel.find(".ms-room-page")[0]);
         }
-        if (hubLoc && hubLoc !== "office" && window.ChoosologyOffice && typeof ChoosologyOffice.openHotspot === "function") {
+        /* "office" closes any open panel, so #/mystuff returns to the bare room. */
+        if (window.ChoosologyOffice && typeof ChoosologyOffice.openHotspot === "function") {
             ChoosologyOffice.openHotspot(hubLoc);
             window.__choosologyOfficeHotspot = null;
         }

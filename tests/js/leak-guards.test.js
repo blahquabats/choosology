@@ -27,6 +27,8 @@ describe("Leak and race guards", () => {
     /* The route must leave the first load to the show-complete handler... */
     expect(shell).toContain('mystuffOpening = which === "mystuff"');
     expect(routes).toContain('activemenu === "mystuff" && !mystuffOpening');
+    /* Sammy passes the capture as an array; office.js compares hotspot names with ===. */
+    expect(routes).toContain("splat = String(splat);");
     /* ...and the retry must not reload a room that already has a hotspot open. */
     expect(shell).toMatch(
       /retryToken !== window\.__choosologyLoadTabRetryToken[\s\S]{0,400}find\("\.ms-room-page"\)\.length\) return;/

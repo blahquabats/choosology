@@ -33,6 +33,8 @@
                 if (splat === undefined || splat === null) {
                     splat = '';
                 }
+                /* Sammy hands regex captures over as an array; hotspot names are compared as strings. */
+                splat = String(splat);
                 /* Normalize empty / office / results / etc. into the Classic room hub. */
                 pendingMystuffTab = splat !== '' ? splat : 'office';
                 showMenuOption("mystuff");
