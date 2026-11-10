@@ -2,12 +2,15 @@
 header('Content-Type: text/xml');
 include ('../connect.php');
 include ('../messagesfunc.php');
+require_once __DIR__ . '/../lib/restricted-helpers.php';
 
 $user = '';
 if (isset($_SESSION['user']))
 {
 	$user = $_SESSION['user'];
 }
+
+$isAdmin = choosology_restricted_is_admin();
 
 $error = '0';
 
@@ -20,7 +23,6 @@ $error = '0';
   if($page < 1) $page=1;
   if(!$board) exit;
   if ($board === 'review') {
-      $isAdmin = !empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1;
       if (!$isAdmin) {
           echo '<response><id>review</id><insertion>0</insertion><deletion>0</deletion><num>0</num><pagesize>0</pagesize><error>Not authorized.</error></response>';
           exit;
@@ -74,7 +76,8 @@ $error = '0';
 
    if ($delete)
    {
-       $dq = "delete from comments where id = '$delete' and (author = '$user' OR '$user' = 'The Grasssmith') limit 1";
+       $ownerClause = $isAdmin ? '' : " and author = '" . mysqli_real_escape_string($db, $user) . "'";
+       $dq = "delete from comments where id = '$delete'$ownerClause limit 1";
        if(@mysqli_query($db, $dq))
        {
            $rows=mysqli_affected_rows($db);
@@ -187,7 +190,7 @@ if ($bresult = @mysqli_fetch_array($bres))
     &lt;span class='CAbyline-main'&gt;{$count}. {$extrainfo} &lt;span class='CAdate'&gt;{$dateEsc}&lt;/span&gt;";
     if($board=="review" or substr($board, 0, 6) == "byuser") $comments .= " on ".convertBoardName($bresult['whichboard']);
     $comments .= "&lt;/span&gt;";
-    if($user == $bresult['name'] || $user == "The Grasssmith")
+    if($user == $bresult['name'] || $isAdmin)
     {
         $comments .= "&lt;div class='CAbylineopts'&gt;";
         if(substr($board, 0, 6) !== "byuser") $comments .= "&lt;a onclick=\"deleteCAComment('{$bresult['commentid']}', '{$bresult['whichboard']}')\"&gt;delete&lt;/a&gt;";
