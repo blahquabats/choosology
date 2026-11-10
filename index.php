@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=restricted4" />
+    <link rel="stylesheet" href="style/choosology.css?v=restricted5" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -73,13 +73,13 @@
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
-    <script src='scripts/index.js'></script>
+    <script src='scripts/index.js?v=newsdesk1'></script>
     <script src='scripts/messages.js?v=clic3'></script>
     <script src='scripts/clipboard.js?v=clip7'></script>
     <script src='scripts/office.js?v=office3'></script>
     <script src='scripts/guide.js?v=guide1'></script>
-    <script src='scripts/restricted.js?v=3'></script>
-    <script src='scripts/routes.js'></script>
+    <script src='scripts/restricted.js?v=4'></script>
+    <script src='scripts/routes.js?v=newsdesk1'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
 

@@ -3332,123 +3332,6 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     margin-top: 14px;
 }
 
-.news-admin-form
-{
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.news-admin-kind
-{
-    margin: 0;
-    padding: 0;
-    border: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 14px;
-}
-
-.news-admin-kind .news-admin-label,
-.news-admin-kind legend.news-admin-label
-{
-    float: none;
-    width: 100%;
-    padding: 0;
-}
-
-.news-admin-radio
-{
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-    color: #263747;
-    cursor: pointer;
-}
-
-.news-admin-radio input
-{
-    margin: 0;
-}
-
-.news-admin-field--disabled
-{
-    opacity: 0.55;
-}
-
-.lab-feed-item-row
-{
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.lab-feed-item-admin
-{
-    display: flex;
-    gap: 6px;
-    margin-left: 2px;
-}
-
-.lab-feed-item-admin button
-{
-    font-family: Consolas, "Courier New", Courier, monospace;
-    font-size: 0.54rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 3px 7px;
-    border: 1px solid #2d8a5e;
-    border-left: 3px solid #1b5c3d;
-    border-radius: 0 3px 3px 0;
-    background: rgba(255, 255, 255, 0.9);
-    color: #1b5c3d;
-    cursor: pointer;
-}
-
-.lab-feed-item-admin .news-admin-delete-update
-{
-    border-color: #b91c1c;
-    border-left-color: #7f1d1d;
-    color: #7f1d1d;
-}
-
-.news-admin-label
-{
-    font-family: Consolas, "Courier New", Courier, monospace;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #34495e;
-}
-
-.news-admin-form input,
-.news-admin-form textarea
-{
-    width: 100%;
-    border: 1px solid #b8c6d8;
-    border-radius: 4px;
-    padding: 6px 7px;
-    box-sizing: border-box;
-    font: inherit;
-}
-
-.news-admin-form textarea
-{
-    resize: vertical;
-}
-
-.news-admin-actions
-{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-}
-
 .news-article-admin
 {
     display: flex;
@@ -3456,16 +3339,28 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     margin-top: 14px;
 }
 
-.news-admin-status
+.news-admin-desk-link
 {
-    font-size: 0.78rem;
-    color: #24543a;
+    display: inline-block;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 4px 9px;
+    border: 1px solid #782f36;
+    border-left: 4px solid #4d171d;
+    border-radius: 0 3px 3px 0;
+    background: rgba(255, 255, 255, 0.9);
+    color: #4d171d;
 }
 
-.news-admin-status--error
+.news-admin-desk-link:hover,
+.news-admin-desk-link:focus
 {
-    color: #9b1c1c;
-    font-weight: 700;
+    background: #782f36;
+    color: #fff5e8;
 }
 
 .news-card
@@ -9702,6 +9597,89 @@ label.restricted-check input
     padding: 1rem;
     color: #59635e;
     text-align: center;
+}
+.restricted-form label[hidden]
+{
+    display: none;
+}
+.restricted-news-kinds
+{
+    margin-top: 0.55rem;
+}
+.restricted-degree-layout
+{
+    display: grid;
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+}
+.restricted-degree-column
+{
+    display: grid;
+    gap: 0.7rem;
+}
+.restricted-table
+{
+    width: 100%;
+    margin-top: 0.55rem;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+.restricted-table th,
+.restricted-table td
+{
+    border-bottom: 1px solid #cdc5b4;
+    padding: 0.35rem 0.4rem;
+    text-align: left;
+    vertical-align: top;
+}
+.restricted-table thead th
+{
+    border-bottom: 2px solid #344b5e;
+    color: #4b545b;
+    font: 700 0.68rem/1.2 Consolas, monospace;
+    text-transform: uppercase;
+}
+.restricted-table .restricted-table-num,
+.restricted-table thead th:last-child
+{
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.restricted-record-head
+{
+    margin: 0.65rem 0 0.3rem;
+    font-weight: 700;
+}
+.restricted-record-list
+{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.restricted-record-list li
+{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 1.9rem;
+    border-bottom: 1px solid #cdc5b4;
+    padding: 0.2rem 0;
+    font-size: 0.8rem;
+}
+.restricted-record-label
+{
+    flex: 1 1 auto;
+    font-weight: 700;
+}
+.restricted-record-state
+{
+    color: #62696e;
+    font: 0.7rem/1.2 Consolas, monospace;
+}
+.restricted-record-list li.is-held .restricted-record-state
+{
+    color: #2c5a3a;
 }
 @media (max-width: 850px)
 {
