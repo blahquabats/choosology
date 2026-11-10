@@ -15,6 +15,24 @@ describe("Leak and race guards", () => {
     expect(src).toContain("if (gen !== menuNavGen) return");
   });
 
+  test("a My Office hotspot link is loaded once, after the window has opened", () => {
+    const shell = fs.readFileSync(
+      path.join(__dirname, "../../scripts/index.js"),
+      "utf8"
+    );
+    const routes = fs.readFileSync(
+      path.join(__dirname, "../../scripts/routes.js"),
+      "utf8"
+    );
+    /* The route must leave the first load to the show-complete handler... */
+    expect(shell).toContain('mystuffOpening = which === "mystuff"');
+    expect(routes).toContain('activemenu === "mystuff" && !mystuffOpening');
+    /* ...and the retry must not reload a room that already has a hotspot open. */
+    expect(shell).toMatch(
+      /retryToken !== window\.__choosologyLoadTabRetryToken[\s\S]{0,400}find\("\.ms-room-page"\)\.length\) return;/
+    );
+  });
+
   test("view.js clears theater via controller and guards screen AJAX", () => {
     const src = fs.readFileSync(
       path.join(__dirname, "../../scripts/view.js"),

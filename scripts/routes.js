@@ -36,7 +36,10 @@
                 /* Normalize empty / office / results / etc. into the Classic room hub. */
                 pendingMystuffTab = splat !== '' ? splat : 'office';
                 showMenuOption("mystuff");
-                if (activemenu === "mystuff") {
+                /* showMenuOption marks My Office active before its window has slid in.
+                   Loading here as well made the show-complete handler reload the plain
+                   room a second later, closing the hotspot this route asked for. */
+                if (activemenu === "mystuff" && !mystuffOpening) {
                     loadTab(pendingMystuffTab);
                     pendingMystuffTab = null;
                 }

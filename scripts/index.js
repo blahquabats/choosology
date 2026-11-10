@@ -2,6 +2,8 @@
 var sammy_app;
 var activemenu;
 var pendingMystuffTab = null;
+/* True while My Office is sliding in; its show-complete handler owns the first room load. */
+var mystuffOpening = false;
 /** Bumps on each menu navigation so stale hide/show/load callbacks are ignored. */
 var menuNavGen = 0;
 var configmenu = {
@@ -668,6 +670,8 @@ function loadTab(loc, retryAfterShow)
     window.setTimeout(function () {
         if (retryToken !== window.__choosologyLoadTabRetryToken) return;
         if (!$("#tabswindow").length) return;
+        /* A room that already loaded may have a hotspot open; reloading would close it. */
+        if (tabs.find(".ui-tabs-panel").eq(which).find(".ms-room-page").length) return;
         try { tabs.tabs("refresh"); } catch (err3) { /* ignore */ }
         tabs.tabs("option", "active", which);
         try { tabs.tabs("load", which); } catch (err4) { /* ignore */ }
@@ -714,6 +718,7 @@ function showMenuOption(which, param)
     var toshow = $(conf.show);
     var toeffect = conf.effect ? conf.effect : "slide";
     var hideconf = null;
+    mystuffOpening = which === "mystuff";
 
     if(activemenu)
     {
@@ -772,6 +777,7 @@ function showMenuOption(which, param)
                             });
                         }
                     if (which === "mystuff") {
+                        mystuffOpening = false;
                         try { $("#tabswindow").tabs("refresh"); } catch (err) { /* ignore */ }
                         $("#tabswindow").addClass("ms-room-hub-mode");
                         if (pendingMystuffTab) {
