@@ -35,6 +35,12 @@
                 }
                 /* Sammy hands regex captures over as an array; hotspot names are compared as strings. */
                 splat = String(splat);
+                /* Legacy deep link: admin tools moved out of My Office to #/admin. */
+                var mystuffTab = String(splat || "").split("?")[0].split("/")[0];
+                if (mystuffTab === "restricted") {
+                    window.location.hash = "#/admin";
+                    return;
+                }
                 /* Normalize empty / office / results / etc. into the Classic room hub. */
                 pendingMystuffTab = splat !== '' ? splat : 'office';
                 showMenuOption("mystuff");
@@ -45,10 +51,20 @@
                     loadTab(pendingMystuffTab);
                     pendingMystuffTab = null;
                 }
-                var guideTab = String(splat || "").split("?")[0].split("/")[0];
-                if (guideTab === "ledger" && window.ChoosologyGuide) {
+                if (mystuffTab === "ledger" && window.ChoosologyGuide) {
                     window.ChoosologyGuide.signal("ledger");
                 }
+        });
+        this.get('#/admin', function(context) {
+                if ($("body").attr("data-logged-in") !== "1") {
+                    window.location.hash = "#/home";
+                    return;
+                }
+                if (!$("#adminwindow").length || !$("#admin_nav").length) {
+                    window.location.hash = "#/home";
+                    return;
+                }
+                showMenuOption("admin");
         });
         this.get('#/search', function(context) {
                 showMenuOption("browse");

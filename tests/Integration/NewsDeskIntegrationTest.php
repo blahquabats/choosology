@@ -4,7 +4,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 /**
- * RESTRICTED News Desk and Degree records against choosology_test.
+ * Admin News Desk and Degree records against choosology_test.
  */
 final class NewsDeskIntegrationTest extends TestCase
 {

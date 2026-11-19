@@ -91,7 +91,7 @@ function choosology_lite_header(array $opts = array()): void
 	if ($user !== '') {
 		echo $nav('ledger', $ledger, 'Ledger') . "\n";
 		if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) {
-			echo $nav('restricted', $restricted, 'RESTRICTED') . "\n";
+			echo $nav('restricted', $restricted, 'Admin') . "\n";
 		}
 		echo $nav('login', $login, 'Sign out') . "\n";
 	} else {

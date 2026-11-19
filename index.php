@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=clic4" />
+    <link rel="stylesheet" href="style/choosology.css?v=admin1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -73,13 +73,13 @@
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
-    <script src='scripts/index.js?v=newsdesk2'></script>
+    <script src='scripts/index.js?v=admin1'></script>
     <script src='scripts/messages.js?v=clic4'></script>
     <script src='scripts/clipboard.js?v=clip7'></script>
-    <script src='scripts/office.js?v=office4'></script>
+    <script src='scripts/office.js?v=admin1'></script>
     <script src='scripts/guide.js?v=guide1'></script>
-    <script src='scripts/restricted.js?v=4'></script>
-    <script src='scripts/routes.js?v=newsdesk2'></script>
+    <script src='scripts/restricted.js?v=admin1'></script>
+    <script src='scripts/routes.js?v=admin1'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
 
@@ -113,6 +113,12 @@
     <?php echo icon("person", "64px"); ?><br />
     My&nbsp;Office
 </div>
+<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+<div class='navbutton maroon navdisabled' id="admin_nav" onclick="location.href='#/admin'" >
+    <?php echo icon("lock", "64px"); ?><br />
+    Admin
+</div>
+<?php } ?>
 <?php } ?>
 <div class="header" style='cursor: pointer;' onclick="location.href='#/home'">
 <img src="images/logo_horizontal_sm.png" />
@@ -182,9 +188,6 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
         <li><a href="mystuff/ledger.php" id='mystuff-ledger' class='tabsa' data-loc='ledger'>Ledger</a></li>
         <li><a href="mystuff/degrees.php" id='mystuff-degrees' class='tabsa' data-loc='degrees'>Degrees</a></li>
         <li><a href="mystuff/account.php" id='mystuff-account' class='tabsa' data-loc='account'>My Information</a></li>
-        <?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
-        <li><a href="mystuff/restricted.php" id='mystuff-restricted' class='tabsa' data-loc='restricted'>RESTRICTED</a></li>
-        <?php } ?>
     </ul>
 </div>
 <?php } ?>
@@ -198,6 +201,11 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 <div class='genericwindow' id="browsewindow">
     <div class='ajaxloader'></div>
 </div>
+<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+<div class='genericwindow' id="adminwindow">
+    <div class='ajaxloader'></div>
+</div>
+<?php } ?>
 
 <div class='genericwindow' id="viewwindow">
     <div class='ajaxloader'></div>

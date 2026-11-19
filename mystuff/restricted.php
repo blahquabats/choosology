@@ -1,6 +1,6 @@
 <?php
 /**
- * RESTRICTED — admin tools and lab-guide configuration.
+ * Admin hub — lab tools and guide configuration (Classic #/admin).
  */
 require_once __DIR__ . '/../connect.php';
 require_once __DIR__ . '/../auxfuncs.php';
@@ -8,21 +8,21 @@ require_once __DIR__ . '/../lib/restricted-helpers.php';
 
 if (!choosology_restricted_is_admin()) {
 	http_response_code(403);
-	echo "<div class='intabs'><p class='error'>RESTRICTED: lab admin access required.</p></div>";
+	echo "<div class='intabs'><p class='error'>Admin: lab admin access required.</p></div>";
 	return;
 }
 ?>
 <div class="intabs restricted-page" id="restricted_center">
 	<header class="restricted-head">
 		<div>
-			<p class="restricted-eyebrow">My Office · authorization level <?php echo (int) $_SESSION['usertype']; ?></p>
-			<h2 class="restricted-title">RESTRICTED</h2>
+			<p class="restricted-eyebrow">Admin · authorization level <?php echo (int) $_SESSION['usertype']; ?></p>
+			<h2 class="restricted-title">Admin</h2>
 			<p class="restricted-lede">Lab administration: guide programming, publications, credentials, treasury, and moderation.</p>
 		</div>
 		<span class="restricted-stamp" aria-hidden="true">AUTHORIZED<br>PERSONNEL</span>
 	</header>
 
-	<nav class="restricted-nav" aria-label="Restricted tools">
+	<nav class="restricted-nav" aria-label="Admin tools">
 		<button type="button" class="restricted-nav-btn is-active" data-restricted-view="mascots">Mascot Packs</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="beats">Dialog Beats</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="news">News Desk</button>

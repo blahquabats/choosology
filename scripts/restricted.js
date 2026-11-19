@@ -1,5 +1,5 @@
 /**
- * My Office → RESTRICTED admin hub.
+ * Classic top-level Admin hub (#/admin).
  */
 (function (window, $) {
 	"use strict";

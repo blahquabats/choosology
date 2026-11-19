@@ -1,6 +1,6 @@
 <?php
 /**
- * Lite RESTRICTED hub.
+ * Lite Admin hub.
  *
  * The full visual guide editor is Classic-only; Lite keeps the news desk,
  * credentials, treasury, and comment moderation usable with plain forms.
@@ -15,7 +15,7 @@ global $db;
 
 if (!choosology_restricted_is_admin()) {
 	http_response_code(403);
-	choosology_lite_header(array('title' => 'RESTRICTED', 'active' => 'restricted'));
+	choosology_lite_header(array('title' => 'Admin', 'active' => 'restricted'));
 	echo '<fieldset class="lite-panel"><legend>Access denied</legend><p>Lab admin authorization is required.</p></fieldset>';
 	choosology_lite_footer();
 	exit;
@@ -131,12 +131,12 @@ if ($draft !== null && $newsItem !== null
 
 $recordQuery = trim((string) ($queryFields['record'] ?? ''));
 $record = $recordQuery !== '' ? choosology_restricted_degree_record($db, $recordQuery) : null;
-$classicGuide = choosology_classic_url('mystuff/restricted');
+$classicGuide = choosology_classic_url('admin');
 
-choosology_lite_header(array('title' => 'RESTRICTED', 'active' => 'restricted'));
+choosology_lite_header(array('title' => 'Admin', 'active' => 'restricted'));
 ?>
 <fieldset class="lite-panel lite-restricted">
-	<legend>RESTRICTED — Admin terminal</legend>
+	<legend>Admin — Lab terminal</legend>
 	<p>Authorized lab administration.</p>
 	<?php if ($flash !== '') { ?>
 	<p class="lite-alert"><?php echo htmlspecialchars($flash, ENT_QUOTES, 'UTF-8'); ?></p>

@@ -2,7 +2,7 @@
 /**
  * Admin writes for `news` posts and one-line `updates` patch notes.
  *
- * Callers enforce the admin gate. Classic RESTRICTED and Lite share these
+ * Callers enforce the admin gate. Classic Admin and Lite share these
  * rules so the two desks cannot drift.
  */
 

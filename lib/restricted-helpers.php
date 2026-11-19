@@ -1,6 +1,6 @@
 <?php
 /**
- * Shared admin-only actions for the RESTRICTED hub.
+ * Shared admin-only actions for the Admin hub.
  *
  * Callers must still enforce the session gate. These helpers validate targets
  * so Classic, Lite, and JSON endpoints use the same rules.
