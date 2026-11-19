@@ -5,19 +5,28 @@ function read(rel) {
   return fs.readFileSync(path.join(__dirname, "../..", rel), "utf8");
 }
 
-describe("RESTRICTED admin hub wiring", () => {
-  test("Classic shell and office expose the admin-only destination", () => {
+describe("Admin hub wiring", () => {
+  test("Classic shell exposes a top-level Admin nav sibling, not a My Office tab", () => {
     const index = read("index.php");
     const office = read("mystuff/office.php");
     const officeJs = read("scripts/office.js");
-    expect(index).toContain("mystuff/restricted.php");
+    const routes = read("scripts/routes.js");
+    const shell = read("scripts/index.js");
+    expect(index).toContain('id="admin_nav"');
+    expect(index).toContain("Admin");
+    expect(index).toContain('id="adminwindow"');
     expect(index).toContain("scripts/restricted.js");
     expect(index).toContain("$_SESSION['usertype']");
-    expect(office).toContain('data-hotspot="restricted"');
-    expect(office).toContain("RESTRICTED");
-    expect(officeJs).toContain('restricted: "mystuff/restricted.php"');
-    expect(officeJs).toContain("ms-room-overlay--full");
+    expect(index).not.toContain("mystuff-restricted");
+    expect(index).not.toContain('href="mystuff/restricted.php"');
+    expect(office).not.toContain('data-hotspot="restricted"');
+    expect(office).not.toContain("RESTRICTED");
+    expect(officeJs).not.toContain('restricted: "mystuff/restricted.php"');
     expect(officeJs).toContain('closest(".minicolors")');
+    expect(shell).toContain('id: \'admin\'');
+    expect(shell).toContain('load: "mystuff/restricted.php"');
+    expect(routes).toContain("this.get('#/admin'");
+    expect(routes).toContain('window.location.hash = "#/admin"');
   });
 
   test("restricted client supports all requested admin tools", () => {
@@ -37,10 +46,13 @@ describe("RESTRICTED admin hub wiring", () => {
     const css = read("style/choosology.css");
     expect(css).toContain(".restricted-btn--primary:hover");
     expect(css).toContain("color: #1c2833");
+    expect(css).toContain(".navbutton.maroon");
+    expect(css).toContain("#adminwindow");
     const page = read("mystuff/restricted.php");
     expect(page).toContain("Mascot Packs");
     expect(page).toContain("Dialog Beats");
     expect(page).toContain("restricted_mascot_availability");
+    expect(page).toContain(">Admin</h2>");
     expect(page).not.toContain("restricted_interaction_mascot");
     expect(page).not.toContain("restricted_portrait_idle");
   });
@@ -77,7 +89,8 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(shell).not.toContain("news-add-form");
     expect(shell).not.toContain("managenews.php");
     expect(shell).toContain("news-admin-desk-link");
-    expect(read("news.php")).toContain('href="#/mystuff/restricted"');
+    expect(read("news.php")).toContain('href="#/admin"');
+    expect(read("news.php")).not.toContain('href="#/mystuff/restricted"');
   });
 
   test("JSON endpoint enforces admin access", () => {
@@ -87,13 +100,14 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(src).toContain("403");
   });
 
-  test("Lite offers a gated RESTRICTED page and Classic guide editor link", () => {
+  test("Lite offers a gated Admin page and Classic guide editor link", () => {
     const shell = read("lite/_bootstrap.php");
     const page = read("lite/restricted.php");
     expect(shell).toContain("restricted.php");
-    expect(shell).toContain("RESTRICTED");
+    expect(shell).toContain("'Admin'");
     expect(page).toContain("choosology_restricted_is_admin");
     expect(page).toContain("Open mascot and interaction editor in Classic");
+    expect(page).toContain("choosology_classic_url('admin')");
     expect(page).toContain("Grant Degree");
     expect(page).toContain("Award DataScrip");
     expect(page).toContain("Comment review");

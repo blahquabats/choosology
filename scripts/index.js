@@ -59,6 +59,19 @@ var configmenu = {
       effect: "slide",
       bgcol: 1
   },
+  admin : {
+      show: "#adminwindow",
+      id: 'admin',
+      name: 'Admin',
+      load: "mystuff/restricted.php",
+      bgtop: 0,
+      bgleft: 0,
+      bgcolor: "#e8d8d8",
+      direction: "up",
+      effect: "blind",
+      transfer: 1,
+      bgcol: 2
+  },
   viewadv : {
       show: "#viewwindow",
       id: 'viewadv',
@@ -141,7 +154,6 @@ $(function() {
             $("#mystuff-ledger").attr("href", 'mystuff/ledger.php');
             $("#mystuff-degrees").attr("href", 'mystuff/degrees.php');
             $("#mystuff-account").attr("href", 'mystuff/account.php');
-            $("#mystuff-restricted").attr("href", 'mystuff/restricted.php');
             $(".tabsa").on("mousedown", function(e){
                 var loc = $(this).attr("data-loc");
                 window.location.hash = "#/mystuff/" + loc;
@@ -341,8 +353,9 @@ $(function() {
                         {
                             $("body").removeAttr("data-logged-in");
                             $("#mystuff_nav").hide();
+                            $("#admin_nav").hide();
                             $("#tabswindow").hide();
-                            if (window.location.hash.indexOf("mystuff") !== -1) {
+                            if (window.location.hash.indexOf("mystuff") !== -1 || window.location.hash.indexOf("admin") !== -1) {
                                 window.location.hash = "#/home";
                             }
                             var newtext = choosologyLoginBoxHtml();
@@ -373,7 +386,7 @@ $(function() {
                 });
             }
 
-            /* News admin lives in My Office → RESTRICTED; carry the item the admin was reading. */
+            /* News admin lives under the top-level Admin hub; carry the item the admin was reading. */
             $(document).on("click", ".news-admin-desk-link", function() {
                 window.ChoosologyRestrictedFocus = {
                     view: "news",

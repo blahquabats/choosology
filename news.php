@@ -70,7 +70,7 @@ function choosology_news_echo_main_article_html(
 		$id = (int) ($displayRow['id'] ?? $newsId);
 		if ($canManageNews && $id > 0) {
 			echo '<div class="news-article-admin">';
-			echo '<a class="news-admin-desk-link" href="#/mystuff/restricted" data-desk-kind="news" data-desk-id="' . $id . '">Edit in News Desk</a>';
+			echo '<a class="news-admin-desk-link" href="#/admin" data-desk-kind="news" data-desk-id="' . $id . '">Edit in News Desk</a>';
 			echo '</div>';
 		}
 		if ($id > 0) {
@@ -242,7 +242,7 @@ if (!empty($_GET['fragment']) && $_GET['fragment'] === 'article') {
 					<h3 class="browse-section-heading" id="news-admin-heading"><span class="browse-section-num" aria-hidden="true">03</span> Admin</h3>
 					<div class="browse-intro">
 						<p>News posts and minor updates are written from My Office.</p>
-						<p><a class="news-admin-desk-link" href="#/mystuff/restricted" data-desk-kind="news" data-desk-id="0">Open News Desk</a></p>
+						<p><a class="news-admin-desk-link" href="#/admin" data-desk-kind="news" data-desk-id="0">Open News Desk</a></p>
 					</div>
 				</section>
 				<?php } ?>

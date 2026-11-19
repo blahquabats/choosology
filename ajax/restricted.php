@@ -1,6 +1,6 @@
 <?php
 /**
- * JSON actions for My Office → RESTRICTED.
+ * JSON actions for the Classic Admin hub.
  */
 ob_start();
 require_once __DIR__ . '/../connect.php';

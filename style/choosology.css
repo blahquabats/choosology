@@ -280,6 +280,17 @@ label.sel:before {
     background-color: #eeeeff;
 
 }
+.navbutton.maroon
+{
+    top:540px;
+    background-color:#f0d4d6;
+    border-color: #775555;
+}
+.navbutton.maroon.navdisabled:hover
+{
+    border-color: #aa8888 !important;
+    background-color: #f8eaea;
+}
 
 .navbutton.navdisabled
 {
@@ -9202,17 +9213,12 @@ body.clipboard-modal-open
     }
 }
 
-/* ---- My Office: RESTRICTED admin hub ---- */
-.ms-room-btn--restricted
+/* ---- Top-level Admin hub ---- */
+#adminwindow
 {
-    background: #782f36;
-    border-color: #4d171d;
-    color: #fff5e8;
-    letter-spacing: 0.08em;
-}
-.ms-room-btn--restricted:hover
-{
-    background: #9b3d46;
+    top: 100px;
+    margin-top: 0;
+    background-color: #f7f1e8;
 }
 .restricted-page
 {
