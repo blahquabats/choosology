@@ -37,6 +37,8 @@ describe("Admin hub wiring", () => {
     expect(src).toContain("award_degree");
     expect(src).toContain("award_scrip");
     expect(src).toContain("moderate_comment");
+    expect(src).toContain("moderate_adventure");
+    expect(src).toContain("set_probation");
     expect(src).toContain("restricted_preview_mascot");
     expect(src).toContain("scan_poses");
     expect(src).toContain('.val("__new")');
@@ -51,6 +53,8 @@ describe("Admin hub wiring", () => {
     const page = read("mystuff/restricted.php");
     expect(page).toContain("Mascot Packs");
     expect(page).toContain("Dialog Beats");
+    expect(page).toContain("Adventure Review");
+    expect(page).toContain('data-restricted-view="adventures"');
     expect(page).toContain("restricted_mascot_availability");
     expect(page).toContain(">Admin</h2>");
     expect(page).not.toContain("restricted_interaction_mascot");
@@ -98,6 +102,20 @@ describe("Admin hub wiring", () => {
     expect(src).toContain("choosology_restricted_is_admin");
     expect(src).toContain("Admin access required.");
     expect(src).toContain("403");
+    expect(src).toContain("moderate_adventure");
+    expect(src).toContain("set_probation");
+    expect(src).toContain("choosology_adventure_review_pending");
+  });
+
+  test("adventure review helpers and publish hook exist", () => {
+    expect(fs.existsSync(path.join(__dirname, "../..", "lib/adventure-review-helpers.php"))).toBe(true);
+    expect(fs.existsSync(path.join(__dirname, "../..", "sql/adventure_review_setup.sql"))).toBe(true);
+    const helpers = read("lib/adventure-review-helpers.php");
+    expect(helpers).toContain("choosology_adventure_review_on_avail_change");
+    expect(helpers).toContain("choosology_adventure_discovery_sql");
+    expect(helpers).toContain("accept_restricted");
+    expect(read("ajax/saveadvmeta.php")).toContain("choosology_adventure_review_on_avail_change");
+    expect(read("vised/advsettings.php")).toContain("as_flag_mature");
   });
 
   test("Lite offers a gated Admin page and Classic guide editor link", () => {
