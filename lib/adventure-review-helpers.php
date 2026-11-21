@@ -306,7 +306,7 @@ function choosology_adventure_review_pending(mysqli $db, int $limit = 100): arra
 	$r = mysqli_query(
 		$db,
 		"SELECT a.id, a.title, a.user, a.avail, a.description, a.tags, a.content_flags,
-		        a.review_status, a.review_hold, a.published, a.edited,
+		        a.review_status, a.review_hold, a.published, a.edited, a.pic,
 		        IFNULL(u.probation,0) AS author_probation
 		 FROM advs a
 		 LEFT JOIN users u ON u.name = a.user
@@ -319,14 +319,22 @@ function choosology_adventure_review_pending(mysqli $db, int $limit = 100): arra
 	}
 	while ($row = mysqli_fetch_assoc($r)) {
 		$flags = choosology_adventure_review_normalize_flags((string) ($row['content_flags'] ?? ''));
+		$held = (int) ($row['review_hold'] ?? 0) === 1;
 		$holdReasons = array();
-		if ((int) ($row['author_probation'] ?? 0) === 1) {
+		if ($held && (int) ($row['author_probation'] ?? 0) === 1) {
 			$holdReasons[] = 'probation';
 		}
 		foreach (CHOOSOLOGY_REVIEW_HOLD_FLAGS as $flag) {
 			if (in_array($flag, $flags, true)) {
 				$holdReasons[] = $flag;
 			}
+		}
+		$picId = (int) ($row['pic'] ?? 0);
+		$picUrl = '';
+		if ($picId > 0 && function_exists('getPicUrl')) {
+			$picUrl = getPicUrl($picId, true);
+		} elseif ($picId > 0 && function_exists('choosology_site_url')) {
+			$picUrl = choosology_site_url('ajax/pic.php?id=' . $picId . '&thumb=1');
 		}
 		$out[] = array(
 			'id' => (int) ($row['id'] ?? 0),
@@ -337,11 +345,13 @@ function choosology_adventure_review_pending(mysqli $db, int $limit = 100): arra
 			'tags' => (string) ($row['tags'] ?? ''),
 			'content_flags' => $flags,
 			'review_status' => (string) ($row['review_status'] ?? ''),
-			'review_hold' => (int) ($row['review_hold'] ?? 0) === 1,
+			'review_hold' => $held,
 			'author_probation' => (int) ($row['author_probation'] ?? 0) === 1,
 			'hold_reasons' => $holdReasons,
 			'published' => (string) ($row['published'] ?? ''),
 			'edited' => (string) ($row['edited'] ?? ''),
+			'pic' => $picId,
+			'pic_url' => $picUrl,
 		);
 	}
 	return $out;

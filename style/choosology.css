@@ -9634,6 +9634,26 @@ label.restricted-check input
     gap: 0.5rem;
     margin-top: 0.6rem;
 }
+.restricted-adventure-row
+{
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+.restricted-adventure-thumb
+{
+    flex: 0 0 auto;
+    width: 120px;
+    height: 75px;
+    object-fit: cover;
+    border: 2px solid var(--restricted-ink);
+    background: #ddd;
+}
+.restricted-adventure-body
+{
+    flex: 1 1 auto;
+    min-width: 0;
+}
 .restricted-comment
 {
     border: 1px solid #aaa18f;

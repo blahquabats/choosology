@@ -569,7 +569,7 @@
 			return;
 		}
 		adventures.forEach(function (adv) {
-			var $item = $("<article>").addClass("restricted-comment").attr("data-adventure-id", adv.id);
+			var $item = $("<article>").addClass("restricted-comment restricted-adventure").attr("data-adventure-id", adv.id);
 			var holdBits = [];
 			if (adv.review_hold) {
 				holdBits.push("HELD");
@@ -577,17 +577,25 @@
 			(adv.hold_reasons || []).forEach(function (reason) {
 				holdBits.push(reason);
 			});
+			var $row = $("<div>").addClass("restricted-adventure-row").appendTo($item);
+			if (adv.pic_url) {
+				$("<img>")
+					.addClass("restricted-adventure-thumb")
+					.attr({ src: adv.pic_url, alt: "", width: 120, height: 75, loading: "lazy" })
+					.appendTo($row);
+			}
+			var $body = $("<div>").addClass("restricted-adventure-body").appendTo($row);
 			$("<p>").addClass("restricted-comment-meta").text(
 				"#" + adv.id + " · " + (adv.user || "?") + " · " + (adv.avail || "") +
 				(holdBits.length ? " · " + holdBits.join(", ") : "") +
 				(adv.published ? " · published " + adv.published : "")
-			).appendTo($item);
-			$("<p>").addClass("restricted-comment-text").css("font-weight", "bold").text(adv.title || "Untitled").appendTo($item);
+			).appendTo($body);
+			$("<p>").addClass("restricted-comment-text").css("font-weight", "bold").text(adv.title || "Untitled").appendTo($body);
 			if (adv.description) {
-				$("<p>").addClass("restricted-comment-text").text(adv.description).appendTo($item);
+				$("<p>").addClass("restricted-comment-text").text(adv.description).appendTo($body);
 			}
 			if ((adv.content_flags || []).length) {
-				$("<p>").addClass("restricted-comment-meta").text("Flags: " + adv.content_flags.join(", ")).appendTo($item);
+				$("<p>").addClass("restricted-comment-meta").text("Flags: " + adv.content_flags.join(", ")).appendTo($body);
 			}
 			var $note = $("<label>").text("Reject note ").append(
 				$("<input>").attr({
@@ -596,9 +604,9 @@
 					maxlength: 500,
 					placeholder: "Required only when rejecting"
 				})
-			).appendTo($item);
+			).appendTo($body);
 			$note.css({ display: "block", margin: "8px 0" });
-			var $actions = $("<div>").addClass("restricted-actions").appendTo($item);
+			var $actions = $("<div>").addClass("restricted-actions").appendTo($body);
 			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--primary restricted-adventure-accept").text("Accept").appendTo($actions);
 			$("<button>").attr("type", "button").addClass("restricted-btn restricted-adventure-restricted").text("Accept as Restricted").appendTo($actions);
 			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--danger restricted-adventure-reject").text("Reject & remove").appendTo($actions);
