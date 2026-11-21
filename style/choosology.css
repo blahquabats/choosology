@@ -6712,6 +6712,17 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
   }
 
 /* ---- Lab signup (personnel intake) ---- */
+/* Inner wrap for wrong-password bump: animate this, not the fixed #topbox. */
+.loginbox-inner,
+#loginbox-inner
+{
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    text-align: right;
+    vertical-align: top;
+}
+
 .login-signup-row
 {
     clear: both;

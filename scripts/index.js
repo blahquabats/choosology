@@ -165,11 +165,36 @@ $(function() {
                 fx: 'fadeout'
             });
             function choosologyLoginBoxHtml() {
-                return "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />"
+                return "<div id='loginbox-inner' class='loginbox-inner'>"
+                    + "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />"
                     + "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />"
                     + "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>"
                     + "<button type='button' id='loginsubmit'>Submit</button>"
-                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
+                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>"
+                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>"
+                    + "</div>";
+            }
+
+            function choosologyCloseForgotModal() {
+                var $m = $("#forgotmodal");
+                if (!$m.length) {
+                    return;
+                }
+                $m.addClass("signup-modal--hidden").attr("aria-hidden", "true");
+                $("body").removeClass("signup-modal-open");
+                $("#forgot-status").removeClass("signup-status--error").text("");
+            }
+
+            function choosologyOpenForgotModal() {
+                var $m = $("#forgotmodal");
+                if (!$m.length) {
+                    return;
+                }
+                $("#forgot-form")[0].reset();
+                $("#forgot-status").removeClass("signup-status--error").text("");
+                $m.removeClass("signup-modal--hidden").attr("aria-hidden", "false");
+                $("body").addClass("signup-modal-open");
+                $("#forgot-identity").trigger("focus");
             }
 
             function choosologyCloseSignupModal() {
@@ -218,13 +243,59 @@ $(function() {
                 e.preventDefault();
                 choosologyOpenSignupModal();
             });
+            $(document).on("click", "#openforgot", function(e) {
+                e.preventDefault();
+                choosologyOpenForgotModal();
+            });
             $(document).on("click", "#signupmodal_close, #signup-cancel, #signupmodal .signup-modal-backdrop", function() {
                 choosologyCloseSignupModal();
             });
+            $(document).on("click", "#forgotmodal_close, #forgot-cancel, #forgotmodal .signup-modal-backdrop", function() {
+                choosologyCloseForgotModal();
+            });
             $(document).on("keydown", function(e) {
-                if (e.key === "Escape" && $("#signupmodal").length && !$("#signupmodal").hasClass("signup-modal--hidden")) {
+                if (e.key !== "Escape") {
+                    return;
+                }
+                if ($("#signupmodal").length && !$("#signupmodal").hasClass("signup-modal--hidden")) {
                     choosologyCloseSignupModal();
                 }
+                if ($("#forgotmodal").length && !$("#forgotmodal").hasClass("signup-modal--hidden")) {
+                    choosologyCloseForgotModal();
+                }
+            });
+            $(document).on("submit", "#forgot-form", function(e) {
+                e.preventDefault();
+                var $submit = $("#forgot-submit");
+                var $status = $("#forgot-status");
+                var payload = {
+                    identity: $.trim($("#forgot-identity").val()),
+                    lab_fax: $("#forgot-fax").val()
+                };
+                $submit.prop("disabled", true);
+                $status.removeClass("signup-status--error").text("Sending…");
+                $.ajax({
+                    type: "POST",
+                    url: "ajax/passwordreset.php",
+                    data: JSON.stringify(payload),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                }).done(function(res) {
+                    if (!res || !res.ok) {
+                        $status.addClass("signup-status--error").text((res && res.error) ? res.error : "Could not start a reset.");
+                        return;
+                    }
+                    var msg = (res.message || "If that account exists, we sent reset instructions.");
+                    if (res.debug_url) {
+                        msg += " Dev link: " + res.debug_url;
+                    }
+                    $status.removeClass("signup-status--error").text(msg);
+                }).fail(function(xhr, status, err) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
+                    $status.addClass("signup-status--error").text(msg);
+                }).always(function() {
+                    $submit.prop("disabled", false);
+                });
             });
             $(document).on("submit", "#signup-form", function(e) {
                 e.preventDefault();
@@ -326,9 +397,22 @@ $(function() {
                         else
                         {
                             var topbox = $("#topbox");
-                            topbox.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</span><br />");
-                            topbox.effect("shake", {distance: 5, times: 2});
-                            $(".wrongpass").fadeOut(2000, "easeInExpo", function(){
+                            var $shake = $("#loginbox-inner");
+                            if (!$shake.length) {
+                                $shake = topbox;
+                            }
+                            $shake.find(".wrongpass").remove();
+                            $shake.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</span><br />");
+                            /* Vertical bump only: horizontal jQuery UI shake on the
+                               right-edge login chrome walks the box off-screen. */
+                            $shake.stop(true, true).effect("shake", {
+                                direction: "up",
+                                distance: 6,
+                                times: 2
+                            }, 350, function () {
+                                $shake.css({ left: "", top: "", position: "" });
+                            });
+                            $shake.find(".wrongpass").fadeOut(2000, "easeInExpo", function(){
                                 this.remove();
                             });
                             $('#loginsubmit').prop('disabled', false);

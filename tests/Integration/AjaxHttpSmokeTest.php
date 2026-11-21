@@ -25,6 +25,7 @@ final class AjaxHttpSmokeTest extends TestCase
 		$this->assertSame(200, $code);
 		$this->assertStringContainsString('Choosology', $body);
 		$this->assertStringContainsString('Apply for lab access', $body);
+		$this->assertStringContainsString('Forgot credentials?', $body);
 		$this->assertStringContainsString('scripts/guide.js', $body);
 		$this->assertStringContainsString('CHOOSOLOGY_GUIDE', $body);
 	}
