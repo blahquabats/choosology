@@ -78,7 +78,7 @@
     <script src='scripts/clipboard.js?v=clip7'></script>
     <script src='scripts/office.js?v=admin1'></script>
     <script src='scripts/guide.js?v=guide1'></script>
-    <script src='scripts/restricted.js?v=admin1'></script>
+    <script src='scripts/restricted.js?v=advreview1'></script>
     <script src='scripts/routes.js?v=admin1'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 

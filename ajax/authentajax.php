@@ -33,6 +33,7 @@ if (isset($_POST['loginsubmit']))
         $alluserinfo = $result2;
         $_SESSION['user'] = $result2['name'];
         $_SESSION['usertype'] = $result2['usertype'];
+        $_SESSION['view_restricted'] = (int) ($result2['view_restricted'] ?? 0);
         $alluserinfo['newmessages'] = getNewMessages();
         choosology_datascrip_try_daily_login($db, (string) $result2['name']);
         echo $result2['name'];
@@ -44,6 +45,7 @@ if (isset($_POST['loginsubmit']))
         echo "2";
         $_SESSION['user'] = false;
         $_SESSION['usertype'] = false;
+        $_SESSION['view_restricted'] = 0;
 
         //echo "{$_POST['login']}";
     }

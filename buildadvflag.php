@@ -9,6 +9,7 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
         a.title AS advtitle,
         a.user AS advuser,
         a.avail AS avail,
+        a.review_hold AS review_hold,
         a.rating AS rating,
         a.description,
         a.created,
@@ -24,9 +25,18 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
     FROM advs a
     INNER JOIN advscreens s ON s.id = a.`begin`
     WHERE a.id = '$id'
-    AND (a.avail = 'public' OR a.user = '$user')";
+    AND (a.avail IN ('public', 'restricted') OR a.user = '$user')";
     $r = runquery_assoc($query);
+    if (!is_array($r) || !isset($r[0])) {
+        return '';
+    }
     $r = $r[0];
+    if (!function_exists('choosology_adventure_can_view')) {
+        require_once __DIR__ . '/lib/adventure-review-helpers.php';
+    }
+    if (!choosology_adventure_can_view($r, (string) $user)) {
+        return '';
+    }
     $pic = getPicUrl($r['advpic'], true);
     if ($pic !== '' && !choosology_adv_pic_usable_for_display($r['advpic'] ?? null)) {
         $pic = '';
@@ -65,7 +75,11 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
         {
             if ($avail == "private") $title .= " (private)";
             if ($avail == "none") $title .= " (<b>unpublished</b>)";
+            if ($avail == "restricted") $title .= " (restricted)";
             if ($avail == "public") $title .= " (public)";
+        }
+        if (!empty($r['review_hold'])) {
+            $title .= " (held for review)";
         }
             
         if($r['tags'])

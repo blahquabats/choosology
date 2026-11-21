@@ -29,6 +29,7 @@ if (!choosology_restricted_is_admin()) {
 		<button type="button" class="restricted-nav-btn" data-restricted-view="degrees">Degrees</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="scrip">Award DataScrip</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="comments">Comment Review <span id="restricted_comment_badge"></span></button>
+		<button type="button" class="restricted-nav-btn" data-restricted-view="adventures">Adventure Review <span id="restricted_adventure_badge"></span></button>
 	</nav>
 
 	<p class="restricted-global-status" id="restricted_global_status" aria-live="polite"></p>
@@ -272,6 +273,32 @@ if (!choosology_restricted_is_admin()) {
 			<button type="button" class="restricted-btn restricted-btn--primary" id="restricted_comments_approve_all">Approve all</button>
 		</div>
 		<div id="restricted_comments" class="restricted-comments"></div>
+	</section>
+
+	<section class="restricted-view" data-restricted-panel="adventures" aria-labelledby="restricted_adventures_heading" hidden>
+		<div class="restricted-section-head">
+			<div>
+				<p class="restricted-kicker">Moderation queue</p>
+				<h3 id="restricted_adventures_heading">Adventure Review</h3>
+			</div>
+		</div>
+		<p class="restricted-note">Publishing stays frictionless. Every new public listing enters this queue. Held rows (probation or content flags) stay out of browse until you act.</p>
+		<div class="restricted-card restricted-card--compact restricted-form">
+			<p class="restricted-kicker">Probation</p>
+			<form id="restricted_probation_form" class="restricted-fields restricted-fields--two" onsubmit="return false;">
+				<label>Researcher <input id="restricted_probation_user" list="restricted_users" maxlength="45" autocomplete="off"></label>
+				<label>Status
+					<select id="restricted_probation_state">
+						<option value="1">On probation (hold new listings)</option>
+						<option value="0">Clear probation</option>
+					</select>
+				</label>
+				<div class="restricted-actions">
+					<button type="submit" class="restricted-btn">Update probation</button>
+				</div>
+			</form>
+		</div>
+		<div id="restricted_adventures" class="restricted-comments"></div>
 	</section>
 </div>
 <script>

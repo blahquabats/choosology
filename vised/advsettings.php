@@ -35,6 +35,15 @@ $title = htmlspecialchars((string) ($adv['title'] ?? ''), ENT_QUOTES, 'UTF-8');
 $description = htmlspecialchars((string) ($adv['description'] ?? ''), ENT_QUOTES, 'UTF-8');
 $tags = htmlspecialchars((string) ($adv['tags'] ?? ''), ENT_QUOTES, 'UTF-8');
 $avail = (string) ($adv['avail'] ?? 'none');
+if (!function_exists('choosology_adventure_review_normalize_flags')) {
+	require_once __DIR__ . '/../lib/adventure-review-helpers.php';
+}
+choosology_adventure_review_ensure_schema($db);
+$contentFlags = choosology_adventure_review_normalize_flags((string) ($adv['content_flags'] ?? ''));
+$flagMature = in_array('mature', $contentFlags, true);
+$flagSensitive = in_array('sensitive', $contentFlags, true);
+$reviewStatus = (string) ($adv['review_status'] ?? 'none');
+$reviewHold = (int) ($adv['review_hold'] ?? 0) === 1;
 $beginVal = (string) ($adv['begin'] ?? '');
 $picVal = trim((string) ($adv['pic'] ?? ''));
 $bgpicVal = (int) ($adv['bgpic'] ?? 0);
@@ -129,7 +138,7 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			</label>
 			<label class="adv-avail-option adv-avail-option--public">
 				<span class="adv-avail-panel">
-					<input type="radio" name="as_avail" value="public" class="adv-avail-input"<?php echo $avail === 'public' ? ' checked' : ''; ?> />
+					<input type="radio" name="as_avail" value="public" class="adv-avail-input"<?php echo ($avail === 'public' || $avail === 'restricted') ? ' checked' : ''; ?> />
 					<span class="adv-avail-main">
 						<span class="adv-avail-code">P2</span>
 						<span class="adv-avail-name">Public</span>
@@ -138,6 +147,22 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 				</span>
 			</label>
 		</div>
+		<input type="hidden" id="as_was_restricted" value="<?php echo $avail === 'restricted' ? '1' : '0'; ?>">
+		<?php if ($avail === 'restricted') { ?>
+		<p class="adv-hint">This experiment is flagged <strong>Restricted</strong> (opt-in readers only). Keeping Public selected preserves Restricted; choose Private or Unpublished to take it down.</p>
+		<?php } ?>
+		<?php if ($reviewStatus === 'pending') { ?>
+		<p class="adv-hint"><?php echo $reviewHold
+			? 'Awaiting lab review — temporarily held out of public discovery.'
+			: 'Listed for discovery and queued for routine lab review.'; ?></p>
+		<?php } ?>
+
+		<p class="advsettings-label" style="margin-top:12px;">Content flags</p>
+		<div class="restricted-checks" style="display:flex;gap:16px;flex-wrap:wrap;">
+			<label><input type="checkbox" id="as_flag_mature"<?php echo $flagMature ? ' checked' : ''; ?>> Mature themes</label>
+			<label><input type="checkbox" id="as_flag_sensitive"<?php echo $flagSensitive ? ' checked' : ''; ?>> Sensitive content</label>
+		</div>
+		<p class="adv-hint">Flagged public releases stay discoverable only after a moderator clears them (or if you are on probation).</p>
 
 		<label class="advsettings-label" for="as_digest_notify" style="margin-top:12px;">Activity digest</label>
 		<select id="as_digest_notify" class="advsettings-input">
@@ -1107,7 +1132,11 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			tags: $("#as_tags").val(),
 			avail: (function () {
 				var $r = $("input[name='as_avail']:checked");
-				return $r.length ? String($r.val()) : "none";
+				var v = $r.length ? String($r.val()) : "none";
+				if (v === "public" && $("#as_was_restricted").val() === "1") {
+					return "restricted";
+				}
+				return v;
 			})(),
 			begin: $("#as_begin").val(),
 			pic: $("#as_pic").val(),
@@ -1122,7 +1151,9 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			textcolor: $("#as_use_auto_text").is(":checked") ? "" : String($("#as_textcolor").val() || "").trim(),
 			linkcolor: $("#as_use_auto_link").is(":checked") ? "" : String($("#as_linkcolor").val() || "").trim(),
 			font: String($("#as_font").val() || "trebuchet"),
-			digest_notify: String($("#as_digest_notify").val() || "off")
+			digest_notify: String($("#as_digest_notify").val() || "off"),
+			content_flag_mature: $("#as_flag_mature").is(":checked") ? 1 : 0,
+			content_flag_sensitive: $("#as_flag_sensitive").is(":checked") ? 1 : 0
 		};
 		$.ajax({
 			type: "POST",

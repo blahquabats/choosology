@@ -561,6 +561,60 @@
 		});
 	}
 
+	function renderAdventures(adventures) {
+		var $wrap = root.find("#restricted_adventures").empty();
+		root.find("#restricted_adventure_badge").text(adventures.length ? "(" + adventures.length + ")" : "");
+		if (!adventures.length) {
+			$wrap.append($("<p>").addClass("restricted-empty").text("Adventure review queue clear."));
+			return;
+		}
+		adventures.forEach(function (adv) {
+			var $item = $("<article>").addClass("restricted-comment").attr("data-adventure-id", adv.id);
+			var holdBits = [];
+			if (adv.review_hold) {
+				holdBits.push("HELD");
+			}
+			(adv.hold_reasons || []).forEach(function (reason) {
+				holdBits.push(reason);
+			});
+			$("<p>").addClass("restricted-comment-meta").text(
+				"#" + adv.id + " · " + (adv.user || "?") + " · " + (adv.avail || "") +
+				(holdBits.length ? " · " + holdBits.join(", ") : "") +
+				(adv.published ? " · published " + adv.published : "")
+			).appendTo($item);
+			$("<p>").addClass("restricted-comment-text").css("font-weight", "bold").text(adv.title || "Untitled").appendTo($item);
+			if (adv.description) {
+				$("<p>").addClass("restricted-comment-text").text(adv.description).appendTo($item);
+			}
+			if ((adv.content_flags || []).length) {
+				$("<p>").addClass("restricted-comment-meta").text("Flags: " + adv.content_flags.join(", ")).appendTo($item);
+			}
+			var $note = $("<label>").text("Reject note ").append(
+				$("<input>").attr({
+					type: "text",
+					class: "restricted-adventure-note",
+					maxlength: 500,
+					placeholder: "Required only when rejecting"
+				})
+			).appendTo($item);
+			$note.css({ display: "block", margin: "8px 0" });
+			var $actions = $("<div>").addClass("restricted-actions").appendTo($item);
+			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--primary restricted-adventure-accept").text("Accept").appendTo($actions);
+			$("<button>").attr("type", "button").addClass("restricted-btn restricted-adventure-restricted").text("Accept as Restricted").appendTo($actions);
+			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--danger restricted-adventure-reject").text("Reject & remove").appendTo($actions);
+			if (adv.user) {
+				$("<button>").attr({
+					type: "button",
+					"data-user": adv.user,
+					"data-probation": adv.author_probation ? "0" : "1"
+				}).addClass("restricted-btn restricted-adventure-probation")
+					.text(adv.author_probation ? "Clear author probation" : "Put author on probation")
+					.appendTo($actions);
+			}
+			$wrap.append($item);
+		});
+	}
+
 	function defaultMascotKey() {
 		var key = "";
 		(state.mascots || []).some(function (mascot) {
@@ -626,6 +680,7 @@
 		}
 
 		renderComments(state.comments || []);
+		renderAdventures(state.adventures || []);
 		updateMascotPreview();
 	}
 
@@ -879,6 +934,47 @@
 			if (window.confirm("Approve every comment currently awaiting review?")) {
 				mutate("moderate_comment", { mode: "approve_all" }, "Review queue approved.");
 			}
+		});
+
+		root.on("click.restricted", ".restricted-adventure-accept, .restricted-adventure-restricted, .restricted-adventure-reject", function () {
+			var $item = $(this).closest("[data-adventure-id]");
+			var mode = "accept";
+			if ($(this).hasClass("restricted-adventure-restricted")) {
+				mode = "accept_restricted";
+			} else if ($(this).hasClass("restricted-adventure-reject")) {
+				mode = "reject";
+			}
+			var note = String($item.find(".restricted-adventure-note").val() || "").trim();
+			if (mode === "reject") {
+				if (!note) {
+					status("A reject note for the creator is required.", true);
+					return;
+				}
+				if (!window.confirm("Remove this experiment permanently and message the creator?")) {
+					return;
+				}
+			}
+			mutate("moderate_adventure", {
+				mode: mode,
+				adventure_id: parseInt($item.attr("data-adventure-id"), 10) || 0,
+				note: note
+			}, mode === "reject" ? "Experiment removed and creator notified." : "Adventure review saved.");
+		});
+
+		root.on("click.restricted", ".restricted-adventure-probation", function () {
+			var user = $(this).attr("data-user") || "";
+			var on = $(this).attr("data-probation") === "1";
+			mutate("set_probation", {
+				user: user,
+				probation: on ? 1 : 0
+			}, on ? "Author placed on probation." : "Probation cleared.");
+		});
+
+		root.on("submit.restricted", "#restricted_probation_form", function () {
+			mutate("set_probation", {
+				user: value("#restricted_probation_user"),
+				probation: value("#restricted_probation_state") === "1" ? 1 : 0
+			}, "Probation updated.");
 		});
 	}
 
