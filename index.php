@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=advreview2" />
+    <link rel="stylesheet" href="style/choosology.css?v=loginreset1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -73,7 +73,7 @@
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
-    <script src='scripts/index.js?v=admin1'></script>
+    <script src='scripts/index.js?v=loginreset1'></script>
     <script src='scripts/messages.js?v=clic4'></script>
     <script src='scripts/clipboard.js?v=clip7'></script>
     <script src='scripts/office.js?v=admin1'></script>
@@ -141,11 +141,14 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 	    <?php
 	    if (empty($_SESSION['user']))
 	    {
+	        echo "<div id='loginbox-inner' class='loginbox-inner'>\n";
 	        echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";
 	        echo "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />\n";
 	        echo "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>";
 	        echo "<button type='button' id='loginsubmit'>Submit</button>";
 	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
+	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>";
+	        echo "</div>\n";
 	    }
 	    else
 	    {
@@ -272,6 +275,34 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 				<button type="submit" id="signup-submit">File application</button>
 				<button type="button" id="signup-cancel" class="signup-cancel">Cancel</button>
 				<span id="signup-status" class="signup-status" aria-live="polite"></span>
+			</div>
+		</form>
+	</div>
+</div>
+
+<?php /* Forgot credentials modal — request email reset link. */ ?>
+<div id="forgotmodal" class="signup-modal signup-modal--hidden" aria-hidden="true">
+	<div class="signup-modal-backdrop" tabindex="-1"></div>
+	<div class="signup-modal-panel" role="dialog" aria-modal="true" aria-labelledby="forgotmodal_title">
+		<div class="signup-modal-header">
+			<div class="signup-modal-heading">
+				<p class="signup-modal-eyebrow">Credentials <span class="signup-modal-eyebrow-tag">reset</span></p>
+				<h2 class="signup-modal-title" id="forgotmodal_title">Forgot credentials?</h2>
+			</div>
+			<button type="button" class="signup-modal-x" id="forgotmodal_close" aria-label="Close">&times;</button>
+		</div>
+		<form id="forgot-form" class="signup-form" action="ajax/passwordreset.php" method="post" novalidate>
+			<p class="signup-lede">Enter your lab handle or contact address. If we find a matching account, we email a one-hour reset link.</p>
+			<label class="signup-label" for="forgot-identity">Lab handle or email</label>
+			<input type="text" id="forgot-identity" name="identity" class="signup-input" maxlength="100" autocomplete="username" required>
+			<div class="signup-honeypot" aria-hidden="true">
+				<label for="forgot-fax">Lab fax</label>
+				<input type="text" id="forgot-fax" name="lab_fax" tabindex="-1" autocomplete="off">
+			</div>
+			<div class="signup-actions">
+				<button type="submit" id="forgot-submit">Send reset link</button>
+				<button type="button" id="forgot-cancel" class="signup-cancel">Cancel</button>
+				<span id="forgot-status" class="signup-status" aria-live="polite"></span>
 			</div>
 		</form>
 	</div>
