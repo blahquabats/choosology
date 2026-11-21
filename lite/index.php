@@ -8,11 +8,13 @@ global $db;
 
 $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
 
+require_once dirname(__DIR__) . '/lib/adventure-review-helpers.php';
+$discoverySql = choosology_adventure_discovery_sql('a');
 $query = "
 	SELECT DISTINCT a.id AS aid, a.title AS adv_title, a.description AS adv_description, a.user AS adv_user
 	FROM advs a
 	INNER JOIN advscreens s ON s.id = a.`begin`
-	WHERE a.avail = 'public'
+	WHERE $discoverySql
 	  AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
 	  AND (
 			NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)

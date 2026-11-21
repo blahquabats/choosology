@@ -504,13 +504,17 @@ function buildColumn($which, $title = "", $where = "", $orderby = "COALESCE(a.pu
     
     $where=stripslashes(html_entity_decode($where));
     if ($where) $where = "and ".$where;
+    if (!function_exists('choosology_adventure_discovery_sql')) {
+        require_once __DIR__ . '/lib/adventure-review-helpers.php';
+    }
+    $discovery = choosology_adventure_discovery_sql('a');
     $query = "select *,
 a.id as aid
 from advs a, advscreens s
-where avail='public' $where and s.id = a.`begin` order by $orderby limit $limit";
+where $discovery $where and s.id = a.`begin` order by $orderby limit $limit";
     $countquery = "select count(a.id) as c
 from advs a, advscreens s
-where avail='public' $where and s.id = a.`begin`";
+where $discovery $where and s.id = a.`begin`";
     $res = runquery_assoc($query);
     $cres = runquery_assoc($countquery);
     $titleid = strtolower(preg_replace("/\s/","", $title));
@@ -586,10 +590,14 @@ function buildColumnFlagsOnly($where, $orderby, $limit)
     if ($where) {
         $where = "and " . $where;
     }
+    if (!function_exists('choosology_adventure_discovery_sql')) {
+        require_once __DIR__ . '/lib/adventure-review-helpers.php';
+    }
+    $discovery = choosology_adventure_discovery_sql('a');
     $query = "select *,
 a.id as aid
 from advs a, advscreens s
-where avail='public' $where and s.id = a.`begin` order by $orderby limit $limit";
+where $discovery $where and s.id = a.`begin` order by $orderby limit $limit";
     $res = runquery_assoc($query);
     $out = "";
     if (!is_array($res) || count($res) === 0) {
@@ -611,9 +619,13 @@ function buildBrowseUnifiedToolbarHtml($which, $title, $where, $orderby, $first,
     if ($whereSql) {
         $whereSql = "and " . $whereSql;
     }
+    if (!function_exists('choosology_adventure_discovery_sql')) {
+        require_once __DIR__ . '/lib/adventure-review-helpers.php';
+    }
+    $discovery = choosology_adventure_discovery_sql('a');
     $countquery = "select count(a.id) as c
 from advs a, advscreens s
-where avail='public' $whereSql and s.id = a.`begin`";
+where $discovery $whereSql and s.id = a.`begin`";
     $cres = runquery_assoc($countquery);
     $fullcount = isset($cres[0]["c"]) ? (int) $cres[0]["c"] : 0;
 

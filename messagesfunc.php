@@ -392,6 +392,7 @@ function choosology_run_adventure_digests(?string $onlyOwner = null): int
 		FROM advs
 		WHERE digest_notify IN ('daily','weekly')
 		  AND avail = 'public'
+		  AND IFNULL(review_hold,0)=0
 		  $ownerClause";
 	$res = mysqli_query($db, $q);
 	if (!$res) {

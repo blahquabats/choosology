@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=admin1" />
+    <link rel="stylesheet" href="style/choosology.css?v=advreview2" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -78,7 +78,7 @@
     <script src='scripts/clipboard.js?v=clip7'></script>
     <script src='scripts/office.js?v=admin1'></script>
     <script src='scripts/guide.js?v=guide1'></script>
-    <script src='scripts/restricted.js?v=admin1'></script>
+    <script src='scripts/restricted.js?v=advreview2'></script>
     <script src='scripts/routes.js?v=admin1'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
