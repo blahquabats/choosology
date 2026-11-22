@@ -9,6 +9,7 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
 if (!function_exists('choosology_adventure_discovery_sql')) {
 	require_once __DIR__ . '/lib/adventure-review-helpers.php';
 }
+choosology_adventure_review_ensure_schema($db);
 $discoverySql = choosology_adventure_discovery_sql('a');
 $query = "
     SELECT DISTINCT a.id AS aid, a.description AS adv_description

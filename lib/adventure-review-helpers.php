@@ -20,53 +20,61 @@ function choosology_adventure_review_ensure_schema(mysqli $db): void
 	}
 	$done = true;
 
-	$advsCols = array();
-	$r = @mysqli_query($db, 'SHOW COLUMNS FROM advs');
-	if ($r) {
-		while ($row = mysqli_fetch_assoc($r)) {
-			$advsCols[(string) ($row['Field'] ?? '')] = true;
+	try {
+		$advsCols = array();
+		$r = mysqli_query($db, 'SHOW COLUMNS FROM advs');
+		if ($r) {
+			while ($row = mysqli_fetch_assoc($r)) {
+				$advsCols[(string) ($row['Field'] ?? '')] = true;
+			}
 		}
-	}
-	if (empty($advsCols['review_status'])) {
-		@mysqli_query(
-			$db,
-			"ALTER TABLE advs ADD COLUMN review_status varchar(16) NOT NULL DEFAULT 'none' AFTER avail"
-		);
-	}
-	if (empty($advsCols['review_hold'])) {
-		@mysqli_query(
-			$db,
-			"ALTER TABLE advs ADD COLUMN review_hold tinyint(1) NOT NULL DEFAULT 0 AFTER review_status"
-		);
-	}
-	if (empty($advsCols['content_flags'])) {
-		@mysqli_query(
-			$db,
-			"ALTER TABLE advs ADD COLUMN content_flags varchar(255) NOT NULL DEFAULT '' AFTER review_hold"
-		);
-	}
-
-	$userCols = array();
-	$ur = @mysqli_query($db, 'SHOW COLUMNS FROM users');
-	if ($ur) {
-		while ($row = mysqli_fetch_assoc($ur)) {
-			$userCols[(string) ($row['Field'] ?? '')] = true;
+		if (empty($advsCols['review_status'])) {
+			mysqli_query(
+				$db,
+				"ALTER TABLE advs ADD COLUMN review_status varchar(16) NOT NULL DEFAULT 'none' AFTER avail"
+			);
 		}
-	}
-	if (empty($userCols['probation'])) {
-		@mysqli_query(
-			$db,
-			"ALTER TABLE users ADD COLUMN probation tinyint(1) NOT NULL DEFAULT 0 AFTER usertype"
-		);
-	}
+		if (empty($advsCols['review_hold'])) {
+			mysqli_query(
+				$db,
+				"ALTER TABLE advs ADD COLUMN review_hold tinyint(1) NOT NULL DEFAULT 0 AFTER review_status"
+			);
+		}
+		if (empty($advsCols['content_flags'])) {
+			mysqli_query(
+				$db,
+				"ALTER TABLE advs ADD COLUMN content_flags varchar(255) NOT NULL DEFAULT '' AFTER review_hold"
+			);
+		}
 
-	/* One-shot: treat already-listed adventures as cleared so the queue stays empty of legacy rows. */
-	@mysqli_query(
-		$db,
-		"UPDATE advs
-		 SET review_status='cleared', review_hold=0
-		 WHERE avail IN ('public','restricted') AND review_status='none'"
-	);
+		$userCols = array();
+		$ur = mysqli_query($db, 'SHOW COLUMNS FROM users');
+		if ($ur) {
+			while ($row = mysqli_fetch_assoc($ur)) {
+				$userCols[(string) ($row['Field'] ?? '')] = true;
+			}
+		}
+		if (empty($userCols['probation'])) {
+			/* MySQL 8: ALTER rebuild can fail on legacy users.lastlogin DEFAULT '0000-00-00'. */
+			if (!function_exists('choosology_users_alter_with_relaxed_sql_mode')) {
+				require_once __DIR__ . '/choosology-core.php';
+			}
+			choosology_users_alter_with_relaxed_sql_mode(
+				$db,
+				'ALTER TABLE users ADD COLUMN probation tinyint(1) NOT NULL DEFAULT 0 AFTER usertype'
+			);
+		}
+
+		/* One-shot: treat already-listed adventures as cleared so the queue stays empty of legacy rows. */
+		mysqli_query(
+			$db,
+			"UPDATE advs
+			 SET review_status='cleared', review_hold=0
+			 WHERE avail IN ('public','restricted') AND review_status='none'"
+		);
+	} catch (Throwable $e) {
+		$done = false;
+	}
 }
 
 /**
@@ -250,6 +258,10 @@ function choosology_adventure_review_on_avail_change(
  */
 function choosology_adventure_discovery_sql(string $alias = 'a', ?bool $includeRestricted = null): string
 {
+	global $db;
+	if ($db instanceof mysqli) {
+		choosology_adventure_review_ensure_schema($db);
+	}
 	$alias = preg_replace('/[^a-zA-Z0-9_]/', '', $alias) ?: 'a';
 	if ($includeRestricted === null) {
 		$includeRestricted = (!empty($_SESSION['view_restricted']) && (int) $_SESSION['view_restricted'] === 1)
