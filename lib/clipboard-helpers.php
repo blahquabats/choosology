@@ -81,6 +81,11 @@ function choosology_clipboard_ensure_schema(mysqli $db): void
 	if (empty($cols['last_played'])) {
 		@mysqli_query($db, 'ALTER TABLE advs ADD COLUMN last_played datetime DEFAULT NULL');
 	}
+
+	if (!function_exists('choosology_ensure_ending_finds_table')) {
+		require_once __DIR__ . '/ending-helpers.php';
+	}
+	choosology_ensure_ending_finds_table($db);
 }
 
 /**
@@ -530,12 +535,16 @@ function choosology_clipboard_experiment_metrics(mysqli $db, string $uname): arr
 			$comments = (int) ($crow['c'] ?? 0);
 		}
 		$endingFinds = 0;
-		$er = @mysqli_query(
-			$db,
-			"SELECT COUNT(*) AS c FROM ending_finds WHERE adv = $advid"
-		);
-		if ($er && ($erow = mysqli_fetch_assoc($er))) {
-			$endingFinds = (int) ($erow['c'] ?? 0);
+		try {
+			$er = mysqli_query(
+				$db,
+				"SELECT COUNT(*) AS c FROM ending_finds WHERE adv = $advid"
+			);
+			if ($er && ($erow = mysqli_fetch_assoc($er))) {
+				$endingFinds = (int) ($erow['c'] ?? 0);
+			}
+		} catch (Throwable $e) {
+			$endingFinds = 0;
 		}
 		$ratings = 0;
 		$rr = @mysqli_query($db, "SELECT COUNT(*) AS c FROM ratings WHERE adv = $advid");

@@ -307,7 +307,13 @@ function choosology_guide_ensure_schema(mysqli $db): void
 	try {
 		$chk = mysqli_query($db, "SHOW COLUMNS FROM users LIKE 'guide_enabled'");
 		if ($chk && mysqli_num_rows($chk) === 0) {
-			mysqli_query($db, 'ALTER TABLE users ADD COLUMN guide_enabled tinyint(1) NOT NULL DEFAULT 1');
+			if (!function_exists('choosology_users_alter_with_relaxed_sql_mode')) {
+				require_once __DIR__ . '/choosology-core.php';
+			}
+			choosology_users_alter_with_relaxed_sql_mode(
+				$db,
+				'ALTER TABLE users ADD COLUMN guide_enabled tinyint(1) NOT NULL DEFAULT 1'
+			);
 		}
 	} catch (Throwable $e) {
 		/* users table may be absent in a partial install */

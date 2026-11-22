@@ -17,6 +17,21 @@ function choosology_date_format_normalize(?string $fmt): string
 	return CHOOSOLOGY_DATE_FMT_MDY;
 }
 
+function choosology_date_format_column_exists(mysqli $db, bool $refresh = false): bool
+{
+	static $exists = null;
+	if (!$refresh && $exists !== null) {
+		return $exists;
+	}
+	try {
+		$chk = mysqli_query($db, "SHOW COLUMNS FROM users LIKE 'date_format'");
+		$exists = ($chk && mysqli_num_rows($chk) > 0);
+	} catch (Throwable $e) {
+		$exists = false;
+	}
+	return $exists;
+}
+
 function choosology_date_format_ensure_schema(mysqli $db): void
 {
 	static $done = false;
@@ -25,16 +40,23 @@ function choosology_date_format_ensure_schema(mysqli $db): void
 	}
 	$done = true;
 	try {
-		$chk = mysqli_query($db, "SHOW COLUMNS FROM users LIKE 'date_format'");
-		if ($chk && mysqli_num_rows($chk) > 0) {
+		if (choosology_date_format_column_exists($db)) {
 			return;
 		}
-		mysqli_query(
+		/* MySQL 8: ALTER rebuild can fail on legacy users.lastlogin DEFAULT '0000-00-00'. */
+		if (!function_exists('choosology_users_alter_with_relaxed_sql_mode')) {
+			require_once __DIR__ . '/choosology-core.php';
+		}
+		choosology_users_alter_with_relaxed_sql_mode(
 			$db,
 			"ALTER TABLE users ADD COLUMN date_format varchar(8) NOT NULL DEFAULT 'mdy'"
 		);
+		if (!choosology_date_format_column_exists($db, true)) {
+			$done = false;
+		}
 	} catch (Throwable $e) {
 		$done = false;
+		choosology_date_format_column_exists($db, true);
 	}
 }
 
@@ -77,10 +99,16 @@ function choosology_date_format_for_user(?mysqli $db, string $uname): string
 	$uname = trim($uname);
 	if ($db instanceof mysqli && $uname !== '') {
 		choosology_date_format_ensure_schema($db);
-		$esc = mysqli_real_escape_string($db, $uname);
-		$r = @mysqli_query($db, "SELECT date_format FROM users WHERE name='$esc' LIMIT 1");
-		if ($r && ($row = mysqli_fetch_assoc($r)) && isset($row['date_format']) && (string) $row['date_format'] !== '') {
-			return choosology_date_format_normalize((string) $row['date_format']);
+		if (choosology_date_format_column_exists($db)) {
+			try {
+				$esc = mysqli_real_escape_string($db, $uname);
+				$r = mysqli_query($db, "SELECT date_format FROM users WHERE name='$esc' LIMIT 1");
+				if ($r && ($row = mysqli_fetch_assoc($r)) && isset($row['date_format']) && (string) $row['date_format'] !== '') {
+					return choosology_date_format_normalize((string) $row['date_format']);
+				}
+			} catch (Throwable $e) {
+				/* Fall through to cookie/default. */
+			}
 		}
 	}
 	return choosology_date_format_anonymous();
@@ -112,9 +140,13 @@ function choosology_date_format_save(?mysqli $db, string $fmt): void
 		}
 	}
 	choosology_date_format_ensure_schema($db);
-	if (!empty($_SESSION['user'])) {
-		$esc = mysqli_real_escape_string($db, (string) $_SESSION['user']);
-		@mysqli_query($db, "UPDATE users SET date_format='$fmt' WHERE name='$esc' LIMIT 1");
+	if (!empty($_SESSION['user']) && choosology_date_format_column_exists($db)) {
+		try {
+			$esc = mysqli_real_escape_string($db, (string) $_SESSION['user']);
+			mysqli_query($db, "UPDATE users SET date_format='$fmt' WHERE name='$esc' LIMIT 1");
+		} catch (Throwable $e) {
+			/* Preference still stored in cookie. */
+		}
 	}
 }
 

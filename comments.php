@@ -1,11 +1,14 @@
 <?php
    class commentArea 
    {
-      var $which="",
-      $ispublic=true,
-      $readonly=false,
-      $html="",
-      $script="";
+      var $which = "";
+      var $ispublic = true;
+      var $readonly = false;
+      var $html = "";
+      var $script = "";
+      var $screenid = 0;
+      var $style = "";
+      var $commentstext = "Comments";
       /*
       which = adv123, 
       

@@ -701,7 +701,7 @@ body[data-logged-in="1"] #logoutsubmit a
 .home-copy-grid
 {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     gap: 14px;
     margin-top: 14px;
 }
@@ -741,6 +741,94 @@ body[data-logged-in="1"] #logoutsubmit a
 {
     border-color: #2d8a5e;
     color: #1b5c3d;
+}
+
+.home-copy-card--featured
+{
+    border-left-color: #2874a6;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.home-copy-card--full p + p
+{
+    margin-top: 0.85em;
+}
+
+.home-featured-mount
+{
+    margin: 0 0 0 42px;
+    min-height: 0;
+    height: auto;
+}
+
+.home-copy-card--featured .featuredslides
+{
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    min-height: 220px;
+    overflow: hidden;
+}
+
+/* Keep cycle gutters >= nav button width so slides aren't clipped under the arrows. */
+.home-copy-card--featured .featuredslides-cycle
+{
+    width: calc(100% - 104px);
+    margin: 0 52px;
+    height: 240px;
+    min-height: 240px;
+    max-height: 240px;
+}
+
+.home-copy-card--featured .featuredslides .slidefolder
+{
+    height: 240px;
+    min-height: 240px;
+    max-height: 240px;
+}
+
+.home-copy-card--featured .featuredslides .slidenav
+{
+    width: 44px;
+    height: 240px;
+}
+
+.home-copy-card--featured .featuredslides .slidenav-left
+{
+    left: 2px;
+}
+
+.home-copy-card--featured .featuredslides .slidenav-right
+{
+    right: 2px;
+}
+
+/* Star floats otherwise shove the "Average / Your rating" lines off to the right. */
+.home-copy-card--featured .advflagrating
+{
+    max-width: none;
+    text-align: center;
+}
+
+.home-copy-card--featured .advflagrating .starsholder
+{
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.home-copy-card--featured .advflagrating [class^="rateresponse"],
+.home-copy-card--featured .advflagrating [class^="rateyours"]
+{
+    clear: both;
+    display: block;
+    width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    text-align: center;
+    white-space: normal;
 }
 
 .home-copy-heading
@@ -908,22 +996,28 @@ body[data-logged-in="1"] #logoutsubmit a
 .lab-feed-list--home
 {
     margin-left: 42px;
-    max-height: 9.75rem; /* ~3 compact feed rows */
+    max-height: min(38vh, 18rem);
     overflow-y: auto;
     padding-right: 4px;
-    gap: 4px;
+    gap: 6px;
 }
 
 .lab-feed-list--home .lab-feed-item
 {
-    gap: 3px 6px;
-    padding: 4px 7px;
+    gap: 4px 8px;
+    padding: 7px 9px;
 }
 
 .lab-feed-list--home .lab-feed-text
 {
-    font-size: 0.74rem;
-    line-height: 1.25;
+    font-size: clamp(0.92rem, 1.15vw + 0.55rem, 1.12rem);
+    line-height: 1.4;
+}
+
+.lab-feed-list--home .lab-feed-badge,
+.lab-feed-list--home .lab-feed-date
+{
+    font-size: clamp(0.72rem, 0.7vw + 0.5rem, 0.88rem);
 }
 
 .lab-feed-list--updates

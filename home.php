@@ -4,6 +4,31 @@ require_once("auxfuncs.php");
 require_once("labfeed.php");
 
 $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
+
+/* DISTINCT + explicit adv columns only: SELECT * from JOIN can overwrite advs.description with another table's column in mysqli_fetch_assoc */
+$query = "
+    SELECT DISTINCT a.id AS aid, a.description AS adv_description
+    FROM advs a
+    INNER JOIN advscreens s ON s.id = a.`begin`
+    WHERE a.avail = 'public'
+      AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
+      AND (
+            NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)
+         OR (SELECT AVG(r.rating) FROM ratings r WHERE r.adv = a.id) > 2.5
+      )
+    ORDER BY a.id DESC
+    LIMIT 40";
+$res = runquery_assoc($query);
+if (is_array($res) && count($res) > 0) {
+    $res = array_values(array_filter($res, function ($row) {
+        $text = trim(decode($row['adv_description'] ?? '', 1));
+        return $text !== '';
+    }));
+    if (count($res) > 0) {
+        shuffle($res);
+        $res = array_slice($res, 0, 10);
+    }
+}
 ?>
 <div class="home-splash">
     <section class="home-hero" aria-labelledby="home-hero-title">
@@ -25,12 +50,44 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
                 Our ever-growing team of Choosologists is hard at work every day discovering new elements of fiction,
                 exciting and efficient methods of exposition, and novel uses for the written word.
             </p>
+            <p>
+                If you're already one of our Choosologists, sign in above to access your workstation.
+                If you're new here, browse the currently-running experiments or read the latest lab notes.
+            </p>
+            <div class="home-copy-actions">
+                <a class="home-copy-action" href="#/browse">Browse experiments</a>
+                <a class="home-copy-action" href="#/news">Read lab notes</a>
+            </div>
         </article>
     </section>
 
-    <section class="home-copy-grid" aria-label="Lab activity and next steps">
-        <article class="home-copy-card home-copy-card--feed">
+    <section class="home-copy-grid" aria-label="Featured experiments and recent lab notes">
+        <article class="home-copy-card home-copy-card--featured">
             <span class="home-copy-code" aria-hidden="true">02</span>
+            <h2 class="home-copy-heading">Newly Featured</h2>
+            <div class="intabs home-featured-mount" id="featadvs">
+                <div class="featuredslides">
+                    <?php if (is_array($res) && count($res) > 0) { ?>
+                    <button type="button" class="slidenav slidenav-left cycle-prev" aria-label="Previous featured experiment"></button>
+                    <div class="featuredslides-cycle">
+                    <?php
+                        foreach ($res as $r) {
+                            echo buildAdvFlag($r['aid'], $name);
+                        }
+                    ?>
+                    </div>
+                    <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
+                    <?php } elseif (is_array($res)) { ?>
+                    <p class="home-no-featured">No public adventures to feature yet.</p>
+                    <?php } else {
+                        echo $res;
+                    } ?>
+                </div>
+            </div>
+        </article>
+
+        <article class="home-copy-card home-copy-card--feed">
+            <span class="home-copy-code" aria-hidden="true">03</span>
             <h2 class="home-copy-heading">Recent Updates</h2>
             <?php if (count($recentFeed) === 0) { ?>
                 <p class="home-feed-empty">No recent lab notes or patch notes yet.</p>
@@ -47,72 +104,9 @@ $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
                 </div>
             <?php } ?>
         </article>
-
-        <article class="home-copy-card">
-            <span class="home-copy-code" aria-hidden="true">03</span>
-            <p>
-                If you're already one of our Choosologists, sign in above to access your workstation.
-                If you're new here, browse the currently-running experiments or read the latest lab notes.
-            </p>
-            <div class="home-copy-actions">
-                <a class="home-copy-action" href="#/browse">Browse experiments</a>
-                <a class="home-copy-action" href="#/news">Read lab notes</a>
-            </div>
-        </article>
     </section>
 </div>
-<h2 class="home-featured-title">Newly Featured</h2>
-<div class='intabs' id = "featadvs" >
 
-
-    <?php
-    /* DISTINCT + explicit adv columns only: SELECT * from JOIN can overwrite advs.description with another table's column in mysqli_fetch_assoc */
-    $query = "
-        SELECT DISTINCT a.id AS aid, a.description AS adv_description
-        FROM advs a
-        INNER JOIN advscreens s ON s.id = a.`begin`
-        WHERE a.avail = 'public'
-          AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
-          AND (
-                NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)
-             OR (SELECT AVG(r.rating) FROM ratings r WHERE r.adv = a.id) > 2.5
-          )
-        ORDER BY a.id DESC
-        LIMIT 40";
-    $res = runquery_assoc($query);
-    if (is_array($res) && count($res) > 0) {
-        $res = array_values(array_filter($res, function ($row) {
-            $text = trim(decode($row['adv_description'] ?? '', 1));
-            return $text !== '';
-        }));
-        if (count($res) > 0) {
-            shuffle($res);
-            $res = array_slice($res, 0, 10);
-        }
-    }
-    ?>
-    <div class='featuredslides'>
-        <?php if (is_array($res) && count($res) > 0) { ?>
-        <button type="button" class="slidenav slidenav-left cycle-prev" aria-label="Previous featured experiment"></button>
-        <div class='featuredslides-cycle'>
-        <?php
-            foreach ($res as $r) {
-                echo buildAdvFlag($r['aid'], $name);
-            }
-        ?>
-        </div>
-        <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
-        <?php } elseif (is_array($res)) { ?>
-        <p class='home-no-featured'>No public adventures to feature yet.</p>
-        <?php } else {
-            echo $res;
-        } ?>
-    </div>
-</div>
-
-<?php
-echo "";
-?>
 <script>
     $(document).ready(function(){
 
