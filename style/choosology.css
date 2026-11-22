@@ -599,7 +599,8 @@ body[data-logged-in="1"] #logoutsubmit a
 
 .home-splash
 {
-    width: min(920px, calc(100% - 64px));
+    width: min(80%, calc(100% - 48px));
+    max-width: 1400px;
     margin: 24px auto 18px;
     box-sizing: border-box;
 }
@@ -994,7 +995,7 @@ body[data-logged-in="1"] #logoutsubmit a
 {
     .home-splash
     {
-        width: min(94%, 920px);
+        width: min(94%, calc(100% - 32px));
     }
 
     .home-hero-lockup,
