@@ -6,7 +6,7 @@
  * Mascot packs own portraits, theme tokens, and dialog. The engine does not.
  *
  * Seed rows are inserted by choosology_guide_seed_defaults(); admins edit them
- * through My Office → RESTRICTED using lib/guide-admin-helpers.php.
+ * through the Classic Admin hub using lib/guide-admin-helpers.php.
  */
 
 const CHOOSOLOGY_GUIDE_COOKIE = 'choosology_guide';

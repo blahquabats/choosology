@@ -126,6 +126,8 @@ if (!mysqli_query($db, $q)) {
 	choosology_account_json(array('ok' => 0, 'error' => 'Could not save account settings.'));
 }
 
+$_SESSION['view_restricted'] = $viewRestricted;
+
 choosology_date_format_cookie_set($dateFmt);
 if ($guideOn !== null) {
 	choosology_guide_cookie_set($guideOn === 1);

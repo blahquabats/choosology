@@ -2,6 +2,8 @@
 var sammy_app;
 var activemenu;
 var pendingMystuffTab = null;
+/* True while My Office is sliding in; its show-complete handler owns the first room load. */
+var mystuffOpening = false;
 /** Bumps on each menu navigation so stale hide/show/load callbacks are ignored. */
 var menuNavGen = 0;
 var configmenu = {
@@ -56,6 +58,19 @@ var configmenu = {
       direction: "right",
       effect: "slide",
       bgcol: 1
+  },
+  admin : {
+      show: "#adminwindow",
+      id: 'admin',
+      name: 'Admin',
+      load: "mystuff/restricted.php",
+      bgtop: 0,
+      bgleft: 0,
+      bgcolor: "#e8d8d8",
+      direction: "up",
+      effect: "blind",
+      transfer: 1,
+      bgcol: 2
   },
   viewadv : {
       show: "#viewwindow",
@@ -139,7 +154,6 @@ $(function() {
             $("#mystuff-ledger").attr("href", 'mystuff/ledger.php');
             $("#mystuff-degrees").attr("href", 'mystuff/degrees.php');
             $("#mystuff-account").attr("href", 'mystuff/account.php');
-            $("#mystuff-restricted").attr("href", 'mystuff/restricted.php');
             $(".tabsa").on("mousedown", function(e){
                 var loc = $(this).attr("data-loc");
                 window.location.hash = "#/mystuff/" + loc;
@@ -151,11 +165,36 @@ $(function() {
                 fx: 'fadeout'
             });
             function choosologyLoginBoxHtml() {
-                return "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />"
+                return "<div id='loginbox-inner' class='loginbox-inner'>"
+                    + "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />"
                     + "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />"
                     + "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>"
                     + "<button type='button' id='loginsubmit'>Submit</button>"
-                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
+                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>"
+                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>"
+                    + "</div>";
+            }
+
+            function choosologyCloseForgotModal() {
+                var $m = $("#forgotmodal");
+                if (!$m.length) {
+                    return;
+                }
+                $m.addClass("signup-modal--hidden").attr("aria-hidden", "true");
+                $("body").removeClass("signup-modal-open");
+                $("#forgot-status").removeClass("signup-status--error").text("");
+            }
+
+            function choosologyOpenForgotModal() {
+                var $m = $("#forgotmodal");
+                if (!$m.length) {
+                    return;
+                }
+                $("#forgot-form")[0].reset();
+                $("#forgot-status").removeClass("signup-status--error").text("");
+                $m.removeClass("signup-modal--hidden").attr("aria-hidden", "false");
+                $("body").addClass("signup-modal-open");
+                $("#forgot-identity").trigger("focus");
             }
 
             function choosologyCloseSignupModal() {
@@ -204,13 +243,59 @@ $(function() {
                 e.preventDefault();
                 choosologyOpenSignupModal();
             });
+            $(document).on("click", "#openforgot", function(e) {
+                e.preventDefault();
+                choosologyOpenForgotModal();
+            });
             $(document).on("click", "#signupmodal_close, #signup-cancel, #signupmodal .signup-modal-backdrop", function() {
                 choosologyCloseSignupModal();
             });
+            $(document).on("click", "#forgotmodal_close, #forgot-cancel, #forgotmodal .signup-modal-backdrop", function() {
+                choosologyCloseForgotModal();
+            });
             $(document).on("keydown", function(e) {
-                if (e.key === "Escape" && $("#signupmodal").length && !$("#signupmodal").hasClass("signup-modal--hidden")) {
+                if (e.key !== "Escape") {
+                    return;
+                }
+                if ($("#signupmodal").length && !$("#signupmodal").hasClass("signup-modal--hidden")) {
                     choosologyCloseSignupModal();
                 }
+                if ($("#forgotmodal").length && !$("#forgotmodal").hasClass("signup-modal--hidden")) {
+                    choosologyCloseForgotModal();
+                }
+            });
+            $(document).on("submit", "#forgot-form", function(e) {
+                e.preventDefault();
+                var $submit = $("#forgot-submit");
+                var $status = $("#forgot-status");
+                var payload = {
+                    identity: $.trim($("#forgot-identity").val()),
+                    lab_fax: $("#forgot-fax").val()
+                };
+                $submit.prop("disabled", true);
+                $status.removeClass("signup-status--error").text("Sending…");
+                $.ajax({
+                    type: "POST",
+                    url: "ajax/passwordreset.php",
+                    data: JSON.stringify(payload),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                }).done(function(res) {
+                    if (!res || !res.ok) {
+                        $status.addClass("signup-status--error").text((res && res.error) ? res.error : "Could not start a reset.");
+                        return;
+                    }
+                    var msg = (res.message || "If that account exists, we sent reset instructions.");
+                    if (res.debug_url) {
+                        msg += " Dev link: " + res.debug_url;
+                    }
+                    $status.removeClass("signup-status--error").text(msg);
+                }).fail(function(xhr, status, err) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
+                    $status.addClass("signup-status--error").text(msg);
+                }).always(function() {
+                    $submit.prop("disabled", false);
+                });
             });
             $(document).on("submit", "#signup-form", function(e) {
                 e.preventDefault();
@@ -312,9 +397,22 @@ $(function() {
                         else
                         {
                             var topbox = $("#topbox");
-                            topbox.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</span><br />");
-                            topbox.effect("shake", {distance: 5, times: 2});
-                            $(".wrongpass").fadeOut(2000, "easeInExpo", function(){
+                            var $shake = $("#loginbox-inner");
+                            if (!$shake.length) {
+                                $shake = topbox;
+                            }
+                            $shake.find(".wrongpass").remove();
+                            $shake.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</span><br />");
+                            /* Vertical bump only: horizontal jQuery UI shake on the
+                               right-edge login chrome walks the box off-screen. */
+                            $shake.stop(true, true).effect("shake", {
+                                direction: "up",
+                                distance: 6,
+                                times: 2
+                            }, 350, function () {
+                                $shake.css({ left: "", top: "", position: "" });
+                            });
+                            $shake.find(".wrongpass").fadeOut(2000, "easeInExpo", function(){
                                 this.remove();
                             });
                             $('#loginsubmit').prop('disabled', false);
@@ -339,8 +437,9 @@ $(function() {
                         {
                             $("body").removeAttr("data-logged-in");
                             $("#mystuff_nav").hide();
+                            $("#admin_nav").hide();
                             $("#tabswindow").hide();
-                            if (window.location.hash.indexOf("mystuff") !== -1) {
+                            if (window.location.hash.indexOf("mystuff") !== -1 || window.location.hash.indexOf("admin") !== -1) {
                                 window.location.hash = "#/home";
                             }
                             var newtext = choosologyLoginBoxHtml();
@@ -353,49 +452,6 @@ $(function() {
                         }
                 });
             });
-
-            function choosologyAdminKind() {
-                return ($("#news-kind-update").is(":checked")) ? "update" : "news";
-            }
-
-            function choosologyApplyAdminKind(kind) {
-                kind = (kind === "news") ? "news" : "update";
-                if (kind === "update") {
-                    $("#news-kind-update").prop("checked", true);
-                } else {
-                    $("#news-kind-news").prop("checked", true);
-                }
-                var isUpdate = kind === "update";
-                $("#news-add-headline-label").text(isUpdate ? "Update text" : "Headline");
-                $("#news-add-headline").attr("maxlength", isUpdate ? 225 : 255);
-                $("#news-add-by").prop("disabled", isUpdate);
-                $("#news-add-body").prop("disabled", isUpdate);
-                if (isUpdate) {
-                    $("#news-add-body").removeAttr("required");
-                } else {
-                    $("#news-add-body").attr("required", "required");
-                }
-                $("#news-admin-byline-wrap, #news-admin-body-wrap").toggleClass("news-admin-field--disabled", isUpdate);
-                var editing = $.trim($("#news-edit-id").val()) !== "";
-                if (editing) {
-                    $("#news-add-submit").text(isUpdate ? "Save update" : "Save news item");
-                } else {
-                    $("#news-add-submit").text(isUpdate ? "Add update" : "Add news item");
-                }
-            }
-
-            function choosologyResetAdminForm() {
-                $("#news-edit-id").val("");
-                $("#news-edit-kind").val("");
-                $("#news-add-headline").val("");
-                $("#news-add-body").val("");
-                $("#news-add-by").val("The Grasssmith");
-                $("#news-kind-update").prop("disabled", false);
-                $("#news-kind-news").prop("disabled", false);
-                choosologyApplyAdminKind("update");
-                $("#news-edit-cancel").hide();
-                $("#news-add-status").removeClass("news-admin-status--error").text("");
-            }
 
             function choosologyReloadUpdatesFeed(page) {
                 var $mount = $("#newswindow #news-updates-mount");
@@ -414,203 +470,13 @@ $(function() {
                 });
             }
 
-            $(document).on("change", "#news-add-form input[name='kind']", function() {
-                // Don't allow switching kind while editing an existing row.
-                if ($.trim($("#news-edit-id").val()) !== "") {
-                    var locked = $("#news-edit-kind").val() || "news";
-                    choosologyApplyAdminKind(locked);
-                    return;
-                }
-                choosologyApplyAdminKind(choosologyAdminKind());
-            });
-
-            // Initial state when News tab loads with the form present.
-            if ($("#news-add-form").length) {
-                choosologyApplyAdminKind(choosologyAdminKind());
-            }
-
-            $(document).on("submit", "#news-add-form", function(e) {
-                e.preventDefault();
-                var $form = $(this);
-                var $submit = $("#news-add-submit");
-                var $status = $("#news-add-status");
-                var editId = $.trim($("#news-edit-id").val());
-                var kind = ($.trim($("#news-edit-kind").val()) || choosologyAdminKind());
-                var payload = {
-                    kind: kind,
-                    headline: $.trim($("#news-add-headline").val()),
-                    by: $.trim($("#news-add-by").val()),
-                    body: $.trim($("#news-add-body").val())
+            /* News admin lives under the top-level Admin hub; carry the item the admin was reading. */
+            $(document).on("click", ".news-admin-desk-link", function() {
+                window.ChoosologyRestrictedFocus = {
+                    view: "news",
+                    kind: $(this).attr("data-desk-kind") || "news",
+                    id: parseInt($(this).attr("data-desk-id"), 10) || 0
                 };
-                var isEdit = editId !== "";
-                if (isEdit) {
-                    payload.action = "update";
-                    payload.id = editId;
-                }
-
-                $submit.prop("disabled", true);
-                $status.removeClass("news-admin-status--error").text(isEdit ? "Saving..." : "Adding...");
-
-                $.ajax({
-                    type: "POST",
-                    url: isEdit ? "ajax/managenews.php" : $form.attr("action"),
-                    data: JSON.stringify(payload),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json"
-                }).done(function(response) {
-                    if (!response || !response.ok) {
-                        $status.addClass("news-admin-status--error").text((response && response.error) ? response.error : "Could not save item.");
-                        return;
-                    }
-
-                    if ((response.kind || kind) === "update") {
-                        choosologyReloadUpdatesFeed(isEdit ? null : 1);
-                        choosologyResetAdminForm();
-                        $status.text(isEdit ? "Update saved." : "Update added.");
-                        return;
-                    }
-
-                    var $list = $("#newswindow .news-archive-results");
-                    $list.find(".news-empty").remove();
-
-                    if (isEdit) {
-                        var $existingCard = $("#newswindow a.news-card[href='#/news/" + response.id + "']");
-                        $existingCard.find(".news-card-title").text(response.headline || "Untitled");
-                        $existingCard.find(".news-card-excerpt").text(response.excerpt || "");
-                        $("#newswindow #news-article-mount")
-                            .stop(true, true)
-                            .hide("blind", { direction: "up" }, 220, function () {
-                                $(this).load("news.php?id=" + response.id + "&fragment=article", function () {
-                                    $(this).show("blind", { direction: "down" }, 260);
-                                    initNewsComments($(this));
-                                });
-                            });
-                    } else {
-                        var $card = $("<a>")
-                            .addClass("news-card")
-                            .attr("href", "#/news/" + response.id)
-                            .append($("<span>").addClass("news-card-title").text(response.headline || "Untitled"))
-                            .append($("<span>").addClass("news-card-date").text(response.date || ""));
-                        if (response.excerpt) {
-                            $card.append($("<span>").addClass("news-card-excerpt").text(response.excerpt));
-                        }
-                        $list.prepend($card);
-                        location.hash = "#/news/" + response.id;
-                    }
-
-                    choosologyResetAdminForm();
-                    $status.text(isEdit ? "Saved." : "Added.");
-                }).fail(function(xhr, status, err) {
-                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
-                    $status.addClass("news-admin-status--error").text(msg);
-                }).always(function() {
-                    $submit.prop("disabled", false);
-                });
-            });
-
-            $(document).on("click", ".news-admin-edit-current", function() {
-                var id = $(this).attr("data-id") || "";
-                var $article = $(this).closest(".news-article");
-                var byline = $.trim($article.find(".news-byline").text()).replace(/^By\s+/i, "");
-                $("#news-edit-id").val(id);
-                $("#news-edit-kind").val("news");
-                $("#news-kind-update").prop("disabled", true);
-                $("#news-kind-news").prop("disabled", true);
-                choosologyApplyAdminKind("news");
-                $("#news-add-headline").val($.trim($article.find(".news-article-title").text()));
-                $("#news-add-by").val(byline || "The Grasssmith");
-                $("#news-add-body").val($.trim($article.find(".news-article-body").html()));
-                $("#news-edit-cancel").show();
-                $("#news-add-status").removeClass("news-admin-status--error").text("Editing news #" + id + ".");
-                $("#news-add-headline").focus();
-            });
-
-            $(document).on("click", ".news-admin-edit-update", function() {
-                var id = $(this).attr("data-id") || "";
-                var text = $(this).attr("data-text") || "";
-                $("#news-edit-id").val(id);
-                $("#news-edit-kind").val("update");
-                $("#news-kind-update").prop("disabled", true);
-                $("#news-kind-news").prop("disabled", true);
-                choosologyApplyAdminKind("update");
-                $("#news-add-headline").val(text);
-                $("#news-add-body").val("");
-                $("#news-edit-cancel").show();
-                $("#news-add-status").removeClass("news-admin-status--error").text("Editing update #" + id + ".");
-                $("#news-add-headline").focus();
-            });
-
-            $(document).on("click", "#news-edit-cancel", function() {
-                choosologyResetAdminForm();
-            });
-
-            $(document).on("click", ".news-admin-delete-current", function() {
-                var id = $(this).attr("data-id") || "";
-                if (!id || !window.confirm("Delete this news item?")) {
-                    return;
-                }
-                var $status = $("#news-add-status");
-                $status.removeClass("news-admin-status--error").text("Deleting...");
-                $.ajax({
-                    type: "POST",
-                    url: "ajax/managenews.php",
-                    data: JSON.stringify({ action: "delete", id: id, kind: "news" }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json"
-                }).done(function(response) {
-                    if (!response || !response.ok) {
-                        $status.addClass("news-admin-status--error").text((response && response.error) ? response.error : "Could not delete news item.");
-                        return;
-                    }
-                    $("#newswindow a.news-card[href='#/news/" + id + "']").remove();
-                    choosologyResetAdminForm();
-                    $status.text("Deleted.");
-                    if (window.location.hash === "#/news" || window.location.hash === "#/news/") {
-                        $("#newswindow #news-article-mount")
-                            .stop(true, true)
-                            .hide("blind", { direction: "up" }, 220, function () {
-                                $(this).load("news.php?id=&fragment=article", function () {
-                                    $(this).show("blind", { direction: "down" }, 260);
-                                    initNewsComments($(this));
-                                    $("#newswindow .news-card").removeClass("news-card--active").first().addClass("news-card--active");
-                                });
-                            });
-                    } else {
-                        location.hash = "#/news";
-                    }
-                }).fail(function(xhr, status, err) {
-                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
-                    $status.addClass("news-admin-status--error").text(msg);
-                });
-            });
-
-            $(document).on("click", ".news-admin-delete-update", function() {
-                var id = $(this).attr("data-id") || "";
-                if (!id || !window.confirm("Delete this minor update?")) {
-                    return;
-                }
-                var $status = $("#news-add-status");
-                $status.removeClass("news-admin-status--error").text("Deleting...");
-                $.ajax({
-                    type: "POST",
-                    url: "ajax/managenews.php",
-                    data: JSON.stringify({ action: "delete", id: id, kind: "update" }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json"
-                }).done(function(response) {
-                    if (!response || !response.ok) {
-                        $status.addClass("news-admin-status--error").text((response && response.error) ? response.error : "Could not delete update.");
-                        return;
-                    }
-                    if ($.trim($("#news-edit-id").val()) === String(id) && $("#news-edit-kind").val() === "update") {
-                        choosologyResetAdminForm();
-                    }
-                    choosologyReloadUpdatesFeed();
-                    $status.text("Update deleted.");
-                }).fail(function(xhr, status, err) {
-                    var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
-                    $status.addClass("news-admin-status--error").text(msg);
-                });
             });
 
             $(document).on("click", "#newswindow .updates-pager-btn[data-updates-page]", function() {
@@ -652,7 +518,8 @@ function loadTab(loc, retryAfterShow)
         if (window.ChoosologyOffice && typeof ChoosologyOffice.mount === "function") {
             ChoosologyOffice.mount($officePanel.find(".ms-room-page")[0]);
         }
-        if (hubLoc && hubLoc !== "office" && window.ChoosologyOffice && typeof ChoosologyOffice.openHotspot === "function") {
+        /* "office" closes any open panel, so #/mystuff returns to the bare room. */
+        if (window.ChoosologyOffice && typeof ChoosologyOffice.openHotspot === "function") {
             ChoosologyOffice.openHotspot(hubLoc);
             window.__choosologyOfficeHotspot = null;
         }
@@ -668,6 +535,8 @@ function loadTab(loc, retryAfterShow)
     window.setTimeout(function () {
         if (retryToken !== window.__choosologyLoadTabRetryToken) return;
         if (!$("#tabswindow").length) return;
+        /* A room that already loaded may have a hotspot open; reloading would close it. */
+        if (tabs.find(".ui-tabs-panel").eq(which).find(".ms-room-page").length) return;
         try { tabs.tabs("refresh"); } catch (err3) { /* ignore */ }
         tabs.tabs("option", "active", which);
         try { tabs.tabs("load", which); } catch (err4) { /* ignore */ }
@@ -714,6 +583,7 @@ function showMenuOption(which, param)
     var toshow = $(conf.show);
     var toeffect = conf.effect ? conf.effect : "slide";
     var hideconf = null;
+    mystuffOpening = which === "mystuff";
 
     if(activemenu)
     {
@@ -763,15 +633,13 @@ function showMenuOption(which, param)
                             if(param) url = url+"?"+param;
                             toshow.load(url, function () {
                                 if (gen !== menuNavGen) return;
-                                if (which === "news" && $("#news-add-form").length) {
-                                    choosologyApplyAdminKind(choosologyAdminKind());
-                                }
                                 if (which === "news") {
                                     initNewsComments(toshow);
                                 }
                             });
                         }
                     if (which === "mystuff") {
+                        mystuffOpening = false;
                         try { $("#tabswindow").tabs("refresh"); } catch (err) { /* ignore */ }
                         $("#tabswindow").addClass("ms-room-hub-mode");
                         if (pendingMystuffTab) {

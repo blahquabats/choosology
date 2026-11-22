@@ -6,11 +6,15 @@ require_once("labfeed.php");
 $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
 
 /* DISTINCT + explicit adv columns only: SELECT * from JOIN can overwrite advs.description with another table's column in mysqli_fetch_assoc */
+if (!function_exists('choosology_adventure_discovery_sql')) {
+	require_once __DIR__ . '/lib/adventure-review-helpers.php';
+}
+$discoverySql = choosology_adventure_discovery_sql('a');
 $query = "
     SELECT DISTINCT a.id AS aid, a.description AS adv_description
     FROM advs a
     INNER JOIN advscreens s ON s.id = a.`begin`
-    WHERE a.avail = 'public'
+    WHERE $discoverySql
       AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
       AND (
             NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)

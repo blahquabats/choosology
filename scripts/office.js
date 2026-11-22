@@ -12,7 +12,6 @@
     degrees: "Degrees",
     account: "My Information",
     results: "Experiment Results",
-    restricted: "RESTRICTED",
     shop: "Office Shop",
     inventory: "Inventory"
   };
@@ -24,8 +23,7 @@
     ledger: "mystuff/ledger.php",
     degrees: "mystuff/degrees.php",
     account: "mystuff/account.php",
-    results: "mystuff/results.php",
-    restricted: "mystuff/restricted.php"
+    results: "mystuff/results.php"
   };
 
   var state = null;
@@ -110,7 +108,6 @@
     if (!$root) return;
     var $ov = $root.find("#ms_room_overlay");
     $ov.removeClass("ms-room-overlay--full").addClass("ms-room-overlay--hidden").attr("aria-hidden", "true");
-    $root.find("#restricted_dock").remove();
     $root.find("#ms_room_panel_body").empty();
   }
 
@@ -330,8 +327,9 @@
     });
   }
 
-  function openHotspot(name) {
-    if (!name) return;
+  function openHotspot(rawName) {
+    if (!rawName) return;
+    var name = String(rawName).split("?")[0].split("/")[0];
     if (name === "office" || name === "") {
       closeOverlay();
       closeTrophy();
@@ -359,7 +357,6 @@
     }
     closeTrophy();
     openOverlay(HOTSPOT_TITLES[name] || name, url, true);
-    $root.find("#ms_room_overlay").toggleClass("ms-room-overlay--full", name === "restricted");
     if (name === "results" && window.ChoosologyClipboard) {
       /* results_analyst awarded by results.php itself */
     }

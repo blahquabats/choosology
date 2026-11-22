@@ -1,5 +1,5 @@
 /**
- * My Office → RESTRICTED admin hub.
+ * Classic top-level Admin hub (#/admin).
  */
 (function (window, $) {
 	"use strict";
@@ -10,6 +10,7 @@
 	var poseFiles = {};
 	var scanTimer = null;
 	var suppressPreview = false;
+	var recordUser = "";
 
 	function $dock() {
 		return dock && dock.length ? dock : root.find("#restricted_dock");
@@ -80,6 +81,19 @@
 
 	function activeView() {
 		return String(root.find("[data-restricted-view].is-active").attr("data-restricted-view") || "mascots");
+	}
+
+	function activateView(view) {
+		var $button = root.find('[data-restricted-view="' + view + '"]');
+		if (!$button.length) return;
+		root.find("[data-restricted-view]").removeClass("is-active");
+		$button.addClass("is-active");
+		root.find("[data-restricted-panel]").removeClass("is-active").attr("hidden", true);
+		root.find('[data-restricted-panel="' + view + '"]').addClass("is-active").removeAttr("hidden");
+		if (view !== "beats") {
+			$dock().find("#restricted_preview").empty();
+		}
+		updateMascotPreview();
 	}
 
 	function currentMascot() {
@@ -371,6 +385,162 @@
 		return found;
 	}
 
+	function newsKey(kind, id) {
+		return kind + ":" + id;
+	}
+
+	function findNews(key) {
+		var parts = String(key || "").split(":");
+		var id = parseInt(parts[1], 10) || 0;
+		var news = (state && state.news) || {};
+		var found = null;
+		if (parts[0] === "update") {
+			(news.updates || []).some(function (row) {
+				if (row.id === id) {
+					found = { kind: "update", id: row.id, headline: row.text, by: "", body: "" };
+					return true;
+				}
+				return false;
+			});
+			return found;
+		}
+		(news.posts || []).some(function (row) {
+			if (row.id === id) {
+				found = { kind: "news", id: row.id, headline: row.headline, by: row.by, body: row.body };
+				return true;
+			}
+			return false;
+		});
+		return found;
+	}
+
+	function newsOptionLabel(when, text) {
+		var label = String(text || "");
+		if (label.length > 60) {
+			label = label.slice(0, 57) + "…";
+		}
+		return (when ? when + " · " : "") + label;
+	}
+
+	function renderNewsOptions(selected) {
+		var news = (state && state.news) || {};
+		var $select = root.find("#restricted_news_select").empty();
+		$("<option>").val("").text("New item…").appendTo($select);
+		var $posts = $("<optgroup>").attr("label", "News posts");
+		(news.posts || []).forEach(function (row) {
+			$("<option>").val(newsKey("news", row.id)).text(newsOptionLabel(row.when_label, row.headline)).appendTo($posts);
+		});
+		var $updates = $("<optgroup>").attr("label", "Minor updates");
+		(news.updates || []).forEach(function (row) {
+			$("<option>").val(newsKey("update", row.id)).text(newsOptionLabel(row.when_label, row.text)).appendTo($updates);
+		});
+		if ($posts.children().length) $select.append($posts);
+		if ($updates.children().length) $select.append($updates);
+		$select.val(selected || "");
+		if ($select.val() === null) {
+			$select.val("");
+		}
+	}
+
+	function newsKind() {
+		return root.find("input[name='restricted_news_kind']:checked").val() === "update" ? "update" : "news";
+	}
+
+	function applyNewsKind() {
+		var isUpdate = newsKind() === "update";
+		var editing = value("#restricted_news_select") !== "";
+		root.find("[data-restricted-news-only]").attr("hidden", isUpdate);
+		root.find("#restricted_news_headline_label").text(isUpdate ? "Update text" : "Headline");
+		root.find("#restricted_news_headline").attr("maxlength", isUpdate ? 225 : 255);
+		root.find("input[name='restricted_news_kind']").prop("disabled", editing);
+		root.find("#restricted_news_mode").text(
+			(editing ? "Editing " : "New ") + (isUpdate ? "minor update" : "news post")
+		);
+		root.find("#restricted_news_save").text(editing ? "Save changes" : "Publish");
+		root.find("#restricted_news_delete").prop("disabled", !editing);
+	}
+
+	function showNews(item) {
+		var kind = item ? item.kind : newsKind();
+		root.find("input[name='restricted_news_kind'][value='" + kind + "']").prop("checked", true);
+		root.find("#restricted_news_headline").val(item ? item.headline : "");
+		root.find("#restricted_news_by").val(item ? item.by : ((state && state.admin) || ""));
+		root.find("#restricted_news_body").val(item ? item.body : "");
+		applyNewsKind();
+	}
+
+	function currentNews() {
+		var key = value("#restricted_news_select");
+		return {
+			kind: newsKind(),
+			id: key ? (parseInt(key.split(":")[1], 10) || 0) : 0,
+			headline: value("#restricted_news_headline"),
+			by: value("#restricted_news_by"),
+			body: value("#restricted_news_body")
+		};
+	}
+
+	function renderDegreeCatalog() {
+		var counts = state.degree_counts || {};
+		var $body = root.find("#restricted_degree_catalog tbody").empty();
+		Object.keys(state.degrees || {}).forEach(function (key) {
+			var degree = state.degrees[key];
+			var $row = $("<tr>").appendTo($body);
+			$("<th>").attr("scope", "row").text(degree.label).appendTo($row);
+			$("<td>").text(degree.blurb).appendTo($row);
+			$("<td>").addClass("restricted-table-num").text(counts[key] || 0).appendTo($row);
+		});
+	}
+
+	function renderRecord(record) {
+		var $wrap = root.find("#restricted_record").empty();
+		var degrees = record.degrees || [];
+		var held = degrees.filter(function (degree) { return !!degree.earned_at; }).length;
+		$("<p>").addClass("restricted-record-head").text(
+			record.user + " holds " + held + " of " + degrees.length + " Degrees."
+		).appendTo($wrap);
+		var $list = $("<ul>").addClass("restricted-record-list").appendTo($wrap);
+		degrees.forEach(function (degree) {
+			var $item = $("<li>").toggleClass("is-held", !!degree.earned_at).appendTo($list);
+			$("<span>").addClass("restricted-record-label").text(degree.label).appendTo($item);
+			if (degree.earned_at) {
+				$("<span>").addClass("restricted-record-state").text("Earned " + (degree.earned_label || degree.earned_at)).appendTo($item);
+			} else {
+				$("<span>").addClass("restricted-record-state").text("Not held").appendTo($item);
+				$("<button>").attr({ type: "button", "data-degree-key": degree.key })
+					.addClass("restricted-btn restricted-record-grant").text("Grant").appendTo($item);
+			}
+		});
+	}
+
+	function lookupRecord(user, quiet) {
+		if (!user) {
+			status("Enter a researcher to look up.", true);
+			return;
+		}
+		post("degree_record", { user: user }).done(function (res) {
+			if (!res || !res.ok) {
+				recordUser = "";
+				root.find("#restricted_record").empty();
+				status((res && res.error) || "Lookup failed.", true);
+				return;
+			}
+			recordUser = res.user;
+			renderRecord(res);
+			if (!quiet) status("");
+		}).fail(function (xhr) {
+			status(errorText(xhr, "Lookup failed."), true);
+		});
+	}
+
+	function grantDegree(to, degree) {
+		mutate("award_degree", { to: to, degree: degree }, "Degree granted to " + to + ".").done(function (res) {
+			if (res && res.ok && recordUser) {
+				lookupRecord(recordUser, true);
+			}
+		});
+	}
+
 	function renderComments(comments) {
 		var $wrap = root.find("#restricted_comments").empty();
 		root.find("#restricted_comment_badge").text(comments.length ? "(" + comments.length + ")" : "");
@@ -391,6 +561,68 @@
 		});
 	}
 
+	function renderAdventures(adventures) {
+		var $wrap = root.find("#restricted_adventures").empty();
+		root.find("#restricted_adventure_badge").text(adventures.length ? "(" + adventures.length + ")" : "");
+		if (!adventures.length) {
+			$wrap.append($("<p>").addClass("restricted-empty").text("Adventure review queue clear."));
+			return;
+		}
+		adventures.forEach(function (adv) {
+			var $item = $("<article>").addClass("restricted-comment restricted-adventure").attr("data-adventure-id", adv.id);
+			var holdBits = [];
+			if (adv.review_hold) {
+				holdBits.push("HELD");
+			}
+			(adv.hold_reasons || []).forEach(function (reason) {
+				holdBits.push(reason);
+			});
+			var $row = $("<div>").addClass("restricted-adventure-row").appendTo($item);
+			if (adv.pic_url) {
+				$("<img>")
+					.addClass("restricted-adventure-thumb")
+					.attr({ src: adv.pic_url, alt: "", width: 120, height: 75, loading: "lazy" })
+					.appendTo($row);
+			}
+			var $body = $("<div>").addClass("restricted-adventure-body").appendTo($row);
+			$("<p>").addClass("restricted-comment-meta").text(
+				"#" + adv.id + " · " + (adv.user || "?") + " · " + (adv.avail || "") +
+				(holdBits.length ? " · " + holdBits.join(", ") : "") +
+				(adv.published ? " · published " + adv.published : "")
+			).appendTo($body);
+			$("<p>").addClass("restricted-comment-text").css("font-weight", "bold").text(adv.title || "Untitled").appendTo($body);
+			if (adv.description) {
+				$("<p>").addClass("restricted-comment-text").text(adv.description).appendTo($body);
+			}
+			if ((adv.content_flags || []).length) {
+				$("<p>").addClass("restricted-comment-meta").text("Flags: " + adv.content_flags.join(", ")).appendTo($body);
+			}
+			var $note = $("<label>").text("Reject note ").append(
+				$("<input>").attr({
+					type: "text",
+					class: "restricted-adventure-note",
+					maxlength: 500,
+					placeholder: "Required only when rejecting"
+				})
+			).appendTo($body);
+			$note.css({ display: "block", margin: "8px 0" });
+			var $actions = $("<div>").addClass("restricted-actions").appendTo($body);
+			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--primary restricted-adventure-accept").text("Accept").appendTo($actions);
+			$("<button>").attr("type", "button").addClass("restricted-btn restricted-adventure-restricted").text("Accept as Restricted").appendTo($actions);
+			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--danger restricted-adventure-reject").text("Reject & remove").appendTo($actions);
+			if (adv.user) {
+				$("<button>").attr({
+					type: "button",
+					"data-user": adv.user,
+					"data-probation": adv.author_probation ? "0" : "1"
+				}).addClass("restricted-btn restricted-adventure-probation")
+					.text(adv.author_probation ? "Clear author probation" : "Put author on probation")
+					.appendTo($actions);
+			}
+			$wrap.append($item);
+		});
+	}
+
 	function defaultMascotKey() {
 		var key = "";
 		(state.mascots || []).some(function (mascot) {
@@ -403,7 +635,10 @@
 		return key || ((state.mascots || [])[0] && state.mascots[0].key) || "";
 	}
 
-	function renderState(next, selectedMascot, selectedInteraction) {
+	function renderState(next, selection) {
+		var firstRender = state === null;
+		var selectedMascot = selection.mascot;
+		var selectedInteraction = selection.interaction;
 		state = next;
 		var users = (state.users || []).map(function (name) {
 			return { value: name, label: name };
@@ -441,20 +676,31 @@
 		var degreeRows = Object.keys(state.degrees || {}).map(function (key) {
 			return { value: key, label: state.degrees[key].label + " — " + state.degrees[key].blurb };
 		});
-		fillOptions(root.find("#restricted_degree_key"), degreeRows);
+		fillOptions(root.find("#restricted_degree_key"), degreeRows, value("#restricted_degree_key") || undefined);
+		renderDegreeCatalog();
+
+		/* An unrelated save must not wipe a half-written news item. */
+		var keepDraft = !firstRender && selection.news === undefined;
+		var newsSelected = keepDraft ? value("#restricted_news_select") : (selection.news || "");
+		renderNewsOptions(newsSelected);
+		if (!keepDraft || (newsSelected && !findNews(newsSelected))) {
+			showNews(findNews(value("#restricted_news_select")));
+		}
+
 		renderComments(state.comments || []);
+		renderAdventures(state.adventures || []);
 		updateMascotPreview();
 	}
 
-	function reload(selectedMascot, selectedInteraction) {
-		status("Loading authorization records…");
+	function reload(selection, message) {
+		status(message || "Loading authorization records…");
 		return post("state").done(function (res) {
 			if (!res || !res.ok) {
 				status((res && res.error) || "Could not load restricted records.", true);
 				return;
 			}
-			renderState(res, selectedMascot, selectedInteraction);
-			status("");
+			renderState(res, selection || {});
+			status(message || "");
 		}).fail(function (xhr) {
 			status(errorText(xhr, "Network error loading restricted records."), true);
 		});
@@ -462,13 +708,12 @@
 
 	function mutate(action, payload, success, selection) {
 		status("Saving…");
-		post(action, payload).done(function (res) {
+		return post(action, payload).done(function (res) {
 			if (!res || !res.ok) {
 				status((res && res.error) || "Action failed.", true);
 				return;
 			}
-			status(success || "Saved.");
-			reload(selection && selection.mascot, selection && selection.interaction);
+			reload(typeof selection === "function" ? selection(res) : selection, success || "Saved.");
 		}).fail(function (xhr) {
 			status(errorText(xhr, "Network error."), true);
 		});
@@ -522,15 +767,7 @@
 	function bind() {
 		root.off(".restricted");
 		root.on("click.restricted", "[data-restricted-view]", function () {
-			var view = $(this).attr("data-restricted-view");
-			root.find("[data-restricted-view]").removeClass("is-active");
-			$(this).addClass("is-active");
-			root.find("[data-restricted-panel]").removeClass("is-active").attr("hidden", true);
-			root.find('[data-restricted-panel="' + view + '"]').addClass("is-active").removeAttr("hidden");
-			if (view !== "beats") {
-				$dock().find("#restricted_preview").empty();
-			}
-			updateMascotPreview();
+			activateView($(this).attr("data-restricted-view"));
 		});
 
 		root.on("change.restricted", "#restricted_mascot_select", function () {
@@ -637,10 +874,41 @@
 			}
 		});
 
+		root.on("change.restricted", "#restricted_news_select", function () {
+			showNews(findNews($(this).val()));
+		});
+		root.on("click.restricted", "#restricted_news_new", function () {
+			root.find("#restricted_news_select").val("");
+			showNews(null);
+			root.find("#restricted_news_headline").trigger("focus");
+		});
+		root.on("change.restricted", "input[name='restricted_news_kind']", applyNewsKind);
+		root.on("click.restricted", "#restricted_news_save", function () {
+			var item = currentNews();
+			var noun = item.kind === "update" ? "Minor update" : "News post";
+			mutate("save_news", { item: item }, noun + (item.id ? " saved." : " published."), function (res) {
+				return { news: newsKey(res.kind, res.id) };
+			});
+		});
+		root.on("click.restricted", "#restricted_news_delete", function () {
+			var item = currentNews();
+			if (!item.id) return;
+			var noun = item.kind === "update" ? "minor update" : "news post";
+			if (window.confirm("Delete this " + noun + " permanently?")) {
+				mutate("delete_news", { kind: item.kind, id: item.id }, "Item deleted.", { news: "" });
+			}
+		});
+
 		root.on("submit.restricted", "#restricted_degree_form", function () {
-			var to = value("#restricted_degree_user");
-			var degree = value("#restricted_degree_key");
-			mutate("award_degree", { to: to, degree: degree }, "Degree granted to " + to + ".");
+			grantDegree(value("#restricted_degree_user"), value("#restricted_degree_key"));
+		});
+		root.on("submit.restricted", "#restricted_record_form", function () {
+			lookupRecord(value("#restricted_record_user"));
+		});
+		root.on("click.restricted", ".restricted-record-grant", function () {
+			if (recordUser) {
+				grantDegree(recordUser, String($(this).attr("data-degree-key") || ""));
+			}
 		});
 		root.on("change.restricted", "input[name='restricted_scrip_scope']", function () {
 			var all = root.find("input[name='restricted_scrip_scope']:checked").val() === "all";
@@ -675,15 +943,64 @@
 				mutate("moderate_comment", { mode: "approve_all" }, "Review queue approved.");
 			}
 		});
+
+		root.on("click.restricted", ".restricted-adventure-accept, .restricted-adventure-restricted, .restricted-adventure-reject", function () {
+			var $item = $(this).closest("[data-adventure-id]");
+			var mode = "accept";
+			if ($(this).hasClass("restricted-adventure-restricted")) {
+				mode = "accept_restricted";
+			} else if ($(this).hasClass("restricted-adventure-reject")) {
+				mode = "reject";
+			}
+			var note = String($item.find(".restricted-adventure-note").val() || "").trim();
+			if (mode === "reject") {
+				if (!note) {
+					status("A reject note for the creator is required.", true);
+					return;
+				}
+				if (!window.confirm("Remove this experiment permanently and message the creator?")) {
+					return;
+				}
+			}
+			mutate("moderate_adventure", {
+				mode: mode,
+				adventure_id: parseInt($item.attr("data-adventure-id"), 10) || 0,
+				note: note
+			}, mode === "reject" ? "Experiment removed and creator notified." : "Adventure review saved.");
+		});
+
+		root.on("click.restricted", ".restricted-adventure-probation", function () {
+			var user = $(this).attr("data-user") || "";
+			var on = $(this).attr("data-probation") === "1";
+			mutate("set_probation", {
+				user: user,
+				probation: on ? 1 : 0
+			}, on ? "Author placed on probation." : "Probation cleared.");
+		});
+
+		root.on("submit.restricted", "#restricted_probation_form", function () {
+			mutate("set_probation", {
+				user: value("#restricted_probation_user"),
+				probation: value("#restricted_probation_state") === "1" ? 1 : 0
+			}, "Probation updated.");
+		});
 	}
 
 	function init(node) {
 		root = $(node);
 		if (!root.length) return;
+		state = null;
+		recordUser = "";
+		/* Set by "Edit in News Desk" links before they navigate here. */
+		var focus = window.ChoosologyRestrictedFocus || null;
+		window.ChoosologyRestrictedFocus = null;
 		mountDock();
 		initThemePickers();
 		bind();
-		reload();
+		if (focus && focus.view) {
+			activateView(focus.view);
+		}
+		reload(focus && focus.view === "news" && focus.id ? { news: newsKey(focus.kind || "news", focus.id) } : {});
 	}
 
 	window.ChoosologyRestricted = { init: init };

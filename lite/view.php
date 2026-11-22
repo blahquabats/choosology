@@ -24,10 +24,9 @@ if (!$adv) {
 	exit;
 }
 
-$avail = (string) ($adv['avail'] ?? '');
-$owner = (string) ($adv['user'] ?? '');
+require_once dirname(__DIR__) . '/lib/adventure-review-helpers.php';
 $sessionUser = (string) ($_SESSION['user'] ?? '');
-$canView = ($avail === 'public') || ($sessionUser !== '' && $sessionUser === $owner);
+$canView = choosology_adventure_can_view($adv, $sessionUser);
 if (!$canView) {
 	http_response_code(403);
 	choosology_lite_header(array('title' => 'Private', 'active' => 'browse'));
