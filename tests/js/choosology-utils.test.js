@@ -48,4 +48,35 @@ describe("ChoosologyUtils", () => {
     expect(utils.isValidExperimentTitle("   ")).toBe(false);
     expect(utils.isValidExperimentTitle("")).toBe(false);
   });
+
+  test("filterUnreadQuickItems keeps only unseen items", () => {
+    const items = [
+      { id: 10, title: "New award", seen: false },
+      { id: 9, title: "Already read", seen: true },
+      { id: 8, title: "New comment", seen: false }
+    ];
+    expect(utils.filterUnreadQuickItems(items).map((x) => x.id)).toEqual([10, 8]);
+    expect(utils.filterUnreadQuickItems(null)).toEqual([]);
+  });
+
+  test("removeQuickItemById removes matching event without mutating input", () => {
+    const items = [
+      { id: 10, title: "A", seen: false },
+      { id: 9, title: "B", seen: false },
+      { id: 8, title: "C", seen: false }
+    ];
+    const snapshot = JSON.stringify(items);
+    const res = utils.removeQuickItemById(items, "9");
+    expect(res.removed).toBe(true);
+    expect(res.items.map((x) => x.id)).toEqual([10, 8]);
+    expect(JSON.stringify(items)).toBe(snapshot);
+
+    const miss = utils.removeQuickItemById(res.items, 999);
+    expect(miss.removed).toBe(false);
+    expect(miss.items.map((x) => x.id)).toEqual([10, 8]);
+
+    const invalid = utils.removeQuickItemById(res.items, 0);
+    expect(invalid.removed).toBe(false);
+    expect(invalid.items).toHaveLength(2);
+  });
 });

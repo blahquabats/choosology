@@ -1,6 +1,6 @@
 <?php
 /**
- * RESTRICTED — admin tools and lab-guide configuration.
+ * Admin hub — lab tools and guide configuration (Classic #/admin).
  */
 require_once __DIR__ . '/../connect.php';
 require_once __DIR__ . '/../auxfuncs.php';
@@ -8,26 +8,28 @@ require_once __DIR__ . '/../lib/restricted-helpers.php';
 
 if (!choosology_restricted_is_admin()) {
 	http_response_code(403);
-	echo "<div class='intabs'><p class='error'>RESTRICTED: lab admin access required.</p></div>";
+	echo "<div class='intabs'><p class='error'>Admin: lab admin access required.</p></div>";
 	return;
 }
 ?>
 <div class="intabs restricted-page" id="restricted_center">
 	<header class="restricted-head">
 		<div>
-			<p class="restricted-eyebrow">My Office · authorization level <?php echo (int) $_SESSION['usertype']; ?></p>
-			<h2 class="restricted-title">RESTRICTED</h2>
-			<p class="restricted-lede">Lab administration, credentials, treasury, moderation, and guide programming.</p>
+			<p class="restricted-eyebrow">Admin · authorization level <?php echo (int) $_SESSION['usertype']; ?></p>
+			<h2 class="restricted-title">Admin</h2>
+			<p class="restricted-lede">Lab administration: guide programming, publications, credentials, treasury, and moderation.</p>
 		</div>
 		<span class="restricted-stamp" aria-hidden="true">AUTHORIZED<br>PERSONNEL</span>
 	</header>
 
-	<nav class="restricted-nav" aria-label="Restricted tools">
+	<nav class="restricted-nav" aria-label="Admin tools">
 		<button type="button" class="restricted-nav-btn is-active" data-restricted-view="mascots">Mascot Packs</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="beats">Dialog Beats</button>
-		<button type="button" class="restricted-nav-btn" data-restricted-view="degrees">Grant Degrees</button>
+		<button type="button" class="restricted-nav-btn" data-restricted-view="news">News Desk</button>
+		<button type="button" class="restricted-nav-btn" data-restricted-view="degrees">Degrees</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="scrip">Award DataScrip</button>
 		<button type="button" class="restricted-nav-btn" data-restricted-view="comments">Comment Review <span id="restricted_comment_badge"></span></button>
+		<button type="button" class="restricted-nav-btn" data-restricted-view="adventures">Adventure Review <span id="restricted_adventure_badge"></span></button>
 	</nav>
 
 	<p class="restricted-global-status" id="restricted_global_status" aria-live="polite"></p>
@@ -168,18 +170,78 @@ if (!choosology_restricted_is_admin()) {
 		<div id="restricted_preview" aria-live="polite"></div>
 	</div>
 
-	<section class="restricted-view" data-restricted-panel="degrees" aria-labelledby="restricted_degrees_heading" hidden>
-		<div class="restricted-card restricted-card--compact">
-			<p class="restricted-kicker">Credentials office</p>
-			<h3 id="restricted_degrees_heading">Grant a Degree</h3>
-			<p>Manual grants use the normal award path: the recipient receives its DataScrip reward, trophy-room trinket, and a CLIC notice.</p>
-			<form id="restricted_degree_form" class="restricted-form restricted-fields" onsubmit="return false;">
-				<label>Recipient <input id="restricted_degree_user" list="restricted_users" maxlength="45" autocomplete="off"></label>
-				<label>Degree <select id="restricted_degree_key"></select></label>
-				<div class="restricted-actions">
-					<button type="submit" class="restricted-btn restricted-btn--primary">Grant Degree</button>
+	<section class="restricted-view" data-restricted-panel="news" aria-labelledby="restricted_news_heading" hidden>
+		<div class="restricted-section-head">
+			<div>
+				<p class="restricted-kicker">Publications</p>
+				<h3 id="restricted_news_heading">News Desk</h3>
+			</div>
+		</div>
+		<p class="restricted-note">News posts get a headline, byline, and a full article on the News page. Minor updates are one-line patch notes in the Home and News feeds.</p>
+		<form class="restricted-card restricted-form" id="restricted_news_form" onsubmit="return false;">
+			<div class="restricted-card-head">
+				<h4 id="restricted_news_mode">New item</h4>
+				<div class="restricted-card-picker">
+					<select id="restricted_news_select" aria-label="News item"></select>
+					<button type="button" class="restricted-btn" id="restricted_news_new">New</button>
 				</div>
-			</form>
+			</div>
+			<div class="restricted-checks restricted-news-kinds">
+				<label><input type="radio" name="restricted_news_kind" value="news" checked> News post</label>
+				<label><input type="radio" name="restricted_news_kind" value="update"> Minor update</label>
+			</div>
+			<div class="restricted-fields">
+				<label><span id="restricted_news_headline_label">Headline</span> <input id="restricted_news_headline" maxlength="255"></label>
+				<label data-restricted-news-only>Byline <input id="restricted_news_by" maxlength="45"></label>
+				<label data-restricted-news-only>Body (basic HTML: paragraphs, links, lists, emphasis) <textarea id="restricted_news_body" rows="12"></textarea></label>
+			</div>
+			<div class="restricted-actions">
+				<button type="button" class="restricted-btn restricted-btn--primary" id="restricted_news_save">Publish</button>
+				<button type="button" class="restricted-btn restricted-btn--danger" id="restricted_news_delete">Delete</button>
+			</div>
+		</form>
+	</section>
+
+	<section class="restricted-view" data-restricted-panel="degrees" aria-labelledby="restricted_degrees_heading" hidden>
+		<div class="restricted-section-head">
+			<div>
+				<p class="restricted-kicker">Credentials office</p>
+				<h3 id="restricted_degrees_heading">Degrees</h3>
+			</div>
+		</div>
+		<p class="restricted-note">Manual grants use the normal award path: the recipient receives the DataScrip reward, the trophy-room trinket, and a CLIC notice.</p>
+		<div class="restricted-degree-layout">
+			<div class="restricted-degree-column">
+				<div class="restricted-card">
+					<h4>Grant a Degree</h4>
+					<form id="restricted_degree_form" class="restricted-form restricted-fields" onsubmit="return false;">
+						<label>Recipient <input id="restricted_degree_user" list="restricted_users" maxlength="45" autocomplete="off"></label>
+						<label>Degree <select id="restricted_degree_key"></select></label>
+						<div class="restricted-actions">
+							<button type="submit" class="restricted-btn restricted-btn--primary">Grant Degree</button>
+						</div>
+					</form>
+				</div>
+				<div class="restricted-card">
+					<h4>Researcher record</h4>
+					<form id="restricted_record_form" class="restricted-form restricted-fields" onsubmit="return false;">
+						<label>Researcher <input id="restricted_record_user" list="restricted_users" maxlength="45" autocomplete="off"></label>
+						<div class="restricted-actions">
+							<button type="submit" class="restricted-btn">Look up</button>
+						</div>
+					</form>
+					<div id="restricted_record" class="restricted-record" aria-live="polite"></div>
+				</div>
+			</div>
+			<div class="restricted-card">
+				<h4>Catalog</h4>
+				<table class="restricted-table" id="restricted_degree_catalog">
+					<thead>
+						<tr><th scope="col">Degree</th><th scope="col">Requirement</th><th scope="col">Holders</th></tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
 		</div>
 	</section>
 
@@ -211,6 +273,32 @@ if (!choosology_restricted_is_admin()) {
 			<button type="button" class="restricted-btn restricted-btn--primary" id="restricted_comments_approve_all">Approve all</button>
 		</div>
 		<div id="restricted_comments" class="restricted-comments"></div>
+	</section>
+
+	<section class="restricted-view" data-restricted-panel="adventures" aria-labelledby="restricted_adventures_heading" hidden>
+		<div class="restricted-section-head">
+			<div>
+				<p class="restricted-kicker">Moderation queue</p>
+				<h3 id="restricted_adventures_heading">Adventure Review</h3>
+			</div>
+		</div>
+		<p class="restricted-note">Publishing stays frictionless. Every new public listing enters this queue. Held rows (probation or content flags) stay out of browse until you act.</p>
+		<div class="restricted-card restricted-card--compact restricted-form">
+			<p class="restricted-kicker">Probation</p>
+			<form id="restricted_probation_form" class="restricted-fields restricted-fields--two" onsubmit="return false;">
+				<label>Researcher <input id="restricted_probation_user" list="restricted_users" maxlength="45" autocomplete="off"></label>
+				<label>Status
+					<select id="restricted_probation_state">
+						<option value="1">On probation (hold new listings)</option>
+						<option value="0">Clear probation</option>
+					</select>
+				</label>
+				<div class="restricted-actions">
+					<button type="submit" class="restricted-btn">Update probation</button>
+				</div>
+			</form>
+		</div>
+		<div id="restricted_adventures" class="restricted-comments"></div>
 	</section>
 </div>
 <script>

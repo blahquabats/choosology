@@ -5,7 +5,11 @@ if (isset($_POST['searchval']))
 {
     $val = $_POST['searchval'];
     $limit = $_POST['limit'];
-    $searchq = "select  * from advs where title like \"%$val%\" and avail='public' limit 11";
+    if (!function_exists('choosology_adventure_discovery_sql')) {
+        require_once __DIR__ . '/lib/adventure-review-helpers.php';
+    }
+    $discoverySql = choosology_adventure_discovery_sql('advs');
+    $searchq = "select * from advs where title like \"%$val%\" and $discoverySql limit 11";
     $val = htmlspecialchars($val);
     $pres=runquery_assoc($searchq);
     $c = 0;

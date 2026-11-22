@@ -14,7 +14,8 @@ $page = max(1, (int) ($_GET['page'] ?? 1));
 $perPage = 12;
 $offset = ($page - 1) * $perPage;
 
-$where = "a.avail = 'public'";
+require_once dirname(__DIR__) . '/lib/adventure-review-helpers.php';
+$where = choosology_adventure_discovery_sql('a');
 $order = 'COALESCE(a.published, a.created) DESC';
 if ($titleQ !== '') {
 	$esc = mysqli_real_escape_string($db, $titleQ);

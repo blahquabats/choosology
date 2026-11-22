@@ -1,6 +1,6 @@
 <?php
 /**
- * JSON actions for My Office → RESTRICTED.
+ * JSON actions for the Classic Admin hub.
  */
 ob_start();
 require_once __DIR__ . '/../connect.php';
@@ -8,6 +8,8 @@ require_once __DIR__ . '/../auxfuncs.php';
 require_once __DIR__ . '/../messagesfunc.php';
 require_once __DIR__ . '/../lib/restricted-helpers.php';
 require_once __DIR__ . '/../lib/guide-admin-helpers.php';
+require_once __DIR__ . '/../lib/news-admin-helpers.php';
+require_once __DIR__ . '/../lib/adventure-review-helpers.php';
 ob_end_clean();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -45,6 +47,7 @@ if (!is_array($data)) {
 
 choosology_guide_ensure_schema($db);
 choosology_clipboard_ensure_schema($db);
+choosology_adventure_review_ensure_schema($db);
 $action = trim((string) ($data['action'] ?? 'state'));
 $admin = (string) $_SESSION['user'];
 
@@ -58,9 +61,13 @@ if ($action === 'state') {
 	}
 	choosology_restricted_json(array(
 		'ok' => 1,
+		'admin' => $admin,
 		'users' => choosology_restricted_usernames($db),
 		'degrees' => choosology_achievement_catalog(),
+		'degree_counts' => choosology_restricted_degree_counts($db),
+		'news' => choosology_news_admin_desk($db),
 		'comments' => choosology_restricted_pending_comments($db),
+		'adventures' => choosology_adventure_review_pending($db),
 		'events' => choosology_guide_event_registry(),
 		'features' => choosology_guide_feature_registry(),
 		'poses' => $poses,
@@ -90,6 +97,29 @@ if ($action === 'award_degree') {
 	));
 }
 
+if ($action === 'degree_record') {
+	choosology_restricted_json(choosology_restricted_degree_record(
+		$db,
+		(string) ($data['user'] ?? '')
+	));
+}
+
+if ($action === 'save_news') {
+	choosology_restricted_json(choosology_news_admin_save(
+		$db,
+		is_array($data['item'] ?? null) ? $data['item'] : array(),
+		$admin
+	));
+}
+
+if ($action === 'delete_news') {
+	choosology_restricted_json(choosology_news_admin_delete(
+		$db,
+		(string) ($data['kind'] ?? ''),
+		(int) ($data['id'] ?? 0)
+	));
+}
+
 if ($action === 'award_scrip') {
 	$scope = (string) ($data['scope'] ?? 'one');
 	$result = choosology_datascrip_admin_grant(
@@ -111,6 +141,24 @@ if ($action === 'moderate_comment') {
 		$db,
 		(string) ($data['mode'] ?? ''),
 		(int) ($data['comment_id'] ?? 0)
+	));
+}
+
+if ($action === 'moderate_adventure') {
+	choosology_restricted_json(choosology_adventure_review_moderate(
+		$db,
+		$admin,
+		(string) ($data['mode'] ?? ''),
+		(int) ($data['adventure_id'] ?? 0),
+		(string) ($data['note'] ?? '')
+	));
+}
+
+if ($action === 'set_probation') {
+	choosology_restricted_json(choosology_adventure_review_set_probation(
+		$db,
+		(string) ($data['user'] ?? ''),
+		!empty($data['probation'])
 	));
 }
 

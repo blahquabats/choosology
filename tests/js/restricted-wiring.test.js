@@ -5,19 +5,28 @@ function read(rel) {
   return fs.readFileSync(path.join(__dirname, "../..", rel), "utf8");
 }
 
-describe("RESTRICTED admin hub wiring", () => {
-  test("Classic shell and office expose the admin-only destination", () => {
+describe("Admin hub wiring", () => {
+  test("Classic shell exposes a top-level Admin nav sibling, not a My Office tab", () => {
     const index = read("index.php");
     const office = read("mystuff/office.php");
     const officeJs = read("scripts/office.js");
-    expect(index).toContain("mystuff/restricted.php");
+    const routes = read("scripts/routes.js");
+    const shell = read("scripts/index.js");
+    expect(index).toContain('id="admin_nav"');
+    expect(index).toContain("Admin");
+    expect(index).toContain('id="adminwindow"');
     expect(index).toContain("scripts/restricted.js");
     expect(index).toContain("$_SESSION['usertype']");
-    expect(office).toContain('data-hotspot="restricted"');
-    expect(office).toContain("RESTRICTED");
-    expect(officeJs).toContain('restricted: "mystuff/restricted.php"');
-    expect(officeJs).toContain("ms-room-overlay--full");
+    expect(index).not.toContain("mystuff-restricted");
+    expect(index).not.toContain('href="mystuff/restricted.php"');
+    expect(office).not.toContain('data-hotspot="restricted"');
+    expect(office).not.toContain("RESTRICTED");
+    expect(officeJs).not.toContain('restricted: "mystuff/restricted.php"');
     expect(officeJs).toContain('closest(".minicolors")');
+    expect(shell).toContain('id: \'admin\'');
+    expect(shell).toContain('load: "mystuff/restricted.php"');
+    expect(routes).toContain("this.get('#/admin'");
+    expect(routes).toContain('window.location.hash = "#/admin"');
   });
 
   test("restricted client supports all requested admin tools", () => {
@@ -28,6 +37,8 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(src).toContain("award_degree");
     expect(src).toContain("award_scrip");
     expect(src).toContain("moderate_comment");
+    expect(src).toContain("moderate_adventure");
+    expect(src).toContain("set_probation");
     expect(src).toContain("restricted_preview_mascot");
     expect(src).toContain("scan_poses");
     expect(src).toContain('.val("__new")');
@@ -37,12 +48,53 @@ describe("RESTRICTED admin hub wiring", () => {
     const css = read("style/choosology.css");
     expect(css).toContain(".restricted-btn--primary:hover");
     expect(css).toContain("color: #1c2833");
+    expect(css).toContain(".navbutton.maroon");
+    expect(css).toContain("#adminwindow");
     const page = read("mystuff/restricted.php");
     expect(page).toContain("Mascot Packs");
     expect(page).toContain("Dialog Beats");
+    expect(page).toContain("Adventure Review");
+    expect(page).toContain('data-restricted-view="adventures"');
     expect(page).toContain("restricted_mascot_availability");
+    expect(page).toContain(">Admin</h2>");
     expect(page).not.toContain("restricted_interaction_mascot");
     expect(page).not.toContain("restricted_portrait_idle");
+  });
+
+  test("News Desk and Degree records live in the hub", () => {
+    const src = read("scripts/restricted.js");
+    expect(src).toContain("save_news");
+    expect(src).toContain("delete_news");
+    expect(src).toContain("degree_record");
+    expect(src).toContain("ChoosologyRestrictedFocus");
+    const page = read("mystuff/restricted.php");
+    expect(page).toContain('data-restricted-view="news"');
+    expect(page).toContain("News Desk");
+    expect(page).toContain("restricted_news_form");
+    expect(page).toContain("restricted_degree_catalog");
+    expect(page).toContain("restricted_record_form");
+    const api = read("ajax/restricted.php");
+    expect(api).toContain("'save_news'");
+    expect(api).toContain("'delete_news'");
+    expect(api).toContain("'degree_record'");
+    expect(api).toContain("degree_counts");
+  });
+
+  test("admin tools outside the hub use the shared role gate, not a username", () => {
+    const root = path.join(__dirname, "../..");
+    ["news.php", "labfeed.php", "ajax/fetchcomments.php", "scripts/index.js", "lite/news.php"].forEach((rel) => {
+      expect(read(rel)).not.toContain("Grasssmith");
+    });
+    expect(read("news.php")).toContain("choosology_restricted_is_admin()");
+    expect(read("ajax/fetchcomments.php")).toContain("choosology_restricted_is_admin()");
+    expect(fs.existsSync(path.join(root, "ajax/addnews.php"))).toBe(false);
+    expect(fs.existsSync(path.join(root, "ajax/managenews.php"))).toBe(false);
+    const shell = read("scripts/index.js");
+    expect(shell).not.toContain("news-add-form");
+    expect(shell).not.toContain("managenews.php");
+    expect(shell).toContain("news-admin-desk-link");
+    expect(read("news.php")).toContain('href="#/admin"');
+    expect(read("news.php")).not.toContain('href="#/mystuff/restricted"');
   });
 
   test("JSON endpoint enforces admin access", () => {
@@ -50,17 +102,36 @@ describe("RESTRICTED admin hub wiring", () => {
     expect(src).toContain("choosology_restricted_is_admin");
     expect(src).toContain("Admin access required.");
     expect(src).toContain("403");
+    expect(src).toContain("moderate_adventure");
+    expect(src).toContain("set_probation");
+    expect(src).toContain("choosology_adventure_review_pending");
   });
 
-  test("Lite offers a gated RESTRICTED page and Classic guide editor link", () => {
+  test("adventure review helpers and publish hook exist", () => {
+    expect(fs.existsSync(path.join(__dirname, "../..", "lib/adventure-review-helpers.php"))).toBe(true);
+    expect(fs.existsSync(path.join(__dirname, "../..", "sql/adventure_review_setup.sql"))).toBe(true);
+    const helpers = read("lib/adventure-review-helpers.php");
+    expect(helpers).toContain("choosology_adventure_review_on_avail_change");
+    expect(helpers).toContain("choosology_adventure_discovery_sql");
+    expect(helpers).toContain("accept_restricted");
+    expect(read("ajax/saveadvmeta.php")).toContain("choosology_adventure_review_on_avail_change");
+    expect(read("vised/advsettings.php")).toContain("as_flag_mature");
+  });
+
+  test("Lite offers a gated Admin page and Classic guide editor link", () => {
     const shell = read("lite/_bootstrap.php");
     const page = read("lite/restricted.php");
     expect(shell).toContain("restricted.php");
-    expect(shell).toContain("RESTRICTED");
+    expect(shell).toContain("'Admin'");
     expect(page).toContain("choosology_restricted_is_admin");
     expect(page).toContain("Open mascot and interaction editor in Classic");
+    expect(page).toContain("choosology_classic_url('admin')");
     expect(page).toContain("Grant Degree");
     expect(page).toContain("Award DataScrip");
     expect(page).toContain("Comment review");
+    expect(page).toContain("News desk");
+    expect(page).toContain("choosology_news_admin_save");
+    expect(page).toContain("choosology_restricted_degree_record");
+    expect(read("lite/news.php")).toContain("restricted.php?news=news:");
   });
 });

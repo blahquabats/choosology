@@ -93,6 +93,7 @@ choosology_lite_header(array(
 			<p><button type="submit" class="lite-btn">Sign in</button></p>
 		</form>
 		<p class="lite-muted">Need an account? <a href="<?php echo htmlspecialchars(choosology_classic_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Apply for lab access in Classic</a>.</p>
+		<p class="lite-muted"><a href="<?php echo htmlspecialchars(choosology_lite_url('forgot.php'), ENT_QUOTES, 'UTF-8'); ?>">Forgot credentials?</a></p>
 	<?php } ?>
 </fieldset>
 <?php

@@ -163,7 +163,7 @@ $userEsc = htmlspecialchars((string) $_SESSION['user'], ENT_QUOTES, 'UTF-8');
 	}
 	if (!boot()) {
 		var s = document.createElement("script");
-		s.src = (typeof choosologyUrl === "function") ? choosologyUrl("scripts/messages.js") : "scripts/messages.js";
+		s.src = (typeof choosologyUrl === "function") ? choosologyUrl("scripts/messages.js?v=clic4") : "scripts/messages.js?v=clic4";
 		s.onload = boot;
 		document.body.appendChild(s);
 	}
