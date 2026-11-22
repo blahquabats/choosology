@@ -3,7 +3,7 @@ require_once("connect.php");
 require_once("auxfuncs.php");
 require_once("labfeed.php");
 
-$recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
+$recentFeed = choosology_build_recent_feed($db, 5);
 
 /* DISTINCT + explicit adv columns only: SELECT * from JOIN can overwrite advs.description with another table's column in mysqli_fetch_assoc */
 if (!function_exists('choosology_adventure_discovery_sql')) {
@@ -47,49 +47,43 @@ if (is_array($res) && count($res) > 0) {
     </section>
 
     <section class="home-main-grid" aria-label="Lab overview, featured experiments, and recent notes">
-        <div class="home-main-primary">
-            <article class="home-copy-card home-copy-card--intro" aria-labelledby="home-copy-01-heading">
-                <span class="home-copy-code" aria-hidden="true">01</span>
-                <h2 id="home-copy-01-heading" class="home-visually-hidden">About Choosology Labs</h2>
-                <p>
-                    Here at Choosology Labs, we're at the forefront of interactive storytelling technology.
-                    Our ever-growing team of Choosologists is hard at work every day discovering new elements of fiction,
-                    exciting and efficient methods of exposition, and novel uses for the written word.
-                </p>
-                <p>
-                    If you're already one of our Choosologists, sign in above to access your workstation.
-                    If you're new here, browse the currently-running experiments or read the latest lab notes.
-                </p>
-                <div class="home-copy-actions">
-                    <a class="home-copy-action" href="#/browse">Browse experiments</a>
-                    <a class="home-copy-action" href="#/news">Read lab notes</a>
-                </div>
-            </article>
+        <article class="home-copy-card home-copy-card--intro" aria-labelledby="home-copy-01-heading">
+            <span class="home-copy-code" aria-hidden="true">01</span>
+            <h2 id="home-copy-01-heading" class="home-visually-hidden">About Choosology Labs</h2>
+            <p>
+                Here at Choosology Labs, we're at the forefront of interactive storytelling technology.
+                Our Choosologists discover new elements of fiction, efficient exposition, and novel uses for the written word.
+                Sign in above for your workstation, or browse experiments and lab notes below.
+            </p>
+            <div class="home-copy-actions">
+                <a class="home-copy-action" href="#/browse">Browse experiments</a>
+                <a class="home-copy-action" href="#/news">Read lab notes</a>
+            </div>
+        </article>
 
-            <article class="home-copy-card home-copy-card--featured">
-                <span class="home-copy-code" aria-hidden="true">02</span>
-                <h2 class="home-copy-heading">Newly Featured</h2>
-                <div class="intabs home-featured-mount" id="featadvs">
-                    <div class="featuredslides">
-                        <?php if (is_array($res) && count($res) > 0) { ?>
-                        <button type="button" class="slidenav slidenav-left cycle-prev" aria-label="Previous featured experiment"></button>
-                        <div class="featuredslides-cycle">
-                        <?php
-                            foreach ($res as $r) {
-                                echo buildAdvFlag($r['aid'], $name);
-                            }
-                        ?>
-                        </div>
-                        <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
-                        <?php } elseif (is_array($res)) { ?>
-                        <p class="home-no-featured">No public adventures to feature yet.</p>
-                        <?php } else {
-                            echo $res;
-                        } ?>
+        <article class="home-copy-card home-copy-card--featured">
+            <span class="home-copy-code" aria-hidden="true">02</span>
+            <h2 class="home-copy-heading">Newly Featured</h2>
+            <div class="intabs home-featured-mount" id="featadvs">
+                <div class="featuredslides">
+                    <?php if (is_array($res) && count($res) > 0) { ?>
+                    <button type="button" class="slidenav slidenav-left cycle-prev" aria-label="Previous featured experiment"></button>
+                    <div class="featuredslides-cycle">
+                    <?php
+                        foreach ($res as $r) {
+                            echo buildAdvFlag($r['aid'], $name);
+                        }
+                    ?>
                     </div>
+                    <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
+                    <?php } elseif (is_array($res)) { ?>
+                    <p class="home-no-featured">No public adventures to feature yet.</p>
+                    <?php } else {
+                        echo $res;
+                    } ?>
                 </div>
-            </article>
-        </div>
+            </div>
+        </article>
 
         <article class="home-copy-card home-copy-card--feed">
             <span class="home-copy-code" aria-hidden="true">03</span>

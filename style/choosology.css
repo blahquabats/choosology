@@ -601,14 +601,14 @@ body[data-logged-in="1"] #logoutsubmit a
 {
     width: min(80%, calc(100% - 48px));
     max-width: 1400px;
-    margin: 24px auto 18px;
+    margin: 12px auto 10px;
     box-sizing: border-box;
 }
 
 .home-hero
 {
     position: relative;
-    padding: 22px clamp(18px, 4vw, 42px) 20px;
+    padding: 14px clamp(14px, 3vw, 28px) 12px;
     border: 1px solid #c7d7e8;
     border-left: 6px solid #604b91;
     border-radius: 0 12px 12px 0;
@@ -643,8 +643,8 @@ body[data-logged-in="1"] #logoutsubmit a
 .home-hero-logo
 {
     display: block;
-    width: clamp(240px, 36vw, 420px);
-    max-width: 48%;
+    width: clamp(200px, 28vw, 340px);
+    max-width: 42%;
     height: auto;
     flex: 0 1 auto;
 }
@@ -659,7 +659,7 @@ body[data-logged-in="1"] #logoutsubmit a
 
 .home-hero-eyebrow
 {
-    margin: 0 0 10px;
+    margin: 0 0 6px;
     font-family: Consolas, "Courier New", Courier, monospace;
     font-size: 0.68rem;
     font-weight: 700;
@@ -710,24 +710,18 @@ body[data-logged-in="1"] #logoutsubmit a
 {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    gap: 14px;
-    margin-top: 16px;
+    grid-template-areas:
+        "intro ."
+        "feat feed";
+    gap: 10px;
+    margin-top: 10px;
     align-items: stretch;
-}
-
-.home-main-primary
-{
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    min-width: 0;
-    min-height: 0;
 }
 
 .home-copy-card
 {
     position: relative;
-    padding: 14px 15px 15px;
+    padding: 12px 14px 12px;
     border: 1px solid #c5d0e0;
     border-left: 5px solid #2874a6;
     border-radius: 0 10px 10px 0;
@@ -738,8 +732,10 @@ body[data-logged-in="1"] #logoutsubmit a
 
 .home-copy-card--intro
 {
+    grid-area: intro;
     border-left-color: #604b91;
-    flex: 0 0 auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .home-copy-card--intro .home-copy-code
@@ -750,22 +746,24 @@ body[data-logged-in="1"] #logoutsubmit a
 
 .home-copy-card--intro p
 {
-    font-size: 0.88rem;
-    line-height: 1.45;
+    font-size: 0.84rem;
+    line-height: 1.4;
 }
 
 .home-copy-card--intro .home-copy-actions
 {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .home-copy-card--feed
 {
+    grid-area: feed;
     border-left-color: #2d8a5e;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
 }
 
 .home-copy-card--feed .home-copy-code
@@ -776,22 +774,23 @@ body[data-logged-in="1"] #logoutsubmit a
 
 .home-copy-card--feed .home-copy-actions
 {
-    margin-top: auto;
-    padding-top: 10px;
+    margin-top: 8px;
+    padding-top: 0;
+    flex: 0 0 auto;
+}
+
+.home-copy-card--feed .home-copy-heading
+{
+    margin-bottom: 6px;
 }
 
 .home-copy-card--featured
 {
+    grid-area: feat;
     border-left-color: #2874a6;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    flex: 1 1 auto;
-}
-
-.home-copy-card--intro p + p
-{
-    margin-top: 0.7em;
 }
 
 .home-featured-mount
@@ -806,7 +805,7 @@ body[data-logged-in="1"] #logoutsubmit a
     width: 100%;
     max-width: none;
     min-width: 0;
-    min-height: 220px;
+    min-height: 200px;
     overflow: hidden;
 }
 
@@ -815,22 +814,22 @@ body[data-logged-in="1"] #logoutsubmit a
 {
     width: calc(100% - 104px);
     margin: 0 52px;
-    height: 240px;
-    min-height: 240px;
-    max-height: 240px;
+    height: 210px;
+    min-height: 210px;
+    max-height: 210px;
 }
 
 .home-copy-card--featured .featuredslides .slidefolder
 {
-    height: 240px;
-    min-height: 240px;
-    max-height: 240px;
+    height: 210px;
+    min-height: 210px;
+    max-height: 210px;
 }
 
 .home-copy-card--featured .featuredslides .slidenav
 {
     width: 44px;
-    height: 240px;
+    height: 210px;
 }
 
 .home-copy-card--featured .featuredslides .slidenav-left
@@ -871,7 +870,7 @@ body[data-logged-in="1"] #logoutsubmit a
 
 .home-copy-heading
 {
-    margin: 0 0 10px 42px;
+    margin: 0 0 6px 42px;
     font-family: Consolas, "Courier New", Courier, monospace;
     font-size: 0.68rem;
     font-weight: 700;
@@ -1004,10 +1003,25 @@ body[data-logged-in="1"] #logoutsubmit a
         grid-template-columns: 1fr;
     }
 
+    .home-main-grid
+    {
+        grid-template-areas:
+            "intro"
+            "feat"
+            "feed";
+    }
+
     .home-copy-card--feed
     {
         height: auto;
-        min-height: 16rem;
+        max-height: none;
+        min-height: 0;
+    }
+
+    .lab-feed-list--home
+    {
+        overflow-y: auto;
+        max-height: 14rem;
     }
 
     .home-hero-lockup
@@ -1043,15 +1057,15 @@ body[data-logged-in="1"] #logoutsubmit a
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
-    overflow-y: auto;
-    padding-right: 4px;
-    gap: 6px;
+    overflow: hidden;
+    padding-right: 2px;
+    gap: 4px;
 }
 
 .lab-feed-list--home .lab-feed-item
 {
-    gap: 4px 8px;
-    padding: 7px 9px;
+    gap: 2px 6px;
+    padding: 5px 7px;
 }
 
 .lab-feed-list--home .lab-feed-text
