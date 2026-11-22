@@ -597,6 +597,7 @@ body[data-logged-in="1"] #logoutsubmit a
     background-size: auto 80%;
 }
 
+.home-splash
 {
     width: min(920px, calc(100% - 64px));
     margin: 24px auto 18px;
@@ -704,17 +705,22 @@ body[data-logged-in="1"] #logoutsubmit a
     background: rgba(255, 255, 255, 0.78);
 }
 
-.home-copy-full
-{
-    margin-top: 16px;
-}
-
-.home-copy-grid
+.home-main-grid
 {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     gap: 14px;
-    margin-top: 14px;
+    margin-top: 16px;
+    align-items: stretch;
+}
+
+.home-main-primary
+{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    min-height: 0;
 }
 
 .home-copy-card
@@ -729,15 +735,27 @@ body[data-logged-in="1"] #logoutsubmit a
     box-sizing: border-box;
 }
 
-.home-copy-card--full
+.home-copy-card--intro
 {
     border-left-color: #604b91;
+    flex: 0 0 auto;
 }
 
-.home-copy-card--full .home-copy-code
+.home-copy-card--intro .home-copy-code
 {
     border-color: #604b91;
     color: #4b3b77;
+}
+
+.home-copy-card--intro p
+{
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.home-copy-card--intro .home-copy-actions
+{
+    margin-top: 10px;
 }
 
 .home-copy-card--feed
@@ -746,6 +764,7 @@ body[data-logged-in="1"] #logoutsubmit a
     display: flex;
     flex-direction: column;
     min-height: 0;
+    height: 100%;
 }
 
 .home-copy-card--feed .home-copy-code
@@ -754,17 +773,24 @@ body[data-logged-in="1"] #logoutsubmit a
     color: #1b5c3d;
 }
 
+.home-copy-card--feed .home-copy-actions
+{
+    margin-top: auto;
+    padding-top: 10px;
+}
+
 .home-copy-card--featured
 {
     border-left-color: #2874a6;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    flex: 1 1 auto;
 }
 
-.home-copy-card--full p + p
+.home-copy-card--intro p + p
 {
-    margin-top: 0.85em;
+    margin-top: 0.7em;
 }
 
 .home-featured-mount
@@ -972,9 +998,15 @@ body[data-logged-in="1"] #logoutsubmit a
     }
 
     .home-hero-lockup,
-    .home-copy-grid
+    .home-main-grid
     {
         grid-template-columns: 1fr;
+    }
+
+    .home-copy-card--feed
+    {
+        height: auto;
+        min-height: 16rem;
     }
 
     .home-hero-lockup
@@ -1007,7 +1039,9 @@ body[data-logged-in="1"] #logoutsubmit a
 .lab-feed-list--home
 {
     margin-left: 42px;
-    max-height: min(38vh, 18rem);
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
     overflow-y: auto;
     padding-right: 4px;
     gap: 6px;
