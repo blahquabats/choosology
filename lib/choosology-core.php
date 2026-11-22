@@ -160,3 +160,31 @@ function makeStars($rating, $tiny = 0)
 	$output .= '</div>';
 	return $output;
 }
+
+/**
+ * Run an ALTER against `users` with session sql_mode relaxed so MySQL 8
+ * does not fail on the legacy `lastlogin` DEFAULT '0000-00-00 00:00:00'.
+ */
+function choosology_users_alter_with_relaxed_sql_mode(mysqli $db, string $alterSql): bool
+{
+	$modeRow = mysqli_query($db, 'SELECT @@SESSION.sql_mode AS m');
+	$oldMode = '';
+	if ($modeRow && ($mr = mysqli_fetch_assoc($modeRow))) {
+		$oldMode = (string) ($mr['m'] ?? '');
+	}
+	$relaxed = $oldMode;
+	foreach (array('NO_ZERO_DATE', 'NO_ZERO_IN_DATE', 'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES') as $flag) {
+		$relaxed = str_replace($flag, '', $relaxed);
+	}
+	$relaxed = trim((string) preg_replace('/,+/', ',', $relaxed), ',');
+	if ($relaxed !== $oldMode) {
+		mysqli_query($db, "SET SESSION sql_mode = '" . mysqli_real_escape_string($db, $relaxed) . "'");
+	}
+	try {
+		return (bool) mysqli_query($db, $alterSql);
+	} finally {
+		if ($oldMode !== '' && $relaxed !== $oldMode) {
+			mysqli_query($db, "SET SESSION sql_mode = '" . mysqli_real_escape_string($db, $oldMode) . "'");
+		}
+	}
+}

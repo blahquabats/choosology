@@ -7,6 +7,7 @@ require_once __DIR__ . '/choosology-core.php';
 
 const CHOOSOLOGY_UI_COOKIE = 'choosology_ui';
 const CHOOSOLOGY_UI_SUGGEST_DISMISS = 'choosology_ui_suggest_dismiss';
+const CHOOSOLOGY_LITE_BTN_DISMISS = 'choosology_lite_btn_dismiss';
 
 function choosology_ui_mode_ensure_schema(mysqli $db): void
 {
@@ -20,7 +21,13 @@ function choosology_ui_mode_ensure_schema(mysqli $db): void
 		if ($chk && mysqli_num_rows($chk) > 0) {
 			return;
 		}
-		mysqli_query($db, "ALTER TABLE users ADD COLUMN ui_mode varchar(16) NOT NULL DEFAULT 'classic'");
+		if (!function_exists('choosology_users_alter_with_relaxed_sql_mode')) {
+			require_once __DIR__ . '/choosology-core.php';
+		}
+		choosology_users_alter_with_relaxed_sql_mode(
+			$db,
+			"ALTER TABLE users ADD COLUMN ui_mode varchar(16) NOT NULL DEFAULT 'classic'"
+		);
 	} catch (Throwable $e) {
 		$done = false;
 	}
@@ -74,6 +81,13 @@ function choosology_ui_cookie_set(string $mode): void
 		'samesite' => 'Lax',
 	));
 	$_COOKIE[CHOOSOLOGY_UI_COOKIE] = $mode;
+}
+
+/** True when the Classic header Lite button was dismissed via its × control. */
+function choosology_lite_btn_dismissed(): bool
+{
+	return isset($_COOKIE[CHOOSOLOGY_LITE_BTN_DISMISS])
+		&& (string) $_COOKIE[CHOOSOLOGY_LITE_BTN_DISMISS] === '1';
 }
 
 /**

@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=restricted4" />
+    <link rel="stylesheet" href="style/choosology.css?v=liteleft1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -80,7 +80,7 @@
     <script src='scripts/guide.js?v=guide1'></script>
     <script src='scripts/restricted.js?v=3'></script>
     <script src='scripts/routes.js'></script>
-    <script src='scripts/lite-suggest.js?v=1'></script>
+    <script src='scripts/lite-suggest.js?v=2'></script>
 
 
 </head>
@@ -114,23 +114,31 @@
     My&nbsp;Office
 </div>
 <?php } ?>
-<div class="header" style='cursor: pointer;' onclick="location.href='#/home'">
-<img src="images/logo_horizontal_sm.png" />
-</div>
-
-<div class="header" id='contextlink'>
-</div>
-<div class="header" id='alertbox'>
-</div>
-
 <?php
 $liteSwitchHref = htmlspecialchars(choosology_lite_url('switch.php?to=lite'), ENT_QUOTES, 'UTF-8');
 $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-page layout with almost no JavaScript; better on slow links and small screens. Opens Lite and saves your preference.';
+$liteBtnDismissed = choosology_lite_btn_dismissed();
 ?>
-<div class="classic-top-cluster">
-	<div class="header" id="litebox">
-		<a class="classic-lite-btn" id="classic_lite_btn" href="<?php echo $liteSwitchHref; ?>" title="<?php echo htmlspecialchars($liteSwitchTitle, ENT_QUOTES, 'UTF-8'); ?>">Lite</a>
+<div class="classic-logo-cluster">
+	<div class="header" id="toplogo" style="cursor: pointer;" onclick="location.href='#/home'">
+		<img src="images/logo_horizontal_sm.png" alt="Choosology" />
 	</div>
+	<?php if (!$liteBtnDismissed) { ?>
+	<div class="header" id="litebox">
+		<span class="classic-lite-wrap">
+			<a class="classic-lite-btn" id="classic_lite_btn" href="<?php echo $liteSwitchHref; ?>" title="<?php echo htmlspecialchars($liteSwitchTitle, ENT_QUOTES, 'UTF-8'); ?>">Lite</a>
+			<button type="button" class="classic-lite-dismiss" id="classic_lite_dismiss" aria-label="Hide Lite button" title="Hide">&times;</button>
+		</span>
+	</div>
+	<?php } ?>
+	<div class="header" id="contextlink">
+	</div>
+</div>
+
+<div class="header" id='alertbox'>
+</div>
+
+<div class="classic-top-cluster">
 	<div class="header" id="topbox">
 	    <?php
 	    if (empty($_SESSION['user']))

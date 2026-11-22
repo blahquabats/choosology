@@ -9,12 +9,14 @@ if (empty($_SESSION['user'])) {
 
 require_once __DIR__ . '/../lib/date-format-helpers.php';
 require_once __DIR__ . '/../lib/guide-helpers.php';
+require_once __DIR__ . '/../lib/lite-helpers.php';
 choosology_date_format_ensure_schema($db);
 choosology_guide_ensure_schema($db);
+choosology_ui_mode_ensure_schema($db);
 
 $user = (string) $_SESSION['user'];
 $escUser = mysqli_real_escape_string($db, $user);
-$rows = runquery_assoc("SELECT name, email, about, pic, view_restricted, date_format, guide_enabled FROM users WHERE name = '$escUser' LIMIT 1");
+$rows = runquery_assoc("SELECT name, email, about, pic, view_restricted, date_format, guide_enabled, ui_mode FROM users WHERE name = '$escUser' LIMIT 1");
 if (!is_array($rows) || !isset($rows[0])) {
 	echo "<div class='intabs'><p class='error'>Could not load your account.</p></div>";
 	return;
@@ -28,6 +30,7 @@ $picUrl = ($pic !== '' && ctype_digit($pic)) ? getPicUrl((int) $pic, true) : '';
 $viewRestricted = (int) ($account['view_restricted'] ?? 0) === 1;
 $dateFmt = choosology_date_format_normalize((string) ($account['date_format'] ?? CHOOSOLOGY_DATE_FMT_MDY));
 $guideOn = choosology_guide_flag_on($account['guide_enabled'] ?? 1);
+$uiMode = choosology_ui_normalize((string) ($account['ui_mode'] ?? 'classic'));
 ?>
 <div class="intabs ms-account-page">
 	<form id="ms-account-form" class="ms-account-paper" onsubmit="return false;">
@@ -84,6 +87,19 @@ $guideOn = choosology_guide_flag_on($account['guide_enabled'] ?? 1);
 					<input type="checkbox" id="acct_guide_enabled"<?php echo $guideOn ? ' checked' : ''; ?>>
 					<span>Lab guide offers help the first time I open a tool</span>
 				</label>
+
+				<fieldset class="ms-account-datefmt">
+					<legend class="ms-account-label">Interface</legend>
+					<label class="ms-account-check">
+						<input type="radio" name="acct_ui_mode" id="acct_ui_mode_classic" value="classic"<?php echo $uiMode === 'classic' ? ' checked' : ''; ?>>
+						<span>Classic</span>
+					</label>
+					<label class="ms-account-check">
+						<input type="radio" name="acct_ui_mode" id="acct_ui_mode_lite" value="lite"<?php echo $uiMode === 'lite' ? ' checked' : ''; ?>>
+						<span>Lite (Instrument Panel)</span>
+					</label>
+					<p class="ms-account-hint">Lite is a lean multi-page layout that works better on slow links and small screens. Choosing Lite saves your preference and opens it after you save.</p>
+				</fieldset>
 
 				<label class="ms-account-label" for="acct_email">Email address</label>
 				<input type="email" id="acct_email" value="<?php echo $email; ?>" readonly>
@@ -377,6 +393,7 @@ $guideOn = choosology_guide_flag_on($account['guide_enabled'] ?? 1);
 			view_restricted: $("#acct_view_restricted").is(":checked") ? 1 : 0,
 			date_format: $("input[name='acct_date_format']:checked").val() || "mdy",
 			guide_enabled: $("#acct_guide_enabled").is(":checked") ? 1 : 0,
+			ui_mode: $("input[name='acct_ui_mode']:checked").val() || "classic",
 			current_password: $("#acct_current_password").val(),
 			new_password: $("#acct_new_password").val(),
 			confirm_password: $("#acct_confirm_password").val()
@@ -407,6 +424,10 @@ $guideOn = choosology_guide_flag_on($account['guide_enabled'] ?? 1);
 				}
 				accountTouched = false;
 				markAccountClean();
+				if (res.ui_mode === "lite" && res.switch_url) {
+					window.location.href = res.switch_url;
+					return;
+				}
 				return;
 			}
 			$("#acct_status").addClass("ms-account-status--error").text((res && res.error) ? res.error : "Could not save.");

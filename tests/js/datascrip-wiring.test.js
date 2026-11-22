@@ -44,22 +44,31 @@ describe("DataScrip UI wiring", () => {
     expect(src).toContain("msg_scrip_send");
   });
 
-  test("Classic Lite switch sits outside #topbox as a bevel button", () => {
+  test("Classic Lite switch sits beside the logo, outside #topbox", () => {
     const src = fs.readFileSync(
       path.join(__dirname, "../../index.php"),
       "utf8"
     );
+    expect(src).toContain('class="classic-logo-cluster"');
     expect(src).toContain('class="classic-top-cluster"');
     expect(src).toContain('id="litebox"');
     expect(src).toContain("classic-lite-btn");
+    expect(src).toContain("classic-lite-dismiss");
     expect(src).toContain("Instrument Panel terminal UI");
     expect(src).not.toContain("classic-lite-link");
+    const logoIdx = src.indexOf('id="toplogo"');
     const liteIdx = src.indexOf('id="litebox"');
     const topIdx = src.indexOf('id="topbox"');
-    expect(liteIdx).toBeGreaterThan(-1);
+    expect(logoIdx).toBeGreaterThan(-1);
+    expect(liteIdx).toBeGreaterThan(logoIdx);
     expect(topIdx).toBeGreaterThan(liteIdx);
     const topboxChunk = src.slice(topIdx, topIdx + 1400);
     expect(topboxChunk).not.toContain("classic-lite-btn");
+    const logoClusterStart = src.indexOf('class="classic-logo-cluster"');
+    const logoClusterEnd = src.indexOf('class="classic-top-cluster"', logoClusterStart);
+    const logoCluster = src.slice(logoClusterStart, logoClusterEnd);
+    expect(logoCluster).toContain('id="litebox"');
+    expect(logoCluster).toContain("classic-lite-dismiss");
   });
 
   test("Classic nav labels My Office (not My Stuff)", () => {

@@ -1,6 +1,7 @@
 /**
  * Classic → Lite suggest banner (viewport + latency). Never shown inside Lite.
  * Dismiss persists in sessionStorage for the tab; cookie tracks 7-day soft dismiss.
+ * Also wires the header Lite button × (long-lived dismiss + brief Settings note).
  */
 (function () {
 	if (window.__choosologyLiteSuggestInit) {
@@ -16,6 +17,25 @@
 	function cookieSet(name, value, days) {
 		var max = days ? (';Max-Age=' + (days * 86400)) : '';
 		document.cookie = name + '=' + encodeURIComponent(value) + '; path=/; SameSite=Lax; ' + max;
+	}
+
+	function wireLiteBtnDismiss() {
+		var btn = document.getElementById('classic_lite_dismiss');
+		var box = document.getElementById('litebox');
+		if (!btn || !box) {
+			return;
+		}
+		btn.addEventListener('click', function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			cookieSet('choosology_lite_btn_dismiss', '1', 3650);
+			if (box.parentNode) {
+				box.parentNode.removeChild(box);
+			}
+			if (typeof showAlert === 'function') {
+				showAlert('Lite mode can still be accessed in Settings under My Information.');
+			}
+		});
 	}
 
 	function preferredIsLite() {
@@ -107,9 +127,14 @@
 		});
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', maybeSuggest);
-	} else {
+	function boot() {
+		wireLiteBtnDismiss();
 		maybeSuggest();
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', boot);
+	} else {
+		boot();
 	}
 })();

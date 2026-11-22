@@ -396,7 +396,65 @@ label.sel:before {
     border-top: none;
 }
 
-/* Login / account chrome + adjacent Lite switch (not nested inside login). */
+/* Logo + Lite switch + context crumb on the left. */
+.classic-logo-cluster
+{
+    position: fixed;
+    top: -2px;
+    left: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    max-width: min(480px, calc(100vw - 280px));
+}
+
+.classic-logo-cluster > .header
+{
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    flex: 0 0 auto;
+}
+
+#litebox
+{
+    padding: 4px;
+    text-align: center;
+}
+
+.classic-lite-wrap
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.classic-lite-dismiss
+{
+    display: inline-block;
+    margin: 0;
+    padding: 0 0.2rem;
+    border: none;
+    background: transparent;
+    color: #888888;
+    font: 0.85rem/1 Tahoma, Verdana, "MS Sans Serif", sans-serif;
+    cursor: pointer;
+    opacity: 0.55;
+    vertical-align: middle;
+}
+
+.classic-lite-dismiss:hover,
+.classic-lite-dismiss:focus
+{
+    color: #444444;
+    opacity: 1;
+    outline: none;
+}
+
+/* Login / account chrome (right side). */
 .classic-top-cluster
 {
     position: fixed;
@@ -416,12 +474,6 @@ label.sel:before {
     top: auto;
     right: auto;
     flex: 0 0 auto;
-}
-
-#litebox
-{
-    padding: 4px;
-    text-align: center;
 }
 
 #topbox
@@ -458,8 +510,7 @@ body[data-logged-in="1"] #logoutsubmit a
 
 #contextlink
 {
-    left: 150px;
-    display:none;
+    display: none;
     cursor: pointer;
 }
 

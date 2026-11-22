@@ -8,6 +8,7 @@ require_once __DIR__ . '/../auxfuncs.php';
 require_once __DIR__ . '/../lib/account-helpers.php';
 require_once __DIR__ . '/../lib/date-format-helpers.php';
 require_once __DIR__ . '/../lib/guide-helpers.php';
+require_once __DIR__ . '/../lib/lite-helpers.php';
 ob_end_clean();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -54,11 +55,16 @@ $viewRestricted = !empty($data['view_restricted']) ? 1 : 0;
 $dateFmt = choosology_date_format_normalize((string) ($data['date_format'] ?? CHOOSOLOGY_DATE_FMT_MDY));
 choosology_date_format_ensure_schema($db);
 choosology_guide_ensure_schema($db);
+choosology_ui_mode_ensure_schema($db);
 $guideSetSql = '';
 $guideOn = null;
 if (array_key_exists('guide_enabled', $data)) {
 	$guideOn = choosology_guide_flag_on($data['guide_enabled']) ? 1 : 0;
 	$guideSetSql = ", guide_enabled = '$guideOn'";
+}
+$uiMode = null;
+if (array_key_exists('ui_mode', $data)) {
+	$uiMode = choosology_ui_normalize((string) $data['ui_mode']);
 }
 $picRaw = isset($data['pic']) ? trim((string) $data['pic']) : '';
 $picSql = '0';
@@ -124,9 +130,18 @@ choosology_date_format_cookie_set($dateFmt);
 if ($guideOn !== null) {
 	choosology_guide_cookie_set($guideOn === 1);
 }
-choosology_account_json(array(
+if ($uiMode !== null) {
+	choosology_ui_save_preference($db, $uiMode);
+}
+$effectiveUi = $uiMode !== null ? $uiMode : choosology_ui_preferred_mode($db);
+$out = array(
 	'ok' => 1,
 	'passwordChanged' => $passwordChanged,
 	'date_format' => $dateFmt,
 	'guide_enabled' => $guideOn === null ? (choosology_guide_enabled($db) ? 1 : 0) : $guideOn,
-));
+	'ui_mode' => $effectiveUi,
+);
+if ($effectiveUi === 'lite') {
+	$out['switch_url'] = choosology_lite_url('switch.php?to=lite');
+}
+choosology_account_json($out);
