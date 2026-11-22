@@ -73,9 +73,27 @@ if (strlen($tags) > 1024) {
 }
 
 $avail = isset($data['avail']) ? trim((string) $data['avail']) : 'none';
-if (!in_array($avail, array('public', 'private', 'none'), true)) {
+if (!in_array($avail, array('public', 'private', 'none', 'restricted'), true)) {
 	$avail = 'none';
 }
+
+require_once __DIR__ . '/../lib/adventure-review-helpers.php';
+choosology_adventure_review_ensure_schema($db);
+$contentFlags = array();
+if (!empty($data['content_flag_mature'])) {
+	$contentFlags[] = 'mature';
+}
+if (!empty($data['content_flag_sensitive'])) {
+	$contentFlags[] = 'sensitive';
+}
+if (isset($data['content_flags'])) {
+	$contentFlags = array_merge(
+		$contentFlags,
+		choosology_adventure_review_normalize_flags($data['content_flags'])
+	);
+}
+$contentFlagsCsv = choosology_adventure_review_flags_csv($contentFlags);
+$contentFlagsEsc = mysqli_real_escape_string($db, $contentFlagsCsv);
 
 $beginRaw = isset($data['begin']) ? trim((string) $data['begin']) : '';
 $beginSql = 'NULL';
@@ -195,7 +213,9 @@ $boxEsc = mysqli_real_escape_string($db, $box);
 $borderEsc = mysqli_real_escape_string($db, $border);
 
 $publishedSet = '';
-if ($avail === 'public' && $oldAvail !== 'public') {
+$listingNow = ($avail === 'public' || $avail === 'restricted');
+$wasListing = ($oldAvail === 'public' || $oldAvail === 'restricted');
+if ($listingNow && !$wasListing) {
 	$pubEmpty = ($oldPublished === null || $oldPublished === '' || $oldPublished === '0000-00-00 00:00:00');
 	if ($pubEmpty) {
 		$publishedSet = ", published = NOW()";
@@ -207,6 +227,7 @@ $q = "UPDATE advs SET
 	description = '$dEsc',
 	tags = '$tagsEsc',
 	avail = '$availEsc',
+	content_flags = '$contentFlagsEsc',
 	`begin` = $beginSql,
 	pic = $picSql,
 	bgpic = '$bgpic',
@@ -229,11 +250,31 @@ if (!runquery($q)) {
 	exit;
 }
 
-if ($avail === 'public') {
+$review = choosology_adventure_review_on_avail_change(
+	$db,
+	$advid,
+	$user,
+	$avail,
+	$oldAvail,
+	$contentFlagsCsv
+);
+if (empty($review['ok'])) {
+	echo json_encode(array(
+		'ok' => 0,
+		'error' => $review['error'] ?? 'Review queue update failed.',
+	), $jsonFlags);
+	exit;
+}
+
+if ($avail === 'public' || $avail === 'restricted') {
 	require_once __DIR__ . '/../lib/clipboard-helpers.php';
 	choosology_award_achievement($db, $user, 'field_release');
 	choosology_clipboard_set_checklist_flag($db, $user, 'publish_experiment', 'completed', 1);
 }
 
-echo json_encode(array('ok' => 1), $jsonFlags);
+echo json_encode(array(
+	'ok' => 1,
+	'review_status' => $review['review_status'] ?? null,
+	'review_hold' => !empty($review['review_hold']) ? 1 : 0,
+), $jsonFlags);
 exit;

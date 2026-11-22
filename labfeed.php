@@ -122,7 +122,7 @@ function choosology_build_recent_feed(mysqli $db, int $limit = CHOOSOLOGY_HOME_F
  *
  * @param array{type:string,id?:int,text:string,whenposted:string,href?:?string} $item
  */
-function choosology_echo_feed_item(array $item, string $extraClass = '', bool $canManage = false): void
+function choosology_echo_feed_item(array $item, string $extraClass = ''): void
 {
 	$type = ($item['type'] ?? '') === 'news' ? 'news' : 'update';
 	$text = htmlspecialchars((string) ($item['text'] ?? ''), ENT_QUOTES, 'UTF-8');
@@ -137,12 +137,6 @@ function choosology_echo_feed_item(array $item, string $extraClass = '', bool $c
 	$href = isset($item['href']) ? $item['href'] : null;
 	$tag = ($href !== null && $href !== '') ? 'a' : 'div';
 	$hrefAttr = ($tag === 'a') ? ' href="' . htmlspecialchars((string) $href, ENT_QUOTES, 'UTF-8') . '"' : '';
-	$id = (int) ($item['id'] ?? 0);
-	$showAdmin = $canManage && $type === 'update' && $id > 0;
-
-	if ($showAdmin) {
-		echo '<div class="lab-feed-item-row">';
-	}
 
 	echo '<' . $tag . ' class="' . $cls . '"' . $hrefAttr . '>';
 	echo '<span class="lab-feed-badge lab-feed-badge--' . $type . '">' . $badge . '</span>';
@@ -152,19 +146,12 @@ function choosology_echo_feed_item(array $item, string $extraClass = '', bool $c
 	}
 	echo '<span class="lab-feed-text">' . $text . '</span>';
 	echo '</' . $tag . '>';
-
-	if ($showAdmin) {
-		echo '<div class="lab-feed-item-admin">';
-		echo '<button type="button" class="news-admin-edit-update" data-id="' . $id . '" data-text="' . $text . '">Edit</button>';
-		echo '<button type="button" class="news-admin-delete-update" data-id="' . $id . '">Delete</button>';
-		echo '</div></div>';
-	}
 }
 
 /**
  * Echo the News-tab paginated updates list (or fragment).
  */
-function choosology_echo_updates_feed(mysqli $db, int $page = 1, bool $canManage = false): void
+function choosology_echo_updates_feed(mysqli $db, int $page = 1): void
 {
 	$ready = choosology_updates_table_ready($db);
 	if (!$ready[0]) {
@@ -191,7 +178,7 @@ function choosology_echo_updates_feed(mysqli $db, int $page = 1, bool $canManage
 				'text' => $row['text'],
 				'whenposted' => $row['whenposted'],
 				'href' => null,
-			), '', $canManage);
+			));
 		}
 		echo '</div>';
 		if ($totalPages > 1) {

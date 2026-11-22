@@ -44,6 +44,26 @@ describe("DataScrip UI wiring", () => {
     expect(src).toContain("msg_scrip_send");
   });
 
+  test("Classic login exposes forgot credentials and vertical shake target", () => {
+    const indexSrc = fs.readFileSync(
+      path.join(__dirname, "../../index.php"),
+      "utf8"
+    );
+    const jsSrc = fs.readFileSync(
+      path.join(__dirname, "../../scripts/index.js"),
+      "utf8"
+    );
+    expect(indexSrc).toContain("id='openforgot'");
+    expect(indexSrc).toContain("Forgot credentials?");
+    expect(indexSrc).toContain('id="forgotmodal"');
+    expect(indexSrc).toContain("loginbox-inner");
+    expect(jsSrc).toContain("id='openforgot'");
+    expect(jsSrc).toContain("choosologyOpenForgotModal");
+    expect(jsSrc).toContain('direction: "up"');
+    expect(jsSrc).toContain("ajax/passwordreset.php");
+    expect(jsSrc).toContain("loginbox-inner");
+  });
+
   test("Classic Lite switch sits outside #topbox as a bevel button", () => {
     const src = fs.readFileSync(
       path.join(__dirname, "../../index.php"),

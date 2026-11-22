@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=restricted4" />
+    <link rel="stylesheet" href="style/choosology.css?v=adminstack1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -67,19 +67,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle/3.0.3/jquery.cycle.all.min.js"></script>
     <script src="scripts/jquery-dateFormat.js"></script>
     <script src="scripts/jquery-minicolors/jquery.minicolors.min.js"></script>
-    <script src="scripts/lib/choosology-utils.js"></script>
+    <script src="scripts/lib/choosology-utils.js?v=clic4"></script>
     <script src="scripts/choosology.js"></script>
     <!-- Konva 10.3.0 UMD (official npm konva.min.js). jsDelivr mirrors npm; cdnjs /ajax/libs/konva/10.x/konva.min.js was 404 when checked — swap to cdnjs when they publish this version. -->
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
-    <script src='scripts/index.js'></script>
-    <script src='scripts/messages.js?v=clic3'></script>
+    <script src='scripts/index.js?v=loginreset1'></script>
+    <script src='scripts/messages.js?v=clic4'></script>
     <script src='scripts/clipboard.js?v=clip7'></script>
-    <script src='scripts/office.js?v=office3'></script>
+    <script src='scripts/office.js?v=admin1'></script>
     <script src='scripts/guide.js?v=guide1'></script>
-    <script src='scripts/restricted.js?v=3'></script>
-    <script src='scripts/routes.js'></script>
+    <script src='scripts/restricted.js?v=advreview2'></script>
+    <script src='scripts/routes.js?v=admin1'></script>
     <script src='scripts/lite-suggest.js?v=1'></script>
 
 
@@ -113,6 +113,12 @@
     <?php echo icon("person", "64px"); ?><br />
     My&nbsp;Office
 </div>
+<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+<div class='navbutton maroon navdisabled' id="admin_nav" onclick="location.href='#/admin'" >
+    <?php echo icon("lock", "64px"); ?><br />
+    Admin
+</div>
+<?php } ?>
 <?php } ?>
 <div class="header" style='cursor: pointer;' onclick="location.href='#/home'">
 <img src="images/logo_horizontal_sm.png" />
@@ -135,11 +141,14 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 	    <?php
 	    if (empty($_SESSION['user']))
 	    {
+	        echo "<div id='loginbox-inner' class='loginbox-inner'>\n";
 	        echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";
 	        echo "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />\n";
 	        echo "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>";
 	        echo "<button type='button' id='loginsubmit'>Submit</button>";
 	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
+	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>";
+	        echo "</div>\n";
 	    }
 	    else
 	    {
@@ -182,9 +191,6 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
         <li><a href="mystuff/ledger.php" id='mystuff-ledger' class='tabsa' data-loc='ledger'>Ledger</a></li>
         <li><a href="mystuff/degrees.php" id='mystuff-degrees' class='tabsa' data-loc='degrees'>Degrees</a></li>
         <li><a href="mystuff/account.php" id='mystuff-account' class='tabsa' data-loc='account'>My Information</a></li>
-        <?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
-        <li><a href="mystuff/restricted.php" id='mystuff-restricted' class='tabsa' data-loc='restricted'>RESTRICTED</a></li>
-        <?php } ?>
     </ul>
 </div>
 <?php } ?>
@@ -198,6 +204,11 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 <div class='genericwindow' id="browsewindow">
     <div class='ajaxloader'></div>
 </div>
+<?php if (!empty($_SESSION['usertype']) && (int) $_SESSION['usertype'] >= 1) { ?>
+<div class='genericwindow' id="adminwindow">
+    <div class='ajaxloader'></div>
+</div>
+<?php } ?>
 
 <div class='genericwindow' id="viewwindow">
     <div class='ajaxloader'></div>
@@ -264,6 +275,34 @@ $liteSwitchTitle = 'Choosology 3.1 — Instrument Panel terminal UI. Lean multi-
 				<button type="submit" id="signup-submit">File application</button>
 				<button type="button" id="signup-cancel" class="signup-cancel">Cancel</button>
 				<span id="signup-status" class="signup-status" aria-live="polite"></span>
+			</div>
+		</form>
+	</div>
+</div>
+
+<?php /* Forgot credentials modal — request email reset link. */ ?>
+<div id="forgotmodal" class="signup-modal signup-modal--hidden" aria-hidden="true">
+	<div class="signup-modal-backdrop" tabindex="-1"></div>
+	<div class="signup-modal-panel" role="dialog" aria-modal="true" aria-labelledby="forgotmodal_title">
+		<div class="signup-modal-header">
+			<div class="signup-modal-heading">
+				<p class="signup-modal-eyebrow">Credentials <span class="signup-modal-eyebrow-tag">reset</span></p>
+				<h2 class="signup-modal-title" id="forgotmodal_title">Forgot credentials?</h2>
+			</div>
+			<button type="button" class="signup-modal-x" id="forgotmodal_close" aria-label="Close">&times;</button>
+		</div>
+		<form id="forgot-form" class="signup-form" action="ajax/passwordreset.php" method="post" novalidate>
+			<p class="signup-lede">Enter your lab handle or contact address. If we find a matching account, we email a one-hour reset link.</p>
+			<label class="signup-label" for="forgot-identity">Lab handle or email</label>
+			<input type="text" id="forgot-identity" name="identity" class="signup-input" maxlength="100" autocomplete="username" required>
+			<div class="signup-honeypot" aria-hidden="true">
+				<label for="forgot-fax">Lab fax</label>
+				<input type="text" id="forgot-fax" name="lab_fax" tabindex="-1" autocomplete="off">
+			</div>
+			<div class="signup-actions">
+				<button type="submit" id="forgot-submit">Send reset link</button>
+				<button type="button" id="forgot-cancel" class="signup-cancel">Cancel</button>
+				<span id="forgot-status" class="signup-status" aria-live="polite"></span>
 			</div>
 		</form>
 	</div>

@@ -4,6 +4,7 @@ choosology_lite_bootstrap();
 require_once dirname(__DIR__) . '/lib/news-helpers.php';
 require_once dirname(__DIR__) . '/lib/date-format-helpers.php';
 require_once dirname(__DIR__) . '/lib/feed-helpers.php';
+require_once dirname(__DIR__) . '/lib/restricted-helpers.php';
 
 global $db;
 
@@ -80,6 +81,9 @@ choosology_lite_header(array('title' => 'News', 'active' => 'news'));
 				<p class="lite-meta"><time datetime="<?php echo htmlspecialchars(choosology_feed_date_iso($stampRaw), ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($stampLabel, ENT_QUOTES, 'UTF-8'); ?></time></p>
 			<?php } ?>
 			<div class="lite-news-body"><?php echo $bodySafe; ?></div>
+			<?php if ($newsId > 0 && choosology_restricted_is_admin()) { ?>
+				<p><a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('restricted.php?news=news:' . $newsId), ENT_QUOTES, 'UTF-8'); ?>">Edit in News desk</a></p>
+			<?php } ?>
 		</article>
 	<?php } ?>
 </fieldset>
