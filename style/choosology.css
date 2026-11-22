@@ -9424,6 +9424,18 @@ body.clipboard-modal-open
     top: 100px;
     margin-top: 0;
     background-color: #f7f1e8;
+    box-sizing: border-box;
+}
+#adminwindow .restricted-page.intabs,
+#adminwindow .restricted-page
+{
+    width: auto;
+    max-width: none;
+    height: auto;
+    min-height: calc(100% - 2rem);
+    margin: 1rem 1.25rem 1.5rem;
+    padding: 0.35rem 0.25rem 3rem;
+    box-sizing: border-box;
 }
 .restricted-page
 {
@@ -9445,6 +9457,7 @@ body.clipboard-modal-open
     border-left: 10px solid var(--restricted-red);
     background: var(--restricted-paper);
     padding: 0.8rem 1rem;
+    margin: 0 0 0.25rem;
     box-shadow: 3px 3px 0 rgba(36, 42, 47, 0.22);
 }
 .restricted-eyebrow,
@@ -9482,7 +9495,7 @@ body.clipboard-modal-open
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
-    margin: 0.8rem 0 0.5rem;
+    margin: 1rem 0 0.75rem;
 }
 .restricted-nav-btn,
 .restricted-btn
@@ -9538,6 +9551,7 @@ body.clipboard-modal-open
 .restricted-view
 {
     display: none;
+    margin-top: 0.35rem;
 }
 .restricted-view.is-active
 {
@@ -9680,7 +9694,8 @@ body.clipboard-modal-open
     border: 1px solid var(--restricted-line);
     border-top: 5px solid #344b5e;
     background: #fbf9f3;
-    padding: 0.75rem;
+    padding: 0.85rem 1rem;
+    margin-top: 0.75rem;
     box-shadow: 2px 2px 0 rgba(36, 42, 47, 0.13);
 }
 .restricted-card--compact
