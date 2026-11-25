@@ -147,20 +147,29 @@ choosology_lite_guide_panel('view', $guideNext);
 		<?php echo $text; ?>
 	</div>
 
-	<?php if ($isEnding && $choices === array()) {
-		echo choosology_lite_ending_panel_html($db, $id, $sid);
-	} else { ?>
-		<div class="lite-btn-row" role="navigation" aria-label="Choices">
-			<?php foreach ($choices as $idx => $c) {
-				$href = choosology_lite_url('view.php?id=' . $id . '&screen=' . (int) $c['target'] . '&from=' . $sid);
-				$label = strip_tags((string) $c['label']);
-				?>
-				<a class="lite-btn" href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>">
-					<?php echo ($idx + 1) . '. ' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
-				</a>
+	<?php $isTerminal = ($isEnding && $choices === array()); ?>
+	<details class="lite-choices-reveal<?php echo $isTerminal ? ' lite-choices-reveal--ending' : ''; ?>">
+		<summary class="lite-choices-summary">
+			<span class="lite-choices-summary-label">Click to reveal choices</span>
+			<span class="lite-choices-summary-cue" aria-hidden="true">&#9662;</span>
+		</summary>
+		<div class="lite-choices-body">
+			<?php if ($isTerminal) {
+				echo choosology_lite_ending_panel_html($db, $id, $sid);
+			} else { ?>
+				<div class="lite-btn-row" role="navigation" aria-label="Choices">
+					<?php foreach ($choices as $idx => $c) {
+						$href = choosology_lite_url('view.php?id=' . $id . '&screen=' . (int) $c['target'] . '&from=' . $sid);
+						$label = strip_tags((string) $c['label']);
+						?>
+						<a class="lite-btn" href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>">
+							<?php echo ($idx + 1) . '. ' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
+						</a>
+					<?php } ?>
+				</div>
 			<?php } ?>
 		</div>
-	<?php } ?>
+	</details>
 
 	<p class="lite-btn-row" style="margin-top:0.75rem;">
 		<a class="lite-btn" href="<?php echo htmlspecialchars($startUrl, ENT_QUOTES, 'UTF-8'); ?>">← Start over</a>

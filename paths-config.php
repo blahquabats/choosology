@@ -102,7 +102,7 @@ function choosology_web_base(bool $reset = false): string
 				}
 			}
 		}
-		$d = rtrim(dirname($sn), '/');
+		$d = rtrim(str_replace('\\', '/', dirname($sn)), '/');
 		$cached = ($d === '' || $d === '.' || $d === '/') ? '' : $d;
 		return $cached;
 	}

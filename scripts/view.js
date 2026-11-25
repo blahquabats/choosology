@@ -3,9 +3,32 @@
  * (img error does not bubble, so each img is bound directly.)
  */
 var commentsTimer = null;
+var choiceExpandTimer = null;
+var choiceFlairTimer = null;
 var screenNavGen = 0;
 /** Set by initTheaterMode so exitTheaterMode can clear animation cleanly. */
 var theaterCtl = null;
+
+function prefersReducedMotion()
+{
+    try {
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    } catch (e) {
+        return false;
+    }
+}
+
+function clearChoiceRevealTimers()
+{
+    if (choiceExpandTimer) {
+        clearTimeout(choiceExpandTimer);
+        choiceExpandTimer = null;
+    }
+    if (choiceFlairTimer) {
+        clearTimeout(choiceFlairTimer);
+        choiceFlairTimer = null;
+    }
+}
 
 function silenceBrokenImages(root)
 {
@@ -38,6 +61,7 @@ function clearViewTimers()
         clearTimeout(commentsTimer);
         commentsTimer = null;
     }
+    clearChoiceRevealTimers();
     screenNavGen++;
 }
 
@@ -50,8 +74,7 @@ function goToScreen(screenid, fromscreen, reverse)
         direction: direction,
         complete: function()
         {
-            $(".choicecover").show();
-            bindEndingReveal($(".choicecontainer"));
+            resetChoiceReveal($(".choicecontainer"));
             replaceScreen(screenid, fromscreen, reverse);
         }
     });
@@ -60,6 +83,7 @@ function goToScreen(screenid, fromscreen, reverse)
 function reloadScreen(screenid)
 {
     var gen = ++screenNavGen;
+    var wasRevealed = $(".choicecontainer .choices").hasClass("is-revealed");
     $.ajax({
        url: "ajax/screenajax.php",
        data: {screen: screenid,
@@ -70,8 +94,13 @@ function reloadScreen(screenid)
         if (gen !== screenNavGen) return;
         var response = $.parseJSON(text);
         $("#choicemeat").html(response.choices);
-        bindEndingReveal($(".choicecontainer"));
-        checkComments();
+        var $box = $(".choicecontainer");
+        bindChoiceReveal($box);
+        if (wasRevealed) {
+            revealChoices($box, { animate: false, flair: false, force: true });
+        } else {
+            resetChoiceReveal($box);
+        }
     });
 }
 
@@ -99,14 +128,13 @@ function replaceScreen(screenid, fromscreen, reverse)
         silenceBrokenImages(".advcanvas");
         $(".advcanvas").prop("style", response.bg);
         $(".realinnards,.viewcol1,.choices").prop("style", response.box+";"+response.border);
-        $(".choicecover").prop("style", response.box+";"+response.border+";"+response.offset);
         $("#choicemeat").html(response.choices);
+        resetChoiceReveal($(".choicecontainer"));
         $(".text").toggle({
                 effect: "slide",
                 direction: direction,
                 complete: function () {
                     if (gen !== screenNavGen) return;
-                    checkComments();
                 }
             });
 
@@ -131,7 +159,7 @@ function showComments(board, screen)
     .done(loadCommentsResponse);
 }
     
-function checkComments()
+function checkComments(immediate)
 {
     if (commentsTimer) {
         clearTimeout(commentsTimer);
@@ -141,6 +169,10 @@ function checkComments()
     {
         var advid = $("#advid").val();
         var screenid = $("#screenid").val();
+        if (immediate) {
+            showComments("adv"+advid, screenid);
+            return;
+        }
         commentsTimer = window.setTimeout(function(){
             commentsTimer = null;
             showComments("adv"+advid, screenid);
@@ -148,28 +180,139 @@ function checkComments()
     }
 }
 
-    function bindEndingReveal($box) {
-        $box.off("mouseenter.ending mouseleave.ending click.ending");
-        $box.on("mouseenter.ending", function(){
-            $(".commentsdiv").removeClass("hidecomments");
-            $(".choicecover").fadeOut("fast");
-        });
-        $box.on("mouseleave.ending", function(){
-            if (!$box.data("commentsPinned")) {
-                $(".commentsdiv").addClass("hidecomments");
-            }
-            $(".choicecover").fadeIn("fast");
-        });
-        $box.on("click.ending", function(){
-            $box.data("commentsPinned", true);
-            $(".commentsdiv").removeClass("hidecomments");
-            $(".choicecover").fadeOut("fast");
-            $box.off("mouseenter.ending mouseleave.ending");
-        });
+function clearEndingFlair($box)
+{
+    if (!$box || !$box.length) return;
+    $box.find(".ending-flair-burst, .ending-flair-sheen").remove();
+    $box.find(".choices").removeClass("is-ending-flair");
+}
+
+function resetChoiceReveal($box)
+{
+    if (!$box || !$box.length) return;
+    clearChoiceRevealTimers();
+    clearEndingFlair($box);
+    var $choices = $box.find(".choices").first();
+    var $cover = $box.find(".choicecover").first();
+    var $meat = $box.find("#choicemeat").first();
+    $choices
+        .off("transitionend.choiceExpand")
+        .removeClass("is-revealed is-expanding is-ending-revealed is-ending-flair")
+        .addClass("is-collapsed")
+        .css({ height: "", overflow: "" });
+    $cover.attr("aria-expanded", "false");
+    $meat.attr("aria-hidden", "true");
+    $meat.find(".commentsdiv").addClass("hidecomments");
+}
+
+function triggerEndingFlair($box, $choices)
+{
+    if (prefersReducedMotion()) return;
+    clearEndingFlair($box);
+    $choices.addClass("is-ending-flair");
+    $choices.append("<span class='ending-flair-sheen' aria-hidden='true'></span>");
+
+    var sparks = [
+        { glyph: "\u2726", dx: "-132px", dy: "-34px", rot: "-28deg", delay: "0.02s", alt: false },
+        { glyph: "\u25C6", dx: "-96px",  dy: "-48px", rot: "22deg",  delay: "0.07s", alt: true  },
+        { glyph: "\u2022", dx: "-62px",  dy: "-30px", rot: "-15deg", delay: "0.04s", alt: true  },
+        { glyph: "\u2726", dx: "-26px",  dy: "-52px", rot: "18deg",  delay: "0.09s", alt: false },
+        { glyph: "\u25C6", dx: "0px",    dy: "-56px", rot: "45deg",  delay: "0.05s", alt: true  },
+        { glyph: "\u2726", dx: "28px",   dy: "-50px", rot: "-20deg", delay: "0.08s", alt: false },
+        { glyph: "\u2022", dx: "64px",   dy: "-32px", rot: "16deg",  delay: "0.03s", alt: true  },
+        { glyph: "\u25C6", dx: "98px",   dy: "-46px", rot: "-24deg", delay: "0.06s", alt: true  },
+        { glyph: "\u2726", dx: "134px",  dy: "-32px", rot: "30deg",  delay: "0.02s", alt: false }
+    ];
+    var burstHtml = "<div class='ending-flair-burst' aria-hidden='true'>";
+    for (var i = 0; i < sparks.length; i++) {
+        var s = sparks[i];
+        var cls = "ending-flair-spark" + (s.alt ? " ending-flair-spark--alt" : "");
+        burstHtml += "<span class='" + cls + "' style='--dx:" + s.dx + ";--dy:" + s.dy + ";--rot:" + s.rot + ";--spark-delay:" + s.delay + ";'>" + s.glyph + "</span>";
     }
-    silenceBrokenImages(".advcanvas");
-    bindEndingReveal($(".choicecontainer"));
-    initTheaterMode();
+    burstHtml += "</div>";
+    $box.append(burstHtml);
+
+    choiceFlairTimer = window.setTimeout(function () {
+        choiceFlairTimer = null;
+        clearEndingFlair($box);
+    }, 950);
+}
+
+function revealChoices($box, opts)
+{
+    if (!$box || !$box.length) return;
+    opts = opts || {};
+    var animate = opts.animate !== false;
+    var flair = opts.flair !== false;
+    var $choices = $box.find(".choices").first();
+    var $cover = $box.find(".choicecover").first();
+    var $meat = $box.find("#choicemeat").first();
+    if (!$choices.length) return;
+    if ($choices.hasClass("is-revealed") && !opts.force) return;
+
+    var isEnding = $meat.find(".ending-panel").length > 0;
+    clearChoiceRevealTimers();
+    clearEndingFlair($box);
+
+    var startH = Math.round($choices[0].getBoundingClientRect().height);
+
+    $cover.attr("aria-expanded", "true");
+    $meat.attr("aria-hidden", "false");
+    $meat.find(".commentsdiv").removeClass("hidecomments");
+    $choices
+        .off("transitionend.choiceExpand")
+        .removeClass("is-collapsed is-expanding")
+        .addClass("is-revealed")
+        .toggleClass("is-ending-revealed", isEnding)
+        .css({ height: "", overflow: "" });
+
+    if (animate && !prefersReducedMotion()) {
+        var targetH = Math.round($choices[0].getBoundingClientRect().height);
+        if (targetH > 0 && Math.abs(targetH - startH) > 1) {
+            var finishExpand = function () {
+                if (choiceExpandTimer) {
+                    clearTimeout(choiceExpandTimer);
+                    choiceExpandTimer = null;
+                }
+                $choices
+                    .off("transitionend.choiceExpand")
+                    .removeClass("is-expanding")
+                    .css({ height: "", overflow: "" });
+            };
+            $choices
+                .addClass("is-expanding")
+                .css({ height: startH + "px", overflow: "hidden" });
+            void $choices[0].offsetHeight;
+            $choices.css("height", targetH + "px");
+            $choices.on("transitionend.choiceExpand", function (e) {
+                if (e.target === $choices[0] && e.originalEvent && e.originalEvent.propertyName === "height") {
+                    finishExpand();
+                }
+            });
+            choiceExpandTimer = window.setTimeout(finishExpand, (isEnding ? 400 : 260) + 60);
+        }
+        if (isEnding && flair) {
+            triggerEndingFlair($box, $choices);
+        }
+    }
+
+    if (isEnding) {
+        checkComments(true);
+    }
+}
+
+function bindChoiceReveal($box)
+{
+    if (!$box || !$box.length) return;
+    $box.off("click.choiceReveal").on("click.choiceReveal", ".choicecover", function (e) {
+        e.preventDefault();
+        revealChoices($box, { animate: true, flair: true });
+    });
+}
+
+silenceBrokenImages(".advcanvas");
+bindChoiceReveal($(".choicecontainer"));
+initTheaterMode();
 
 /**
  * Theater mode: expand the adventure play surface to fill the viewport.
@@ -187,15 +330,6 @@ function initTheaterMode()
     if (!$toggle.length) {
         theaterCtl = null;
         return;
-    }
-
-    function prefersReducedMotion()
-    {
-        try {
-            return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-        } catch (e) {
-            return false;
-        }
     }
 
     function isOn()

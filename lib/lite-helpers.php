@@ -287,15 +287,14 @@ function choosology_lite_ending_panel_html(mysqli $db, int $advid, int $screenid
 		? '<p>Lab note: additional terminal outcomes remain unclassified.</p>'
 		: '<p>Lab note: every known terminal outcome in this experiment has been logged (or none remain).</p>';
 
-	$html = '<div class="lite-ending" role="status">';
-	$html .= '<p class="lite-ending-eyebrow">Terminal outcome</p>';
-	$html .= '<h3>You have reached an end</h3>';
+	$html = '<fieldset class="lite-ending" role="status">';
+	$html .= '<legend class="lite-ending-legend"><span class="lite-ending-pill">END NODE</span></legend>';
 	$html .= '<p>This path through the experiment terminates here.</p>';
 	$html .= '<p>' . $foundLabel . '</p>';
 	$html .= $moreHtml;
 	$html .= '<p class="lite-muted">Rating and comments are available in <a href="' .
 		htmlspecialchars(choosology_classic_url('view/' . $advid), ENT_QUOTES, 'UTF-8') .
 		'">Classic view</a>.</p>';
-	$html .= '</div>';
+	$html .= '</fieldset>';
 	return $html;
 }

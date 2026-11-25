@@ -48,4 +48,14 @@ final class PathsConfigTest extends TestCase
 		$this->assertSame('', choosology_web_base());
 		$this->assertSame('/home.php', choosology_site_url('home.php'));
 	}
+
+	/** @runInSeparateProcess */
+	public function testSiteUrlAtRootScriptNormalizesWindowsDirname(): void
+	{
+		putenv('CHOOSOLOGY_WEB_BASE=');
+		$_SERVER['SCRIPT_NAME'] = '/index.php';
+		choosology_web_base_reset();
+		$this->assertSame('', choosology_web_base());
+		$this->assertSame('/lite/switch.php?to=lite', choosology_site_url('lite/switch.php?to=lite'));
+	}
 }

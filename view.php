@@ -140,7 +140,7 @@ $out = "
 
     <meta charset='utf-8' />
 
-        <link rel='stylesheet' href='style/view.css?v=theater1' /><link rel='stylesheet' href='style/choosology.css?v=myoffice1' />
+        <link rel='stylesheet' href='style/view.css?v=choices2' /><link rel='stylesheet' href='style/choosology.css?v=myoffice1' />
         <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css' />
       <style>
         .choice
@@ -188,12 +188,12 @@ $text.
 "<br/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</div></span>
 
     <div class='choicecontainer'>
-        <div class='choices adv-play-choices'  style='$box;$border;'>
-            <div class='choicecover' style='$box;$border;$offset'><br>
-            <br>
-            Hover to reveal choices!
-            </div>
-        <div id = 'choicemeat'>
+        <div class='choices adv-play-choices is-collapsed' style='$box;$border;'>
+            <button type='button' class='choicecover' aria-expanded='false' aria-controls='choicemeat'>
+                <span class='choicecover-label'>Click to reveal choices</span>
+                <span class='choicecover-cue' aria-hidden='true'>&#9662;</span>
+            </button>
+        <div id='choicemeat' class='choicemeat' aria-hidden='true'>
         $choices
         </div>
         </div>
@@ -208,7 +208,7 @@ $text.
 
 <button type='button' class='theater-exit' id='theater_exit' hidden title='Return to normal view'>Exit theater</button>
 
-    <script src='scripts/view.js'></script>
+    <script src='scripts/view.js?v=choices1'></script>
 ";
 //<div style='$choicestyling;$box;$border' class='commentsholder'>See comments...</div>
 //    <script src='jquery.js'></script>

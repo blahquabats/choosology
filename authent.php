@@ -158,7 +158,7 @@ if (!empty($_POST['regsub']))
 }
 
 
-if (!$_SESSION['user'] && array_key_exists('choosologyLogin',$_COOKIE))
+if (empty($_SESSION['user']) && array_key_exists('choosologyLogin',$_COOKIE))
 {
 	$cookieData = @unserialize($_COOKIE['choosologyLogin'], ['allowed_classes' => false]);
 	if (!is_array($cookieData) || count($cookieData) !== 3) {
@@ -196,7 +196,9 @@ if (!$_SESSION['user'] && array_key_exists('choosologyLogin',$_COOKIE))
 
 if (($_GET['logout'] ?? null) == 1 && !isset($_POST['loginsubmit']))
 {
-	eatCookies($_SESSION['user']);
+	if (!empty($_SESSION['user'])) {
+		eatCookies($_SESSION['user']);
+	}
 	$_SESSION['user'] = false;
 	$_SESSION['usertype'] = false;
 	session_destroy();
@@ -204,7 +206,7 @@ if (($_GET['logout'] ?? null) == 1 && !isset($_POST['loginsubmit']))
 if (!isset($error))
 	$error = "";
 
-if ($_SESSION['user'])
+if (!empty($_SESSION['user']))
 {
 	$query = "select * from users where name=\"{$_SESSION['user']}\"";
 	$result = mysqli_query($db, $query) or die("No te Gusta");
