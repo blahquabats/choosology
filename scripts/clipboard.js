@@ -171,7 +171,7 @@
 		top.forEach(function (m) {
 			html +=
 				'<li class="clip-results-item">' +
-				'<div class="clip-results-title">' + esc(m.title || "Untitled") + "</div>" +
+				'<div class="clip-results-title">' + (m.title || "Untitled") + "</div>" +
 				'<div class="clip-results-meta">' +
 				esc(String(m.play_starts || 0)) + " plays · " +
 				esc(String(m.comments || 0)) + " comments · avg " +
@@ -243,7 +243,7 @@
 			activityHtml =
 				'<p class="clip-activity-line">' +
 				'<a class="clip-link" href="#/edit/' + esc(String(last.id)) + '">Return to last edited experiment</a>' +
-				'<span class="clip-muted"> — ' + esc(last.title || "Untitled") + "</span></p>" +
+				'<span class="clip-muted"> — ' + (last.title || "Untitled") + "</span></p>" +
 				'<p class="clip-activity-line">' +
 				'<a class="clip-link" href="#/view/' + esc(String(last.id)) + '">Preview</a>' +
 				'<span class="clip-sep">·</span>' +

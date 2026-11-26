@@ -57,11 +57,34 @@ describe("DataScrip UI wiring", () => {
     expect(indexSrc).toContain("Forgot credentials?");
     expect(indexSrc).toContain('id="forgotmodal"');
     expect(indexSrc).toContain("loginbox-inner");
-    expect(jsSrc).toContain("id='openforgot'");
+    expect(indexSrc).toContain("loginbox-field");
+    expect(indexSrc).toContain("loginbox-eyebrow");
+    expect(indexSrc).toContain("id='loginsubmit'>Sign in");
+    expect(jsSrc).toContain('"#openforgot"');
     expect(jsSrc).toContain("choosologyOpenForgotModal");
     expect(jsSrc).toContain('direction: "up"');
     expect(jsSrc).toContain("ajax/passwordreset.php");
     expect(jsSrc).toContain("loginbox-inner");
+    expect(jsSrc).toContain("<p class='wrongpass'");
+    expect(jsSrc).toContain("function choosologyShowLoginReloadSpinner(label)");
+    expect(jsSrc).toContain("loginbox-spinner");
+    expect(jsSrc).toContain("Signing in…");
+    expect(jsSrc).toContain("location.reload()");
+    expect(jsSrc).not.toContain("Logged in as \"+response");
+    expect(jsSrc).not.toContain("Logged in as \" + (res.name");
+    expect(jsSrc).toContain('choosologyShowLoginReloadSpinner("Signing out…")');
+    expect(jsSrc).not.toContain("choosologyLoginBoxHtml()");
+    const loginHits = jsSrc.split("choosologyShowLoginReloadSpinner()").length - 1;
+    expect(loginHits).toBe(2);
+    const css = fs.readFileSync(
+      path.join(__dirname, "../../style/choosology.css"),
+      "utf8"
+    );
+    expect(css).toContain("#topbox:has(.loginbox-inner)");
+    expect(css).toMatch(/#topbox:has\(\.loginbox-inner\)[\s\S]*?border-left:\s*5px solid #604b91;/);
+    expect(css).toMatch(/\.loginbox-inner #loginsubmit[\s\S]*?text-transform:\s*uppercase;/);
+    expect(css).toContain(".loginbox-spinner");
+    expect(css).toContain(".loginbox-inner--pending");
   });
 
   test("Classic Lite switch sits beside the logo, outside #topbox", () => {

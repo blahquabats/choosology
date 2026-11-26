@@ -30,7 +30,7 @@ if (isset($_GET['id']) && $_GET['id'] !== '' && is_numeric($_GET['id'])) {
 var advid = "<?php echo htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8'); ?>";
 </script>
 
-    <script src='vised/config.js'></script>
-    <script src='vised/setup.js'></script>
-    <script src='vised/vised.js'></script>
+    <script src='vised/config.js?v=visedring3'></script>
+    <script src='vised/setup.js?v=visedring3'></script>
+    <script src='vised/vised.js?v=visedring3'></script>
 

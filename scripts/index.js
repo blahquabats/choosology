@@ -164,15 +164,18 @@ $(function() {
                 timeout: 0,
                 fx: 'fadeout'
             });
-            function choosologyLoginBoxHtml() {
-                return "<div id='loginbox-inner' class='loginbox-inner'>"
-                    + "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />"
-                    + "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />"
-                    + "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>"
-                    + "<button type='button' id='loginsubmit'>Submit</button>"
-                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>"
-                    + "<div class='login-signup-row'><button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>"
-                    + "</div>";
+            function choosologyShowLoginReloadSpinner(label) {
+                var pending = label || "Signing in…";
+                var box = $("#topbox");
+                box.stop(true, true);
+                box.html(
+                    "<div id='loginbox-inner' class='loginbox-inner loginbox-inner--pending' role='status' aria-live='polite'>"
+                    + "<p class='loginbox-eyebrow'>Lab access</p>"
+                    + "<div class='loginbox-spinner' aria-hidden='true'></div>"
+                    + "<p class='loginbox-pending'>" + pending + "</p>"
+                    + "</div>"
+                );
+                location.reload();
             }
 
             function choosologyCloseForgotModal() {
@@ -341,15 +344,7 @@ $(function() {
                     if (window.ChoosologyClipboard && typeof ChoosologyClipboard.markForceAutoOpenOnNextLoad === "function") {
                         ChoosologyClipboard.markForceAutoOpenOnNextLoad();
                     }
-                    var newtext = "Logged in as " + (res.name || "researcher");
-                    newtext += "<br><span id='logoutsubmit'><a href='#'>log out</a></span>";
-                    var box = $("#topbox");
-                    box.slideUp("slow", "swing", function() {
-                        box.html(newtext);
-                        box.slideDown("slow", "swing", function() {
-                            location.reload();
-                        });
-                    });
+                    choosologyShowLoginReloadSpinner();
                 }).fail(function(xhr, status, err) {
                     var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : (err || status || "Network error");
                     $status.addClass("signup-status--error").text(msg);
@@ -383,15 +378,7 @@ $(function() {
                             if (window.ChoosologyClipboard && typeof ChoosologyClipboard.markForceAutoOpenOnNextLoad === "function") {
                                 ChoosologyClipboard.markForceAutoOpenOnNextLoad();
                             }
-                            var newtext = "Logged in as "+response;
-                            newtext += "<br><span id='logoutsubmit'><a href='#'>log out</a></span>";
-                            var box = $("#topbox");
-                            box.slideUp("slow","swing", function(){
-                                box.html(newtext);
-                                box.slideDown("slow", "swing", function() {
-                                    location.reload();
-                                });
-                            });
+                            choosologyShowLoginReloadSpinner();
                             if($('#commentsexist').length) reloadScreen($('#screenid').val()); // show interactive comments/rating if you're on a last screen
                         }
                         else
@@ -402,7 +389,7 @@ $(function() {
                                 $shake = topbox;
                             }
                             $shake.find(".wrongpass").remove();
-                            $shake.append("<span style='color:red; font-weight:bold' class='wrongpass'><br />Wrong username or password.</span><br />");
+                            $shake.append("<p class='wrongpass' role='alert'>Wrong username or password.</p>");
                             /* Vertical bump only: horizontal jQuery UI shake on the
                                right-edge login chrome walks the box off-screen. */
                             $shake.stop(true, true).effect("shake", {
@@ -420,11 +407,14 @@ $(function() {
                         }
                     }).fail(function(xhr, status, err) {
                         var msg = (xhr.responseText && xhr.responseText.length < 500) ? xhr.responseText : (err || status || "Network error");
-                        $("#topbox").append("<div class='login-ajax-error' style='color:#b00;font-weight:bold;margin-top:6px;'>Login failed (" + xhr.status + "): " + $("<div>").text(msg).html() + "</div>");
+                        $("#topbox").append("<p class='login-ajax-error' role='alert'>Login failed (" + xhr.status + "): " + $("<div>").text(msg).html() + "</p>");
                         $('#loginsubmit').prop('disabled', false);
                     });
             });
-            $(document).on("click", "#logoutsubmit", function(){
+            $(document).on("click", "#logoutsubmit", function(e){
+                if (e) {
+                    e.preventDefault();
+                }
                 $.ajax({
                     type: "POST",
                     url: "ajax/authentajax.php",
@@ -435,20 +425,15 @@ $(function() {
             
                         if(response == 1)
                         {
-                            $("body").removeAttr("data-logged-in");
-                            $("#mystuff_nav").hide();
-                            $("#admin_nav").hide();
-                            $("#tabswindow").hide();
-                            if (window.location.hash.indexOf("mystuff") !== -1 || window.location.hash.indexOf("admin") !== -1) {
-                                window.location.hash = "#/home";
+                            var hash = window.location.hash || "";
+                            if (hash.indexOf("mystuff") !== -1 || hash.indexOf("admin") !== -1) {
+                                if (window.history && window.history.replaceState) {
+                                    window.history.replaceState(null, "", "#/home");
+                                } else {
+                                    window.location.hash = "#/home";
+                                }
                             }
-                            var newtext = choosologyLoginBoxHtml();
-                            var box = $("#topbox");
-                            box.slideUp("slow","swing", function(){
-                                box.html(newtext);
-                                box.slideDown("slow");
-                            });
-                            if($('#commentsexist').length) reloadScreen($('#screenid').val()); // show interactive comments/rating if you're on a last screen
+                            choosologyShowLoginReloadSpinner("Signing out…");
                         }
                 });
             });

@@ -26,6 +26,21 @@ final class ClipboardCatalogTest extends TestCase
 		}
 	}
 
+	public function testClipboardTitleUsesStoredFontHtml(): void
+	{
+		require_once CHOOSOLOGY_ROOT . '/lib/clipboard-helpers.php';
+		$stored = '&lt;font color=&quot;#ffccff&quot;&gt;blah blah adventure&lt;/font&gt;';
+		$this->assertSame(
+			'<font color="#ffccff">blah blah adventure</font>',
+			choosology_clipboard_title_html($stored)
+		);
+		$this->assertSame(
+			decode($stored),
+			choosology_clipboard_title_html($stored)
+		);
+		$this->assertSame('Untitled', choosology_clipboard_title_html('   '));
+	}
+
 	public function testEvalAutoExposesChecklistAutoKeys(): void
 	{
 		require_once CHOOSOLOGY_ROOT . '/lib/clipboard-helpers.php';

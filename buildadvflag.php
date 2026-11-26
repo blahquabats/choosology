@@ -168,10 +168,11 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
         $out .= "</div>\n</div>\n";
         return $out;
     }
+    $slideInfoClass = $pic ? 'slideinfo' : 'slideinfo slideinfo--no-icon';
     $out = "
     <div class='slidefolder' style = \"background-color: $bg; $bgpic\">
 
-    <div class='slideinfo' style='$pagestyle; $titlestyle'>";
+    <div class='$slideInfoClass' style='$pagestyle; $titlestyle'>";
     if($pic) $out .= "<img class='advflagicon' src=\"" . htmlspecialchars($pic, ENT_QUOTES, 'UTF-8') . "\" alt=\"\" />";
     $out .= "<div class='slideinfo-inner'>
     <div class='slideinfo-toprow'>
@@ -179,21 +180,24 @@ function buildAdvFlag($id, $user, $mini = 0, $applyBrowseAdvTone = false)
     <div class='advflagrating'>$rating</div>
     </div>
     <div class='slideinfo-meta'>
-    <small>by <a class='link' onclick=\"location.href='#/mystuff/$id'\">{$r['advuser']}</a></small>
-    <br />";
+    <div class='slideinfo-byline-row'>
+    <small class='slideinfo-byline'>by <a class='link' onclick=\"location.href='#/mystuff/$id'\">{$r['advuser']}</a></small>";
     if ($dateline !== '') {
-        $out .= "<small>" . htmlspecialchars($dateline, ENT_QUOTES, 'UTF-8') . "</small><br />";
+        $out .= "<small class='slideinfo-date'>" . htmlspecialchars($dateline, ENT_QUOTES, 'UTF-8') . "</small>";
     }
     $out .= "
-    $tags
+    </div>";
+    if ($tags !== '') {
+        $out .= "<div class='slideinfo-tags'>$tags</div>";
+    }
+    $out .= "
     </div>
     </div>
     </div>
     <div class='oneslide oneslide-teaser' style = '$pagestyle'>
     <div class='slidetitle' style='$textstyle'>
-    <span class='expnotes'><b>Experiment&nbsp;notes:</b></span>
-    <br />
-   $desc
+    <div class='expnotes-header'><span class='expnotes'>Experiment notes</span></div>
+    <div class='expnotes-body'>$desc</div>
     </div>
     </div>
     </div>

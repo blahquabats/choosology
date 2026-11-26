@@ -107,7 +107,45 @@ if (is_array($res) && count($res) > 0) {
 </div>
 
 <script>
+    /* Size the featured card to the tallest slide so notes are not clipped.
+       Recent Updates stretches with that row. Very small viewports may still scroll. */
+    function fitFeaturedSlides() {
+        var $cyc = $(".featuredslides-cycle");
+        var $slides = $cyc.children(".slidefolder");
+        if (!$cyc.length || !$slides.length) {
+            return;
+        }
+        var maxH = 0;
+        $slides.each(function () {
+            var el = this;
+            var prevDisplay = el.style.display;
+            var prevVis = el.style.visibility;
+            el.style.display = "block";
+            el.style.visibility = "hidden";
+            el.style.height = "auto";
+            el.style.maxHeight = "none";
+            /* offsetHeight is the border-box size; scrollHeight is short by the border under border-box. */
+            maxH = Math.max(maxH, Math.ceil(el.offsetHeight));
+            el.style.display = prevDisplay;
+            el.style.visibility = prevVis;
+        });
+        if (!maxH) {
+            return;
+        }
+        var tiny = window.matchMedia("(max-width: 560px), (max-height: 520px)").matches;
+        var cap = Math.max(220, Math.round(window.innerHeight * 0.7));
+        var viewH = (tiny && maxH > cap) ? cap : maxH;
+        $cyc.css({
+            height: viewH + "px",
+            maxHeight: tiny ? cap + "px" : "none",
+            overflowY: (tiny && maxH > cap) ? "auto" : "hidden"
+        });
+        $slides.css({ height: maxH + "px", maxHeight: "none" });
+    }
+    fitFeaturedSlides();
+
     $(document).ready(function(){
+        fitFeaturedSlides();
 
         /* Cycle 3.x uses slideExpr, not "slides"; prev/next must be outside the cycle root or they become slides */
         var $cyc = $(".featuredslides-cycle");
@@ -123,8 +161,10 @@ if (is_array($res) && count($res) > 0) {
                 prev: ".featuredslides .cycle-prev",
                 next: ".featuredslides .cycle-next",
                 containerResize: 0,
-                slideResize: 0
+                slideResize: 0,
+                fit: 0
             });
+            fitFeaturedSlides();
             /* pauseOnHover on the cycle root unpauses when the pointer moves to the
                sibling prev/next buttons; pause the whole slideshow chrome instead. */
             $(".featuredslides").on("mouseenter", function() {
@@ -134,7 +174,14 @@ if (is_array($res) && count($res) > 0) {
             });
         } else if (slideCount === 1) {
             $(".featuredslides .cycle-prev, .featuredslides .cycle-next").hide();
+            fitFeaturedSlides();
         }
+
+        var featuredResizeTimer;
+        $(window).off("resize.featuredSlides").on("resize.featuredSlides", function () {
+            clearTimeout(featuredResizeTimer);
+            featuredResizeTimer = setTimeout(fitFeaturedSlides, 80);
+        });
 
         $("#tinyshowhide").click(function() {
             var feats = $("#featadvs");

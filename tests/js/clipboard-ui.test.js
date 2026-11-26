@@ -41,6 +41,12 @@ describe("Clipboard UI polish", () => {
     expect(js).not.toContain("Full filterable results");
   });
 
+  test("Recent results titles insert server-decoded title HTML", () => {
+    expect(js).toContain('<div class="clip-results-title">\' + (m.title || "Untitled")');
+    expect(js).not.toContain("esc(m.title");
+    expect(js).not.toContain("esc(last.title");
+  });
+
   test("close control is a bordered button with hover", () => {
     expect(css).toMatch(/\.clip-modal-x\s*\{[^}]*border:\s*1px solid/s);
     expect(css).toMatch(/\.clip-modal-x:hover\s*\{[^}]*border-color:/s);

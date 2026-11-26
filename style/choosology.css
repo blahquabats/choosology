@@ -191,9 +191,16 @@ label.sel:before {
 
 .rememberme
 {
-    display:inline-block;
-    float:left;
-    font-size: 1.3vmin;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    float: none;
+    margin: 0;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #134056;
 }
 
 .mstar
@@ -494,6 +501,18 @@ label.sel:before {
     text-align: right;
 }
 
+#topbox:has(.loginbox-inner)
+{
+    max-width: 340px;
+    padding: 8px 12px 8px 10px;
+    border: 1px solid #c5d0e0;
+    border-left: 5px solid #604b91;
+    border-radius: 0 10px 10px 0;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(239, 244, 251, 0.96) 100%);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.13);
+    text-align: left;
+}
+
 /* Compact logged-in account chrome (~half the prior stacked height). */
 body[data-logged-in="1"] #topbox
 {
@@ -761,9 +780,11 @@ body[data-logged-in="1"] #logoutsubmit a
     border-left-color: #2d8a5e;
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    max-height: 100%;
-    overflow: hidden;
+    align-self: stretch;
+    height: auto;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
 }
 
 .home-copy-card--feed .home-copy-code
@@ -793,11 +814,16 @@ body[data-logged-in="1"] #logoutsubmit a
     min-height: 0;
 }
 
-.home-featured-mount
+.home-copy-card--featured #featadvs.home-featured-mount
 {
     margin: 0 0 0 42px;
-    min-height: 0;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    min-height: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: visible;
 }
 
 .home-copy-card--featured .featuredslides
@@ -805,31 +831,41 @@ body[data-logged-in="1"] #logoutsubmit a
     width: 100%;
     max-width: none;
     min-width: 0;
-    min-height: 200px;
+    height: auto;
+    min-height: 0;
     overflow: hidden;
 }
 
-/* Keep cycle gutters >= nav button width so slides aren't clipped under the arrows. */
+/* Keep cycle gutters >= nav button width so slides aren't clipped under the arrows.
+   Height is set from the tallest slide so notes stay fully visible. */
 .home-copy-card--featured .featuredslides-cycle
 {
     width: calc(100% - 104px);
     margin: 0 52px;
-    height: 210px;
-    min-height: 210px;
-    max-height: 210px;
+    height: auto;
+    min-height: 0;
+    max-height: none;
 }
 
 .home-copy-card--featured .featuredslides .slidefolder
 {
-    height: 210px;
-    min-height: 210px;
-    max-height: 210px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    border: 1px solid #b5c6da;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
 }
 
 .home-copy-card--featured .featuredslides .slidenav
 {
     width: 44px;
-    height: 210px;
+    top: 0;
+    bottom: 0;
+    height: auto;
 }
 
 .home-copy-card--featured .featuredslides .slidenav-left
@@ -1020,8 +1056,8 @@ body[data-logged-in="1"] #logoutsubmit a
 
     .lab-feed-list--home
     {
-        overflow-y: auto;
-        max-height: 14rem;
+        overflow: visible;
+        max-height: none;
     }
 
     .home-hero-lockup
@@ -1057,7 +1093,7 @@ body[data-logged-in="1"] #logoutsubmit a
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
-    overflow: hidden;
+    overflow: visible;
     padding-right: 2px;
     gap: 4px;
 }
@@ -4328,9 +4364,9 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     position: relative;
     width: calc(100% - 112px);
     margin: 0 56px;
-    height: 300px;
-    min-height: 300px;
-    max-height: 300px;
+    height: auto;
+    min-height: 0;
+    max-height: none;
     overflow: hidden;
 }
 
@@ -4362,9 +4398,9 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 /* Home featured slideshow: description only; column flex so header height can grow without overlapping notes */
 .featuredslides .slidefolder
 {
-    height: 300px;
-    max-height: 300px;
-    min-height: 300px;
+    height: auto;
+    max-height: none;
+    min-height: 0;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -4382,6 +4418,27 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     width: 100%;
     margin: 0;
     flex: 0 0 auto;
+    min-height: 82px;
+    padding: 6px 10px 7px 8px;
+}
+.featuredslides .slideinfo.slideinfo--no-icon
+{
+    min-height: 0;
+    padding: 6px 10px 7px 10px;
+}
+.featuredslides .slideinfo .advflagicon
+{
+    width: 70px;
+    height: 70px;
+}
+.featuredslides .slideinfo .slideinfo-inner
+{
+    padding-left: 82px;
+    gap: 3px;
+}
+.featuredslides .slideinfo.slideinfo--no-icon .slideinfo-inner
+{
+    padding-left: 0;
 }
 .featuredslides .oneslide.oneslide-teaser
 {
@@ -4392,32 +4449,35 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     width: 100%;
     margin-left: 0;
     margin-right: 0;
-    flex: 1 1 0;
+    flex: 0 0 auto;
     min-height: 0;
     height: auto !important;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    padding: 6px 6px 8px;
+    padding: 8px 12px 10px;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
     box-sizing: border-box;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: visible;
 }
 .featuredslides .oneslide.oneslide-teaser .slidetitle
 {
     position: relative;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-height: 0;
     margin: 0;
-    padding: 8px 10px 10px 12px;
-    width: auto;
+    padding: 0;
+    width: 100%;
+    height: auto;
     top: auto;
     left: auto;
-    overflow: hidden;
-    overflow-y: hidden;
-    display: block;
-    line-height: 1.35;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.92rem;
+    line-height: 1.5;
 }
 .slideinfo
 {
@@ -4471,6 +4531,52 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 .slideinfo-meta
 {
     line-height: 1.35;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.slideinfo-byline-row
+{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.slideinfo-byline
+{
+    min-width: 0;
+}
+
+.slideinfo-date
+{
+    margin-left: auto;
+    text-align: right;
+    white-space: nowrap;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: 0.03em;
+    opacity: 0.85;
+}
+
+.slideinfo-tags
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+
+.slideinfo-tags .onetag
+{
+    float: none;
+    display: inline-block;
+    margin-top: 0;
 }
 
 .slideinfo .advflagrating
@@ -4530,7 +4636,7 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     z-index: 3;
 }
 
-/* Featured slideshow prev/next: full-height CSS rails (match 300px cards). */
+/* Featured slideshow prev/next: rails stretch with the content-sized card. */
 .featuredslides .slidenav
 {
     -webkit-appearance: none;
@@ -4541,8 +4647,9 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     box-sizing: border-box;
     position: absolute;
     top: 0;
+    bottom: 0;
     width: 48px;
-    height: 300px;
+    height: auto;
     margin: 0;
     padding: 0;
     border: 1px solid #604b91;
@@ -4694,17 +4801,54 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 
 }
 
+.expnotes-header
+{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 7px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(40, 116, 166, 0.28);
+}
+
 .expnotes
 {
-    background-color: #eeeeee;
-    border: 2px solid grey;
-    border-radius: 4px;
-    padding:1px 3px 1px 3px;
-    font-family: "Courier New", Arial, sans-serif;
-    color: #333333;
-    font-weight:bold;
-    font-style: italic;
-    line-height:1.8em;
+    display: inline-block;
+    padding: 2px 7px;
+    border: 1px solid #2874a6;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.84);
+    color: #134056;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.64rem;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.3;
+}
+
+.expnotes-body
+{
+    flex: 0 0 auto;
+    min-height: 0;
+    overflow: visible;
+    padding-right: 4px;
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+/* Inner scrolling only when the viewport itself is very small. */
+@media (max-width: 560px), (max-height: 520px)
+{
+    .home-copy-card--featured .featuredslides-cycle
+    {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
 }
 
 .advflagrating
@@ -6911,17 +7055,163 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
 #loginbox-inner
 {
     position: relative;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    width: 300px;
     max-width: 100%;
-    text-align: right;
+    text-align: left;
     vertical-align: top;
+}
+
+.loginbox-eyebrow
+{
+    margin: 0;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #604b91;
+}
+
+.loginbox-field
+{
+    display: grid;
+    grid-template-columns: 5.6rem minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.loginbox-label
+{
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #134056;
+}
+
+.loginbox-field input
+{
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 4px 7px;
+    border: 1px solid #b5c6da;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #0d2137;
+    font: 0.82rem/1.3 Consolas, "Courier New", Courier, monospace;
+}
+
+.loginbox-field input:focus
+{
+    outline: none;
+    border-color: #2874a6;
+    box-shadow: 0 0 0 2px rgba(40, 116, 166, 0.22);
+}
+
+.loginbox-actions
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 1px;
+}
+
+.loginbox-inner #loginsubmit
+{
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid #604b91;
+    border-left: 4px solid #4b3b77;
+    border-radius: 0 5px 5px 0;
+    background: rgba(255, 255, 255, 0.9);
+    color: #302454;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.loginbox-inner #loginsubmit:hover
+{
+    background: #f4f0fb;
+    color: #1f1f2d;
+}
+
+.loginbox-inner #loginsubmit:disabled
+{
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.loginbox-inner--pending
+{
+    align-items: center;
+    justify-content: center;
+    min-height: 7.5rem;
+    gap: 8px;
+    padding: 4px 0 2px;
+}
+
+.loginbox-spinner
+{
+    width: 26px;
+    height: 26px;
+    box-sizing: border-box;
+    border: 3px solid rgba(96, 75, 145, 0.22);
+    border-top-color: #604b91;
+    border-radius: 50%;
+    animation: loginbox-spin 0.7s linear infinite;
+}
+
+.loginbox-pending
+{
+    margin: 0;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #134056;
+}
+
+@keyframes loginbox-spin
+{
+    to { transform: rotate(360deg); }
+}
+
+.loginbox-inner .wrongpass,
+#topbox .login-ajax-error
+{
+    margin: 2px 0 0;
+    color: #8b1e1e;
+    font-family: Consolas, "Courier New", Courier, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
 }
 
 .login-signup-row
 {
-    clear: both;
-    margin-top: 6px;
-    text-align: right;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    margin-top: 0;
+    text-align: left;
 }
 
 .login-signup-link
@@ -6933,10 +7223,11 @@ ui-tabs: The outer container of the tabs. This element will additionally have a 
     background: none;
     color: #1c5a7a;
     font-family: Consolas, "Courier New", Courier, monospace;
-    font-size: 1.15vmin;
+    font-size: 0.68rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     text-decoration: underline;
+    text-underline-offset: 2px;
     cursor: pointer;
 }
 
@@ -8397,6 +8688,11 @@ body.clipboard-modal-open
     .clip-modal-panel
     {
         transition: none;
+    }
+
+    .loginbox-spinner
+    {
+        animation: none;
     }
 }
 .clip-modal-header

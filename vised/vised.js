@@ -78,8 +78,9 @@
         skip = 0;
         modename = "normal";
         mode = modes[modename];
-        menubox;
+        menubox = null;
         stopmenuonce = 0;
+        if (typeof refreshStatusPill === "function") refreshStatusPill();
         
         $.ajax({
             type: "POST",
@@ -109,6 +110,7 @@
                 buildFrom(i);
             }
             refreshAllConnectionDots();
+            if (typeof refreshOffscreenArrows === "function") refreshOffscreenArrows();
             $("#visedloader").hide();
             if (typeof window.__konvaPatternImagesRedraw === 'function') {
                 window.__konvaPatternImagesRedraw();
@@ -538,9 +540,212 @@
 
         
     }
+    function statusPillCopy(which) {
+        var raw = (menubox && menubox.title) ? String(menubox.title) : "this screen";
+        raw = raw.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+        if (!raw) raw = "this screen";
+        if (raw.length > 32) raw = raw.slice(0, 31) + "\u2026";
+        if (which === "connect_to") {
+            return "Connecting from \u201c" + raw + "\u201d \u2014 click the next screen";
+        }
+        if (which === "disconnect_from") {
+            return "Removing a link from \u201c" + raw + "\u201d \u2014 click either end";
+        }
+        return "Ready";
+    }
+
+    function applyModeOutline() {
+        var src = (menubox && menubox.name) ? menubox.name() : "";
+        var color = modename === "connect_to" ? config.to_color : config.from_color;
+        for (var id in boxes) {
+            if (!boxes[id]) continue;
+            if (modename !== "normal" && id === src) {
+                boxes[id].stroke(color);
+                boxes[id].strokeWidth(3);
+            } else if (boxes[id].strokeWidth() === 3) {
+                boxes[id].stroke(config.box_border);
+                boxes[id].strokeWidth(2);
+            }
+        }
+        if (typeof layerScene !== "undefined" && layerScene) layerScene.batchDraw();
+    }
+
+    function formatPanCoord(n) {
+        var rounded = Math.round(n);
+        var neg = rounded < 0;
+        var body = String(Math.abs(rounded));
+        if (body.length > 5) body = body.slice(0, 5);
+        while (body.length < 5) body = " " + body;
+        return (neg ? "-" : " ") + body;
+    }
+
+    function refreshPanReadout() {
+        if (typeof statusPanText === "undefined" || !statusPanText || typeof graphPan === "undefined") return;
+        statusPanText.text("x " + formatPanCoord(graphPan.x()) + "   y " + formatPanCoord(graphPan.y()));
+        refreshOffscreenArrows();
+        if (layers['bg']) layers['bg'].batchDraw();
+    }
+
+    function refreshOffscreenArrows() {
+        if (typeof offscreenArrows === "undefined" || !offscreenArrows || typeof stage === "undefined" || typeof graphPan === "undefined") return;
+        offscreenArrows.destroyChildren();
+        var vw = stage.width();
+        var vh = stage.height();
+        var cx = vw / 2;
+        var cy = vh / 2;
+        var nodes = [];
+        var id;
+        for (id in boxgroups) {
+            var b = boxgroups[id];
+            if (!b || b.deleted) continue;
+            var bw = b.width() || 184;
+            var bh = b.height() || 54;
+            var x = graphPan.x() + b.x();
+            var y = graphPan.y() + b.y();
+            if (x + bw >= 0 && x <= vw && y + bh >= 0 && y <= vh) continue;
+            var nx = x + bw / 2;
+            var ny = y + bh / 2;
+            nodes.push({ x: nx, y: ny, ang: Math.atan2(ny - cy, nx - cx) });
+        }
+        nodes.sort(function (a, b) { return a.ang - b.ang; });
+        var thresh = 22 * Math.PI / 180;
+        var clusters = [];
+        var n;
+        for (n = 0; n < nodes.length; n++) {
+            var last = clusters[clusters.length - 1];
+            if (last && Math.abs(nodes[n].ang - last.ang) <= thresh) {
+                last.items.push(nodes[n]);
+                var sx = 0, sy = 0, k;
+                for (k = 0; k < last.items.length; k++) {
+                    sx += last.items[k].x;
+                    sy += last.items[k].y;
+                }
+                last.ang = Math.atan2(sy / last.items.length - cy, sx / last.items.length - cx);
+            } else {
+                clusters.push({ ang: nodes[n].ang, items: [nodes[n]] });
+            }
+        }
+        if (clusters.length > 1) {
+            var first = clusters[0];
+            var tail = clusters[clusters.length - 1];
+            var wrap = Math.abs(first.ang - tail.ang);
+            if (wrap > Math.PI) wrap = (Math.PI * 2) - wrap;
+            if (wrap <= thresh) {
+                first.items = tail.items.concat(first.items);
+                clusters.pop();
+                var sx2 = 0, sy2 = 0, k2;
+                for (k2 = 0; k2 < first.items.length; k2++) {
+                    sx2 += first.items[k2].x;
+                    sy2 += first.items[k2].y;
+                }
+                first.ang = Math.atan2(sy2 / first.items.length - cy, sx2 / first.items.length - cx);
+            }
+        }
+        var pad = 22;
+        var c;
+        for (c = 0; c < clusters.length; c++) {
+            var ang = clusters[c].ang;
+            var dx = Math.cos(ang);
+            var dy = Math.sin(ang);
+            var t = Infinity;
+            if (dx > 0.0001) t = Math.min(t, (vw - pad - cx) / dx);
+            if (dx < -0.0001) t = Math.min(t, (pad - cx) / dx);
+            if (dy > 0.0001) t = Math.min(t, (vh - pad - cy) / dy);
+            if (dy < -0.0001) t = Math.min(t, (pad - cy) / dy);
+            if (!isFinite(t)) continue;
+            var ax = cx + dx * t;
+            var ay = cy + dy * t;
+            if (typeof statusPillBg !== "undefined" && statusPillBg) {
+                var pw = statusPillBg.width() + 18;
+                var ph = statusPillBg.height() + 18;
+                if (ax < pw && ay < ph) {
+                    ay = ph + 8;
+                }
+            }
+            offscreenArrows.add(new Konva.RegularPolygon({
+                x: ax,
+                y: ay,
+                sides: 3,
+                radius: 8,
+                rotation: ang * 180 / Math.PI + 90,
+                fill: "#d6a84f",
+                stroke: "#576b55",
+                strokeWidth: 1,
+                listening: false,
+                name: "offscreen_arrow"
+            }));
+        }
+        if (layers['bg']) layers['bg'].batchDraw();
+    }
+
+    function measureStatusText(textNode) {
+        var canvas = measureStatusText._canvas || (measureStatusText._canvas = document.createElement("canvas"));
+        var ctx = canvas.getContext("2d");
+        var size = textNode.fontSize() || 13;
+        var style = textNode.fontStyle() || "normal";
+        var family = textNode.fontFamily() || "Consolas, monospace";
+        ctx.font = style + " " + size + "px " + family;
+        var measured = Math.ceil(ctx.measureText(String(textNode.text() || "")).width);
+        var konvaW = textNode.getTextWidth ? Math.ceil(textNode.getTextWidth()) : 0;
+        return Math.max(measured, konvaW, 8);
+    }
+
+    function layoutStatusPill() {
+        if (typeof statusPillText === "undefined" || !statusPillText) return;
+        var textW = measureStatusText(statusPillText);
+        statusPillText.width(textW);
+        statusPillText.wrap("none");
+        statusPillText.ellipsis(false);
+        statusPillText.x(16);
+        statusPillText.y(12);
+        var sentenceBottom = 12 + statusPillText.height();
+        var rightEdge = 16 + textW;
+        if (modename === "normal") {
+            statusCancel.hide();
+        } else {
+            statusCancel.show();
+            statusCancel.x(rightEdge + 16);
+            statusCancel.y(12);
+            rightEdge = rightEdge + 16 + 72;
+        }
+        statusPanText.x(16);
+        statusPanText.y(sentenceBottom + 8);
+        statusPanText.width(168);
+        var width = Math.max(rightEdge, 16 + 168) + 16;
+        var height = statusPanText.y() + statusPanText.height() + 12;
+        statusPillBg.width(width);
+        statusPillBg.height(Math.max(height, 58));
+        if (layers['bg']) layers['bg'].batchDraw();
+    }
+
+    function refreshStatusPill() {
+        if (typeof statusPillText === "undefined" || !statusPillText) return;
+        var which = modename;
+        statusPillText.text(statusPillCopy(which));
+        var fill = "#fff8dc";
+        var stroke = "#d6a84f";
+        var ink = "#3a3a6a";
+        if (which === "connect_to") {
+            fill = "#e7f6ea";
+            stroke = config.to_color;
+            ink = "#145c28";
+        } else if (which === "disconnect_from") {
+            fill = "#fdecec";
+            stroke = config.from_color;
+            ink = "#7a2424";
+        }
+        statusPillText.fill(ink);
+        statusPillBg.fill(fill);
+        statusPillBg.stroke(stroke);
+        if (typeof statusPanText !== "undefined" && statusPanText && typeof graphPan !== "undefined") {
+            statusPanText.text("x " + Math.round(graphPan.x()) + "    y " + Math.round(graphPan.y()));
+        }
+        layoutStatusPill();
+        applyModeOutline();
+    }
+
     function switchTo(mn)
     {
-        var oldmode = modename;
         modename = mn;
         if(modes[modename]) mode = modes[modename];
         else 
@@ -549,13 +754,7 @@
             return false;
         }
         $('html').css("cursor", mode['cursor']);
-        var mb = layers['bg'].findOne("#topbar_"+modename);
-        var omb = layers['bg'].findOne("#topbar_"+oldmode);
-        if (omb) omb.opacity(0);
-        if (mb) mb.opacity(1);
-        
-        layers['bg'].batchDraw();
-        
+        refreshStatusPill();
         return true;
     }
     
@@ -564,14 +763,14 @@
         switchTo("connect_to");
         boxMouseout(box);
         closeMenu();
-        stage.on("mouseup", figureConnectToClick);
+        stage.on("mouseup.connect", figureConnectToClick);
     }
     function startDisconnect(box)
     {
         switchTo("disconnect_from");
         boxMouseout(box);
         closeMenu();
-        stage.on("mouseup", figureDisconnectClick);
+        stage.on("mouseup.connect", figureDisconnectClick);
     }
     
     function figureConnectToClick(e)
@@ -697,7 +896,22 @@
         var mg = layers['menu'];
         mg.x(xmid);
         mg.y(ymid);
+        layers['menu'].scale({ x: 0.08, y: 0.08 });
+        layers['menu'].opacity(0.15);
         layers['menu'].show();
+        if (ringTween) {
+            ringTween.destroy();
+            ringTween = null;
+        }
+        ringTween = new Konva.Tween({
+            node: layers['menu'],
+            scaleX: 1,
+            scaleY: 1,
+            opacity: 1,
+            duration: 0.22,
+            easing: Konva.Easings.BackEaseOut
+        });
+        ringTween.play();
         if (typeof layerScene !== 'undefined' && layerScene) {
             layerScene.batchDraw();
         } else {
@@ -735,7 +949,7 @@
         }
         dirtyboxes = [];
         switchTo(tomode);
-        stage.off("mouseup");
+        stage.off("mouseup.connect");
         
     }
     
@@ -865,7 +1079,10 @@
         if(boxid.substr(-5,5) == "_text") boxid = boxid.slice(0,-5);
        // alert(boxid);
         //$(bg).css('cursor', 'default');
-        boxes[boxid].stroke(config.box_border);
+        boxes[boxid].stroke(modename !== "normal" && menubox && menubox.name() === boxid
+            ? (modename === "connect_to" ? config.to_color : config.from_color)
+            : config.box_border);
+        boxes[boxid].strokeWidth(modename !== "normal" && menubox && menubox.name() === boxid ? 3 : 2);
         //boxes[boxid].fill(config.box_color);
         boxes[boxid].fillPatternImage(config.box_bg);
         boxgroups[boxid].draw();
@@ -902,6 +1119,7 @@
         layers['lines'].draw();
         layers['boxes'].draw();
             layers['labels'].draw();
+        applyModeOutline();
         if(modename == "connect_to")
         {
             return true;
@@ -976,8 +1194,8 @@
         box1 = boxgroups[box1];
         box2 = boxgroups[box2];
         //alert("lineorpath "+box1.name()+" "+box2.name());
-        var b1x=parseInt(box1.getAbsolutePosition().x);
-        var b2x=parseInt(box2.getAbsolutePosition().x);
+        var b1x=parseInt(box1.x());
+        var b2x=parseInt(box2.x());
         var b1w=parseInt(box1.width());
         if(b1x+b1w>=b2x+3) 
         {
@@ -994,10 +1212,10 @@
       function drawLine(box1,box2)
       {
         var r=[];
-        r[0]=parseInt(box1.getAbsolutePosition().x)+box1.width(); // x1
-        r[1]=parseInt(box1.getAbsolutePosition().y)+(box1.height()*.5); //y1
-        r[2]=parseInt(box2.getAbsolutePosition().x)-1;          // x2
-        r[3]=parseInt(box2.getAbsolutePosition().y)+(box2.height()*.5); // y2
+        r[0]=parseInt(box1.x())+box1.width(); // x1
+        r[1]=parseInt(box1.y())+(box1.height()*.5); //y1
+        r[2]=parseInt(box2.x())-1;          // x2
+        r[3]=parseInt(box2.y())+(box2.height()*.5); // y2
         var linename = box1.name()+"to"+box2.name();
         var stroke = config.std_color;
         
@@ -1050,13 +1268,13 @@ function drawPath(box1, box2)
 {
     var b1 = box1;
     var b2 = box2;
-    var b1x = parseInt(b1.getAbsolutePosition().x),
-        b1y = parseInt(b1.getAbsolutePosition().y),
+    var b1x = parseInt(b1.x()),
+        b1y = parseInt(b1.y()),
         b1w = parseInt(b1.width()),
         b1h = parseInt(b1.height()),
         b1n = b1.name(),
-        b2x = parseInt(b2.getAbsolutePosition().x),
-        b2y = parseInt(b2.getAbsolutePosition().y),
+        b2x = parseInt(b2.x()),
+        b2y = parseInt(b2.y()),
         b2w = parseInt(b2.width()),
         b2h = parseInt(b2.height()),
         b2n = b2.name();
@@ -1184,9 +1402,8 @@ function drawPath(box1, box2)
                 //anim.start();
                 
                 
-                // play tween
-                savetween.play();
-                
+                // play tween removed with the unlabeled save rectangle
+
                 loadAdv(advid);
                 
                 //tween.reverse();
@@ -1203,27 +1420,20 @@ function drawPath(box1, box2)
 // init
     $(document).ready(function(){
         var texWhiteCssUrl = choosologyUrl('images/tex-white.png');
-        pie1.setZIndex(1);
-        pie2.setZIndex(2);
-        pie3.setZIndex(3);
-        pie4.setZIndex(4);
-        texOrange.onload = function() { // apparently we gotta do this for first load, and outside of onload for later loads
-            pie1.fillPatternImage(config.menu_bg);
-            pie2.fillPatternImage(config.menu_bg);
-           // pie2hover.fillPatternImage(texRed);
-            pie3.fillPatternImage(config.menu_bg);
-            pie4.fillPatternImage(config.menu_bg);
-            pieleft.fillPatternImage(config.menu_bg);
-            pieright.fillPatternImage(config.menu_bg);
+        texOrange.onload = function() {
             $('#newswindow').css('background-image', 'url("' + texWhiteCssUrl + '")');
+            if (typeof window.__konvaPatternImagesRedraw === 'function') window.__konvaPatternImagesRedraw();
         };
-        pie1.fillPatternImage(config.menu_bg);
-        pie2.fillPatternImage(config.menu_bg);
-        pie3.fillPatternImage(config.menu_bg);
-        pie4.fillPatternImage(config.menu_bg);
-        pieleft.fillPatternImage(config.menu_bg);
-            pieright.fillPatternImage(config.menu_bg);
         $('#newswindow').css('background-image', 'url("' + texWhiteCssUrl + '")');
+
+        $(document).on("keydown.visedmode", function (e) {
+            if (e.key !== "Escape" && e.keyCode !== 27) return;
+            var tag = e.target && e.target.tagName;
+            if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+            if (modename !== "normal" || menuup) {
+                resetView();
+            }
+        });
 
       // $('#newswindow').css('background-image', 'url(images/tex-teal.png)');
 

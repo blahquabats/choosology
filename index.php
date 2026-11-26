@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=adminmargin1" />
+    <link rel="stylesheet" href="style/choosology.css?v=slidearrow1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -73,9 +73,9 @@
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
-    <script src='scripts/index.js?v=loginreset1'></script>
+    <script src='scripts/index.js?v=logoutspin1'></script>
     <script src='scripts/messages.js?v=clic4'></script>
-    <script src='scripts/clipboard.js?v=clip7'></script>
+    <script src='scripts/clipboard.js?v=clip8'></script>
     <script src='scripts/office.js?v=admin1'></script>
     <script src='scripts/guide.js?v=guide1'></script>
     <script src='scripts/restricted.js?v=advreview2'></script>
@@ -150,12 +150,13 @@ $liteBtnDismissed = choosology_lite_btn_dismissed();
 	    if (empty($_SESSION['user']))
 	    {
 	        echo "<div id='loginbox-inner' class='loginbox-inner'>\n";
-	        echo "User Name: <input type='text' name='logname' id='loginuser' autocomplete='username' /><br />\n";
-	        echo "Password: <input type='password' name='logpass' id='loginpass' autocomplete='current-password' /><br />\n";
-	        echo "<div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me?</label></div>";
-	        echo "<button type='button' id='loginsubmit'>Submit</button>";
-	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button></div>";
-	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>";
+	        echo "<p class='loginbox-eyebrow'>Lab access</p>\n";
+	        echo "<label class='loginbox-field' for='loginuser'><span class='loginbox-label'>User name</span><input type='text' name='logname' id='loginuser' autocomplete='username' /></label>\n";
+	        echo "<label class='loginbox-field' for='loginpass'><span class='loginbox-label'>Password</span><input type='password' name='logpass' id='loginpass' autocomplete='current-password' /></label>\n";
+	        echo "<div class='loginbox-actions'><div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me</label></div>";
+	        echo "<button type='button' id='loginsubmit'>Sign in</button></div>\n";
+	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button>";
+	        echo "<button type='button' class='login-signup-link' id='openforgot'>Forgot credentials?</button></div>\n";
 	        echo "</div>\n";
 	    }
 	    else

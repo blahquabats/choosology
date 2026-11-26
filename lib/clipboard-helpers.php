@@ -481,6 +481,16 @@ function choosology_clipboard_delete_todo(mysqli $db, string $uname, int $id): b
 }
 
 /**
+ * Title HTML for the clipboard. Uses decode() with tags kept, the same call
+ * Classic home featured titles use, so stored font markup renders.
+ */
+function choosology_clipboard_title_html(string $stored): string
+{
+	$html = decode($stored);
+	return trim($html) === '' ? 'Untitled' : $html;
+}
+
+/**
  * @return array{id:int,title:string,edited:?string}|null
  */
 function choosology_clipboard_last_edited_adv(mysqli $db, string $uname): ?array
@@ -495,7 +505,7 @@ function choosology_clipboard_last_edited_adv(mysqli $db, string $uname): ?array
 	}
 	return array(
 		'id' => (int) ($row['id'] ?? 0),
-		'title' => (string) ($row['title'] ?? 'Untitled'),
+		'title' => choosology_clipboard_title_html((string) ($row['title'] ?? '')),
 		'edited' => (string) ($row['edited'] ?? ''),
 	);
 }
@@ -553,7 +563,7 @@ function choosology_clipboard_experiment_metrics(mysqli $db, string $uname): arr
 		}
 		$rows[] = array(
 			'id' => $advid,
-			'title' => (string) ($adv['title'] ?? 'Untitled'),
+			'title' => choosology_clipboard_title_html((string) ($adv['title'] ?? '')),
 			'avail' => (string) ($adv['avail'] ?? 'none'),
 			'rating' => (string) ($adv['rating'] ?? 'NA'),
 			'rating_count' => $ratings,
