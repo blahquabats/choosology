@@ -47,6 +47,31 @@ final class FontOptionsTest extends TestCase
 		$this->assertNotSame('', $choice);
 	}
 
+	public function testReadingPresentationUsesAuthorAndScreenColors(): void
+	{
+		$adv = array(
+			'bg' => '#112233',
+			'box' => '#fff8dc',
+			'border' => '#d6a84f',
+			'borderwidth' => 3,
+			'font' => 'arial',
+			'textstyle' => 'color:#111111;',
+			'linkstyle' => 'color:#0000ff;',
+			'titlestyle' => 'font-weight:bold;color:#ffccff;',
+			'title' => '&lt;font color=&quot;#ffccff&quot;&gt;Cave mouth&lt;/font&gt;',
+		);
+		$screen = array('screenbgcolor' => '#abcdef', 'screenboxcolor' => '');
+		$read = choosology_adv_reading_presentation($adv, $screen);
+		$this->assertStringContainsString('background-color:#abcdef', $read['background']);
+		$this->assertStringContainsString('background-color:#fff8dc', $read['panel']);
+		$this->assertStringContainsString('3px solid #d6a84f', $read['panel']);
+		$this->assertStringContainsString('font-family', $read['text']);
+		$this->assertStringContainsString('color:#111111', $read['text']);
+		$this->assertStringContainsString('color:#0000ff', $read['choice']);
+		$this->assertStringContainsString('color:#ffccff', $read['title']);
+		$this->assertStringContainsString('<font color="#ffccff">Cave mouth</font>', $read['title_html']);
+	}
+
 	public function testTinymceFormatsNonEmpty(): void
 	{
 		$fmt = choosology_font_tinymce_formats();

@@ -74,6 +74,11 @@ $title = trim(decode((string) ($adv['title'] ?? ''), 1));
 if ($title === '') {
 	$title = 'Experiment #' . $id;
 }
+$owner = (string) ($adv['user'] ?? '');
+$read = choosology_adv_reading_presentation($adv, $screen);
+if (trim(strip_tags($read['title_html'])) === '') {
+	$read['title_html'] = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+}
 
 $text = '';
 if (function_exists('choosology_omit_unreachable_pic_images')) {
@@ -133,52 +138,56 @@ if ($from > 0) {
 choosology_lite_header(array('title' => $title, 'active' => 'browse'));
 choosology_lite_guide_panel('view', $guideNext);
 ?>
-<fieldset class="lite-panel">
-	<legend><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></legend>
-	<p class="lite-meta">
-		<?php echo $iconHtml; ?>
-		Exp #<?php echo (int) $id; ?> · by <?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?>
-		· <a href="<?php echo htmlspecialchars($structureUrl, ENT_QUOTES, 'UTF-8'); ?>">Structure (ASCII)</a>
-		<?php if ($sessionUser !== '' && $sessionUser === $owner) { ?>
-			· <a href="<?php echo htmlspecialchars($classicEdit, ENT_QUOTES, 'UTF-8'); ?>">Edit in Classic</a>
-		<?php } ?>
-	</p>
-	<div class="lite-screen adv-play-text">
-		<?php echo $text; ?>
-	</div>
-
-	<?php $isTerminal = ($isEnding && $choices === array()); ?>
-	<details class="lite-choices-reveal<?php echo $isTerminal ? ' lite-choices-reveal--ending' : ''; ?>">
-		<summary class="lite-choices-summary">
-			<span class="lite-choices-summary-label">Click to reveal choices</span>
-			<span class="lite-choices-summary-cue" aria-hidden="true">&#9662;</span>
-		</summary>
-		<div class="lite-choices-body">
-			<?php if ($isTerminal) {
-				echo choosology_lite_ending_panel_html($db, $id, $sid);
-			} else { ?>
-				<div class="lite-btn-row" role="navigation" aria-label="Choices">
-					<?php foreach ($choices as $idx => $c) {
-						$href = choosology_lite_url('view.php?id=' . $id . '&screen=' . (int) $c['target'] . '&from=' . $sid);
-						$label = strip_tags((string) $c['label']);
-						?>
-						<a class="lite-btn" href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>">
-							<?php echo ($idx + 1) . '. ' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
-						</a>
-					<?php } ?>
-				</div>
-			<?php } ?>
+<div class="lite-read" style="<?php echo htmlspecialchars($read['background'], ENT_QUOTES, 'UTF-8'); ?>">
+	<article class="lite-read-sheet" style="<?php echo htmlspecialchars($read['panel'], ENT_QUOTES, 'UTF-8'); ?>">
+		<header class="lite-read-head">
+			<?php echo $iconHtml; ?>
+			<h1 class="lite-read-title"<?php echo $read['title'] !== '' ? ' style="' . htmlspecialchars($read['title'], ENT_QUOTES, 'UTF-8') . '"' : ''; ?>><?php echo $read['title_html']; ?></h1>
+			<p class="lite-read-meta">
+				Exp #<?php echo (int) $id; ?> · by <?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?>
+				· <a href="<?php echo htmlspecialchars($structureUrl, ENT_QUOTES, 'UTF-8'); ?>">Structure (ASCII)</a>
+				<?php if ($sessionUser !== '' && $sessionUser === $owner) { ?>
+					· <a href="<?php echo htmlspecialchars($classicEdit, ENT_QUOTES, 'UTF-8'); ?>">Edit in Classic</a>
+				<?php } ?>
+			</p>
+		</header>
+		<div class="lite-read-text adv-play-text"<?php echo $read['text'] !== '' ? ' style="' . htmlspecialchars($read['text'], ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
+			<?php echo $text; ?>
 		</div>
-	</details>
 
-	<p class="lite-btn-row" style="margin-top:0.75rem;">
-		<a class="lite-btn" href="<?php echo htmlspecialchars($startUrl, ENT_QUOTES, 'UTF-8'); ?>">← Start over</a>
-		<?php if ($returnUrl !== '') { ?>
-			<a class="lite-btn" href="<?php echo htmlspecialchars($returnUrl, ENT_QUOTES, 'UTF-8'); ?>">← Return to previous screen</a>
-		<?php } ?>
-		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8'); ?>">Back to Browse</a>
-	</p>
-</fieldset>
+		<?php $isTerminal = ($isEnding && $choices === array()); ?>
+		<details class="lite-choices-reveal lite-read-choices<?php echo $isTerminal ? ' lite-choices-reveal--ending' : ''; ?>">
+			<summary class="lite-choices-summary lite-read-summary">
+				<span class="lite-choices-summary-label">Click to reveal choices</span>
+				<span class="lite-choices-summary-cue" aria-hidden="true">&#9662;</span>
+			</summary>
+			<div class="lite-choices-body">
+				<?php if ($isTerminal) {
+					echo choosology_lite_ending_panel_html($db, $id, $sid);
+				} else { ?>
+					<div class="lite-read-choice-list" role="navigation" aria-label="Choices">
+						<?php foreach ($choices as $idx => $c) {
+							$href = choosology_lite_url('view.php?id=' . $id . '&screen=' . (int) $c['target'] . '&from=' . $sid);
+							?>
+							<a class="lite-read-choice" href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $read['choice'] !== '' ? ' style="' . htmlspecialchars($read['choice'], ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
+								<?php echo ($idx + 1) . '. ' . $c['label']; ?>
+							</a>
+						<?php } ?>
+					</div>
+				<?php } ?>
+			</div>
+		</details>
+
+		<p class="lite-btn-row lite-read-nav">
+			<a class="lite-btn" href="<?php echo htmlspecialchars($startUrl, ENT_QUOTES, 'UTF-8'); ?>">← Start over</a>
+			<?php if ($returnUrl !== '') { ?>
+				<a class="lite-btn" href="<?php echo htmlspecialchars($returnUrl, ENT_QUOTES, 'UTF-8'); ?>">← Return to previous screen</a>
+			<?php } ?>
+			<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8'); ?>">Back to Browse</a>
+		</p>
+	</article>
+</div>
+<script src="<?php echo htmlspecialchars(choosology_site_url('lite/play.js?v=choiceload1'), ENT_QUOTES, 'UTF-8'); ?>"></script>
 <?php
 choosology_lite_guide_form($guideNext);
 choosology_lite_footer();

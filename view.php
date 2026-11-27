@@ -118,7 +118,7 @@ for ($i=1; $i <= 8; $i++)
         if(!$c[1] || !$c[0]) continue;
         if ($c[1] == $adv['begin']) continue;
         $choicetext = htmlspecialchars_decode(htmlspecialchars_decode($c[0]));
-        $choices .= "<div class='choice' onclick = \"goToScreen('".$c[1]."', '$sid', 0)\">$choicetext</div>";
+        $choices .= "<div class='choice' onclick = \"goToScreen('".$c[1]."', '$sid', 0, this)\">$choicetext</div>";
     }
 }
 if ($choices === '') {
@@ -130,7 +130,7 @@ if ($choices === '') {
 $offset = "top: -".$adv['borderwidth']."px; left: -".$adv['borderwidth']."px";
 //$choices = "hey look choices";
 $text = choosology_omit_unreachable_pic_images(
-	htmlspecialchars_decode(htmlspecialchars_decode($screen['text']))
+	htmlspecialchars_decode(htmlspecialchars_decode((string) ($screen['text'] ?? '')))
 );
 /*$text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.";
@@ -140,7 +140,7 @@ $out = "
 
     <meta charset='utf-8' />
 
-        <link rel='stylesheet' href='style/view.css?v=choices2' /><link rel='stylesheet' href='style/choosology.css?v=myoffice1' />
+        <link rel='stylesheet' href='style/view.css?v=choiceload1' /><link rel='stylesheet' href='style/choosology.css?v=myoffice1' />
         <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css' />
       <style>
         .choice
@@ -166,7 +166,7 @@ htmlspecialchars_decode($adv['title']).
 <p class='view-sidebar-byline'>by <span class='view-sidebar-author'>".htmlspecialchars((string) $adv['user'], ENT_QUOTES, 'UTF-8')."</span></p>
 </div>
 <div class='view-sidebar-nav' role='navigation' aria-label='Experiment navigation'>
-<div class='choice view-sidebar-action' id='firstscreen' onclick=\"goToScreen('".$adv['begin']."', $sid,1)\">
+<div class='choice view-sidebar-action' id='firstscreen' onclick=\"goToScreen('".$adv['begin']."', $sid,1,this)\">
     &larr; Start over
 </div>
 ".($showExpMap ? "<div class='choice view-sidebar-action' id='mapbutton' data-advid='".htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8')."'>
@@ -208,7 +208,7 @@ $text.
 
 <button type='button' class='theater-exit' id='theater_exit' hidden title='Return to normal view'>Exit theater</button>
 
-    <script src='scripts/view.js?v=choices1'></script>
+    <script src='scripts/view.js?v=choiceload1'></script>
 ";
 //<div style='$choicestyling;$box;$border' class='commentsholder'>See comments...</div>
 //    <script src='jquery.js'></script>

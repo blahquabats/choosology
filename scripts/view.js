@@ -6,6 +6,7 @@ var commentsTimer = null;
 var choiceExpandTimer = null;
 var choiceFlairTimer = null;
 var screenNavGen = 0;
+var screenNavBusy = false;
 /** Set by initTheaterMode so exitTheaterMode can clear animation cleanly. */
 var theaterCtl = null;
 
@@ -63,20 +64,111 @@ function clearViewTimers()
     }
     clearChoiceRevealTimers();
     screenNavGen++;
+    screenNavBusy = false;
+    clearSelectedChoicePending();
+    document.body.classList.remove("choosology-screen-loading");
 }
 
-function goToScreen(screenid, fromscreen, reverse)
+function choiceNavTargets()
 {
-    if(reverse) direction = "right";
-    else direction = "left";
+    return $("#choicemeat .choice, #firstscreen, #lastscreen");
+}
+
+function markSelectedChoicePending(selected)
+{
+    choiceNavTargets().addClass("is-choice-pending").attr("aria-disabled", "true");
+    document.body.classList.add("choosology-screen-loading");
+    if (!selected || selected.nodeType !== 1) return;
+    var $sel = $(selected);
+    $sel.addClass("is-choice-selected");
+    if (!$sel.children(".choice-spinner").length) {
+        $sel.append("<span class='choice-spinner' aria-hidden='true'></span>");
+    }
+}
+
+function clearSelectedChoicePending()
+{
+    $(".is-choice-pending").removeClass("is-choice-pending is-choice-selected").removeAttr("aria-disabled");
+    $(".choice-spinner").remove();
+}
+
+function finishScreenNav()
+{
+    screenNavBusy = false;
+    document.body.classList.remove("choosology-screen-loading");
+}
+
+function abortScreenNav()
+{
+    screenNavBusy = false;
+    clearSelectedChoicePending();
+    document.body.classList.remove("choosology-screen-loading");
+}
+
+function slideCurrentScreen(direction, complete)
+{
     $(".text").toggle({
         effect: "slide",
         direction: direction,
-        complete: function()
-        {
-            resetChoiceReveal($(".choicecontainer"));
-            replaceScreen(screenid, fromscreen, reverse);
+        complete: function () {
+            if (typeof complete === "function") complete();
         }
+    });
+}
+
+function paintLoadedScreen(response, screenid, fromscreen)
+{
+    clearSelectedChoicePending();
+    $("#lastscreen").off().show("fade");
+    $("#lastscreen").on("click", function () {
+        goToScreen(fromscreen, screenid, 1, this);
+    });
+    $("#innards div").html(response.text);
+    silenceBrokenImages(".advcanvas");
+    $(".advcanvas").prop("style", response.bg);
+    $(".realinnards,.viewcol1,.choices").prop("style", response.box + ";" + response.border);
+    $("#choicemeat").html(response.choices);
+    resetChoiceReveal($(".choicecontainer"));
+}
+
+function goToScreen(screenid, fromscreen, reverse, selected)
+{
+    if (screenNavBusy) return;
+    screenNavBusy = true;
+    markSelectedChoicePending(selected);
+    var hideDirection = reverse ? "right" : "left";
+    var showDirection = reverse ? "left" : "right";
+    var gen = ++screenNavGen;
+    $.ajax({
+       url: "ajax/screenajax.php",
+       data: {screen: screenid,
+       from: fromscreen,
+       project_lazarus:'go'}
+    })
+    .done(function (text) {
+        if (gen !== screenNavGen) {
+            if (screenNavBusy) abortScreenNav();
+            return;
+        }
+        var response;
+        try {
+            response = $.parseJSON(text);
+        } catch (err) {
+            abortScreenNav();
+            return;
+        }
+        slideCurrentScreen(hideDirection, function () {
+            if (gen !== screenNavGen) return;
+            paintLoadedScreen(response, screenid, fromscreen);
+            slideCurrentScreen(showDirection, function () {
+                if (gen !== screenNavGen) return;
+                finishScreenNav();
+            });
+        });
+    })
+    .fail(function () {
+        if (gen !== screenNavGen) return;
+        abortScreenNav();
     });
 }
 
@@ -102,43 +194,6 @@ function reloadScreen(screenid)
             resetChoiceReveal($box);
         }
     });
-}
-
-function replaceScreen(screenid, fromscreen, reverse)
-{
-    if(reverse) direction = "left";
-    else direction = "right";
-    var gen = ++screenNavGen;
-    $.ajax({
-       url: "ajax/screenajax.php",
-       data: {screen: screenid,
-       from: fromscreen,
-       project_lazarus:'go'}
-    })
-    .done(function(text)
-    {
-        if (gen !== screenNavGen) return;
-        var response = $.parseJSON(text);
-        
-        $("#lastscreen").off().show("fade");
-        $("#lastscreen").on("click",function(){
-            goToScreen(fromscreen,screenid,1);
-        });
-        $("#innards div").html(response.text);
-        silenceBrokenImages(".advcanvas");
-        $(".advcanvas").prop("style", response.bg);
-        $(".realinnards,.viewcol1,.choices").prop("style", response.box+";"+response.border);
-        $("#choicemeat").html(response.choices);
-        resetChoiceReveal($(".choicecontainer"));
-        $(".text").toggle({
-                effect: "slide",
-                direction: direction,
-                complete: function () {
-                    if (gen !== screenNavGen) return;
-                }
-            });
-
-    });   
 }
 
 function showComments(board, screen)

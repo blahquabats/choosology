@@ -14,7 +14,7 @@ if (isset($_POST['screen']))
     if(!$screen) die(json_encode($response)); // just fail
     $advused = $screen['advused'];
     $text = choosology_omit_unreachable_pic_images(
-        htmlspecialchars_decode(htmlspecialchars_decode($screen['text']))
+        htmlspecialchars_decode(htmlspecialchars_decode((string) ($screen['text'] ?? '')))
     );
     $response['text'] = nl2br($text)."<br/><div class='spacebox'>&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; 
     &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; --</div>";
@@ -27,8 +27,8 @@ if (isset($_POST['screen']))
             $c = explode("|Q-D-|", $screen['choice'.$i]);
             if(!$c[1] || !$c[0]) continue;
             if($c[1] == $screen['begin']) continue;
-            $choicetext = htmlspecialchars_decode(htmlspecialchars_decode($c[0]));
-            $choices .= "<div class='choice' onclick = \"goToScreen('".$c[1]."',$screenid,0)\">$choicetext</div>";
+            $choicetext = htmlspecialchars_decode(htmlspecialchars_decode((string) ($c[0] ?? '')));
+            $choices .= "<div class='choice' onclick = \"goToScreen('".$c[1]."',$screenid,0,this)\">$choicetext</div>";
         }
     }
     if($choices == "") 

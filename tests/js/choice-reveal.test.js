@@ -52,6 +52,67 @@ describe("Click-to-reveal choices and ending flair", () => {
     expect(src).toContain("prefers-reduced-motion: no-preference");
   });
 
+  test("Classic loads the next screen before sliding and marks the selected choice", () => {
+    const js = fs.readFileSync(
+      path.join(__dirname, "../../scripts/view.js"),
+      "utf8"
+    );
+    const css = fs.readFileSync(
+      path.join(__dirname, "../../style/view.css"),
+      "utf8"
+    );
+    const view = fs.readFileSync(
+      path.join(__dirname, "../../view.php"),
+      "utf8"
+    );
+    const ajax = fs.readFileSync(
+      path.join(__dirname, "../../ajax/screenajax.php"),
+      "utf8"
+    );
+    const go = js.slice(js.indexOf("function goToScreen"), js.indexOf("function reloadScreen"));
+    const ajaxAt = go.indexOf("ajax/screenajax.php");
+    const slideAt = go.indexOf("slideCurrentScreen");
+    expect(ajaxAt).toBeGreaterThan(-1);
+    expect(slideAt).toBeGreaterThan(ajaxAt);
+    expect(go).toContain("markSelectedChoicePending");
+    expect(go).toContain("$.parseJSON");
+    expect(js).toContain("choice-spinner");
+    expect(js).toContain("is-choice-selected");
+    expect(css).toContain(".choice-spinner");
+    expect(css).toContain("@keyframes choosology-choice-spin");
+    expect(view).toContain(", '$sid', 0, this)");
+    expect(ajax).toContain(",$screenid,0,this)");
+  });
+
+  test("Lite shows a Loading placeholder whose dots travel from one to four and back", () => {
+    const php = fs.readFileSync(
+      path.join(__dirname, "../../lite/view.php"),
+      "utf8"
+    );
+    const js = fs.readFileSync(
+      path.join(__dirname, "../../lite/play.js"),
+      "utf8"
+    );
+    const css = fs.readFileSync(
+      path.join(__dirname, "../../lite/style.css"),
+      "utf8"
+    );
+    expect(php).toContain("lite/play.js");
+    expect(js).toContain("Loading");
+    expect(js).toContain("lite-loading-dots");
+    expect(js).toContain("is-choice-pending");
+    expect(js).toContain("aria-disabled");
+    expect(js).toContain("location.assign");
+    expect(css).toContain("@keyframes lite-loading-dots");
+    expect(css).toContain('content: "."');
+    expect(css).toContain('content: ".."');
+    expect(css).toContain('content: "..."');
+    expect(css).toContain('content: "...."');
+    const one = css.indexOf('content: "."');
+    const four = css.indexOf('content: "...."');
+    expect(four).toBeGreaterThan(one);
+  });
+
   test("Lite view wraps choices and endings in uniform click-to-reveal details with ending flair", () => {
     const php = fs.readFileSync(
       path.join(__dirname, "../../lite/view.php"),

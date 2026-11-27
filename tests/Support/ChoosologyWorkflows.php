@@ -195,6 +195,9 @@ final class ChoosologyWorkflows
 
 		$view = $client->request('GET', '/lite/view.php?id=' . $advid, null, array(), 1, 'lite_open_experiment', 'Open experiment begin');
 		$assertions['view_begin'] = $view['code'] === 200 && (str_contains($view['body'], 'Continue') || str_contains($view['body'], 'choice') || str_contains($view['body'], 'lite-btn'));
+		$assertions['view_owner'] = $view['code'] === 200
+			&& str_contains($view['body'], '· by ')
+			&& !str_contains($view['body'], 'Undefined variable $owner');
 
 		$mid = $client->request(
 			'GET',
@@ -271,7 +274,10 @@ final class ChoosologyWorkflows
 			'Classic AJAX navigate to middle'
 		);
 		$midJson = json_decode($mid['body'], true);
-		$assertions['ajax_middle'] = $mid['code'] === 200 && is_array($midJson) && !empty($midJson['choices']);
+		$assertions['ajax_middle'] = $mid['code'] === 200
+			&& is_array($midJson)
+			&& !empty($midJson['choices'])
+			&& !str_starts_with(ltrim($mid['body']), '<');
 
 		$end = $client->request(
 			'GET',

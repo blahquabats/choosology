@@ -354,3 +354,81 @@ function choosology_adv_play_typography_css(array $adv, string $role): string
 	$style = trim(str_replace(array("\r", "\n"), '', $style), '; ');
 	return $style;
 }
+
+/**
+ * Drop characters that would break out of a style attribute.
+ */
+function choosology_css_decl_safe(string $css): string
+{
+	$css = str_replace(array("\r", "\n", "\t"), '', $css);
+	$css = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F<>]/', '', $css) ?? '';
+	return trim($css);
+}
+
+/**
+ * Allow the color forms authors store (hex, rgb/rgba, or a plain name).
+ */
+function choosology_css_color_safe(string $color, string $fallback): string
+{
+	$color = trim($color);
+	if (preg_match('/^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i', $color)) {
+		return $color;
+	}
+	if (preg_match('/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i', $color)) {
+		return $color;
+	}
+	if (preg_match('/^[a-z]{3,20}$/i', $color)) {
+		return $color;
+	}
+	return $fallback;
+}
+
+/**
+ * Reading surface for Classic and Lite. Screen colors override the adventure
+ * the same way view.php does; typography comes from the adventure style columns.
+ *
+ * @param array<string,mixed> $adv
+ * @param array<string,mixed> $screen
+ * @return array{background:string,panel:string,text:string,choice:string,title:string,title_html:string}
+ */
+function choosology_adv_reading_presentation(array $adv, array $screen = array()): array
+{
+	$screenBg = trim((string) ($screen['screenbgcolor'] ?? ''));
+	$bgPic = (string) ($adv['bgpic'] ?? '');
+	if ($screenBg !== '') {
+		$background = 'background-color:' . choosology_css_color_safe($screenBg, '#edf3ff') . ';';
+	} elseif ($bgPic !== '' && function_exists('choosology_adv_pic_usable_for_display') && choosology_adv_pic_usable_for_display($bgPic) && function_exists('getPicUrl')) {
+		$url = getPicUrl($bgPic, false);
+		if ($url !== '') {
+			$background = 'background-image:url("' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '");background-size:cover;background-position:center center;background-repeat:no-repeat;';
+		} else {
+			$background = 'background-color:' . choosology_css_color_safe((string) ($adv['bg'] ?? ''), '#edf3ff') . ';';
+		}
+	} else {
+		$background = 'background-color:' . choosology_css_color_safe((string) ($adv['bg'] ?? ''), '#edf3ff') . ';';
+	}
+
+	$box = trim((string) ($screen['screenboxcolor'] ?? ''));
+	if ($box === '') {
+		$box = trim((string) ($adv['box'] ?? ''));
+	}
+	$box = choosology_css_color_safe($box, '#f5f3e5');
+	$bw = (int) ($adv['borderwidth'] ?? 2);
+	if ($bw < 0) {
+		$bw = 0;
+	}
+	if ($bw > 24) {
+		$bw = 24;
+	}
+	$border = choosology_css_color_safe((string) ($adv['border'] ?? ''), '#333333');
+	$panel = 'background-color:' . $box . ';border:' . $bw . 'px solid ' . $border . ';';
+
+	return array(
+		'background' => $background,
+		'panel' => $panel,
+		'text' => choosology_css_decl_safe(choosology_adv_play_typography_css($adv, 'text')),
+		'choice' => choosology_css_decl_safe(choosology_adv_play_typography_css($adv, 'choice')),
+		'title' => choosology_css_decl_safe(htmlspecialchars_decode((string) ($adv['titlestyle'] ?? ''))),
+		'title_html' => htmlspecialchars_decode((string) ($adv['title'] ?? '')),
+	);
+}

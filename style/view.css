@@ -550,6 +550,62 @@
     padding:12px;
 }
 
+.choice.is-choice-pending
+{
+    pointer-events: none;
+    cursor: default;
+}
+
+#choicemeat .choice.is-choice-pending:not(.is-choice-selected),
+#firstscreen.is-choice-pending:not(.is-choice-selected),
+#lastscreen.is-choice-pending:not(.is-choice-selected)
+{
+    opacity: 0.45;
+}
+
+.choice.is-choice-selected
+{
+    position: relative;
+    padding-right: 34px;
+}
+
+.choice-spinner
+{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    margin-top: -8px;
+    box-sizing: border-box;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: choosology-choice-spin 0.7s linear infinite;
+}
+
+@keyframes choosology-choice-spin
+{
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+    .choice-spinner
+    {
+        animation: none;
+        border-right-color: currentColor;
+        opacity: 0.55;
+    }
+}
+
+body.choosology-screen-loading #choicemeat .choice,
+body.choosology-screen-loading #firstscreen,
+body.choosology-screen-loading #lastscreen
+{
+    pointer-events: none;
+}
+
 .commentsholder
 {
     position:absolute;

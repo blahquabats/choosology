@@ -160,11 +160,11 @@ function choosology_lite_constrain_html_images(string $html): string
 			$attrs = $m[1];
 			$attrs = preg_replace('/\s(width|height)\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $attrs);
 			if (!preg_match('/\bstyle\s*=/i', $attrs)) {
-				$attrs .= ' style="max-width:280px;max-height:200px;height:auto;"';
+				$attrs .= ' style="max-width:100%;height:auto;"';
 			} else {
 				$attrs = preg_replace(
 					'/\sstyle\s*=\s*("|\')(.*?)\1/i',
-					' style=$1$2;max-width:280px;max-height:200px;height:auto;$1',
+					' style=$1$2;max-width:100%;height:auto;$1',
 					$attrs,
 					1
 				);
