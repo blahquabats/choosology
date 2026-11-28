@@ -9,31 +9,7 @@ $recentFeed = choosology_build_recent_feed($db, 5);
 if (!function_exists('choosology_adventure_discovery_sql')) {
 	require_once __DIR__ . '/lib/adventure-review-helpers.php';
 }
-choosology_adventure_review_ensure_schema($db);
-$discoverySql = choosology_adventure_discovery_sql('a');
-$query = "
-    SELECT DISTINCT a.id AS aid, a.description AS adv_description
-    FROM advs a
-    INNER JOIN advscreens s ON s.id = a.`begin`
-    WHERE $discoverySql
-      AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
-      AND (
-            NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)
-         OR (SELECT AVG(r.rating) FROM ratings r WHERE r.adv = a.id) > 2.5
-      )
-    ORDER BY a.id DESC
-    LIMIT 40";
-$res = runquery_assoc($query);
-if (is_array($res) && count($res) > 0) {
-    $res = array_values(array_filter($res, function ($row) {
-        $text = trim(decode($row['adv_description'] ?? '', 1));
-        return $text !== '';
-    }));
-    if (count($res) > 0) {
-        shuffle($res);
-        $res = array_slice($res, 0, 10);
-    }
-}
+$res = choosology_newly_featured_adventures($db, 10);
 ?>
 <div class="home-splash">
     <section class="home-hero" aria-labelledby="home-hero-title">
@@ -58,6 +34,10 @@ if (is_array($res) && count($res) > 0) {
             <div class="home-copy-actions">
                 <a class="home-copy-action" href="#/browse">Browse experiments</a>
                 <a class="home-copy-action" href="#/news">Read lab notes</a>
+                <a class="home-copy-action" href="#/about">About</a>
+                <?php if (empty($_SESSION['user'])) { ?>
+                <a class="home-copy-action" href="#/try">Try it yourself</a>
+                <?php } ?>
             </div>
         </article>
 
@@ -77,7 +57,7 @@ if (is_array($res) && count($res) > 0) {
                     </div>
                     <button type="button" class="slidenav slidenav-right cycle-next" aria-label="Next featured experiment"></button>
                     <?php } elseif (is_array($res)) { ?>
-                    <p class="home-no-featured">No public adventures to feature yet.</p>
+                    <p class="home-no-featured">No featured experiments yet.</p>
                     <?php } else {
                         echo $res;
                     } ?>

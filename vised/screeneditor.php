@@ -1,6 +1,30 @@
 <?php
 require_once("../connect.php");
 require_once("../auxfuncs.php");
+require_once dirname(__DIR__) . "/lib/try-draft.php";
+$choosologyTryEditor = isset($_GET['try']) && (string) $_GET['try'] === '1';
+if ($choosologyTryEditor) {
+	if (choosology_try_visitor_is_logged_in()) {
+		echo "<p class='home-copy-card'>Try it yourself is only for visitors who are not signed in.</p>";
+		exit;
+	}
+	$sid = (string) ($_GET['screenid'] ?? '');
+	$draft = choosology_try_draft_get(true);
+	if (!isset($draft['screens'][$sid])) {
+		echo "<div class='error'>Screen could not be found!</div>";
+		exit;
+	}
+	$screen = $draft['screens'][$sid];
+	$advid = 'try';
+	$adv = array('advbg' => (string) ($draft['adv']['bg'] ?? '#FFFFFF'), 'advfont' => '', 'advtextstyle' => '');
+	$allscreens = array();
+	foreach ($draft['screens'] as $v) {
+		if ((string) ($v['deleted'] ?? '0') === '1') {
+			continue;
+		}
+		$allscreens[$v['id']] = array('screenid' => $v['id'], 'screenname' => $v['name']);
+	}
+} else {
 $sid = $_GET['screenid'];
 $res = runquery_assoc("Select * from advscreens where id = '$sid'");
 if(!$res) echo "<div class='error'>Screen could not be found!</div>";
@@ -13,6 +37,7 @@ foreach ($advres as $v)
     $allscreens[$v['screenid']] = $v;
 }
 $adv = $advres[0];
+}
 // Match ajax/screenajax.php: DB may store entity-encoded HTML (once or twice from legacy saves).
 $editor_body_html = htmlspecialchars_decode(htmlspecialchars_decode((string)($screen['text'] ?? '')));
 $editor_screen_name = htmlspecialchars_decode(htmlspecialchars_decode((string)($screen['name'] ?? '')));
@@ -243,8 +268,9 @@ for($c = 1; $c <= 8; $c++)
     }
 }
 
-echo "<br/><div class='fakebutton fgreen' id = 'savescreen' >Save</div>
-<div id='savetime'>Last Saved: ".nicedatetime($screen['edited'])."</div>
+$savedLabel = choosology_last_saved_label($screen['edited'] ?? '');
+echo "<br/><div class='fakebutton fgreen' id = 'savescreen' >" . ($choosologyTryEditor ? "Update draft" : "Save") . "</div>
+<div id='savetime'>" . htmlspecialchars($savedLabel, ENT_QUOTES, 'UTF-8') . "</div>
 
 
 <input type='hidden' id='screenid' value='$sid' />
@@ -470,6 +496,35 @@ $(document).ready(function(){
         }
         
         
+        var tryEditor = <?php echo $choosologyTryEditor ? 'true' : 'false'; ?>;
+        if (tryEditor) {
+            var choiceLabels = {};
+            $(".choicetext").each(function () {
+                var cid = $(this).attr("id");
+                choiceLabels[cid] = temparray[cid] || "";
+            });
+            $.ajax({
+                type: "POST",
+                url: choosologyUrlSafe("ajax/trydraft.php"),
+                contentType: "application/json; charset=UTF-8",
+                dataType: "json",
+                data: JSON.stringify({
+                    op: "savetext",
+                    id: sid,
+                    name: screenlabel,
+                    text: content,
+                    choices: choiceLabels
+                })
+            }).fail(function () {
+                if (typeof showAlert === "function") showAlert("Could not update the draft.", "error");
+                $("#savescreen").addClass("fgreen");
+            }).done(function () {
+                $("#savescreen").addClass("fgreen");
+                updateSaveTime();
+                if (typeof loadAdv === "function") loadAdv("try");
+            });
+            return;
+        }
          $.ajax({
         type: "POST",
         url: "vised/saveadvscreen.php",
@@ -480,7 +535,7 @@ $(document).ready(function(){
         }).done(function(response){
             $("#savescreen").addClass("fgreen");
              updateSaveTime();
-             loadAdv("<?php echo $advid ?>");
+             loadAdv("<?php echo htmlspecialchars((string) $advid, ENT_QUOTES, 'UTF-8'); ?>");
         });
     });
     

@@ -41,7 +41,7 @@ function choosology_lite_header(array $opts = array()): void
 	$title = (string) ($opts['title'] ?? 'Choosology 3.1');
 	$active = (string) ($opts['active'] ?? '');
 	$pageTitle = $title === 'Choosology 3.1' ? $title : ($title . ' — Choosology 3.1');
-	$css = htmlspecialchars(choosology_site_url('lite/style.css?v=choiceload1'), ENT_QUOTES, 'UTF-8');
+	$css = htmlspecialchars(choosology_site_url('lite/style.css?v=authorprof1'), ENT_QUOTES, 'UTF-8');
 	$home = htmlspecialchars(choosology_lite_url('index.php'), ENT_QUOTES, 'UTF-8');
 	$browse = htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8');
 	$news = htmlspecialchars(choosology_lite_url('news.php'), ENT_QUOTES, 'UTF-8');
@@ -81,7 +81,11 @@ function choosology_lite_header(array $opts = array()): void
 	echo '<div class="lite-inner">' . "\n";
 	echo '<div class="lite-brand-row">' . "\n";
 	echo '<div><p class="lite-brand">CHOOSOLOGY 3.1</p>';
-	echo '<p class="lite-tag">Proprietary narrative application © 1986</p></div>' . "\n";
+	$termsUrl = htmlspecialchars(choosology_lite_url('terms.php'), ENT_QUOTES, 'UTF-8');
+	$privacyUrl = htmlspecialchars(choosology_lite_url('privacy.php'), ENT_QUOTES, 'UTF-8');
+	echo '<p class="lite-tag">Proprietary narrative application © 1986';
+	echo ' <span class="lite-legal"><a href="' . $termsUrl . '">Terms</a> · <a href="' . $privacyUrl . '">Privacy</a></span>';
+	echo '</p></div>' . "\n";
 	echo '<p class="lite-mode-link"><a href="' . $switchClassic . '" title="Full Classic Choosology interface">Classic view</a></p>' . "\n";
 	echo '</div>' . "\n";
 	echo '<nav class="lite-menubar" aria-label="Choosology 3.1">' . "\n";
@@ -103,7 +107,8 @@ function choosology_lite_header(array $opts = array()): void
 		if ($scripFmt !== '') {
 			echo ' <span class="lite-scrip" title="Balance">' . $scripFmt . '</span>';
 		}
-		echo '<br>My Office extras remain in <a href="' . htmlspecialchars(choosology_classic_url('mystuff'), ENT_QUOTES, 'UTF-8') . '">Classic</a>';
+		echo '<br><a href="' . htmlspecialchars(choosology_lite_url('account.php'), ENT_QUOTES, 'UTF-8') . '">My Information</a>';
+		echo ' · My Office extras remain in <a href="' . htmlspecialchars(choosology_classic_url('mystuff'), ENT_QUOTES, 'UTF-8') . '">Classic</a>';
 		echo '</p>' . "\n";
 	}
 }

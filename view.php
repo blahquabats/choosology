@@ -22,6 +22,7 @@ try to be self-sufficient? (migrate to mobile easily)
 */
 require_once("connect.php");
 require_once("auxfuncs.php");
+require_once __DIR__ . '/lib/play-surface.php';
 
 function getAdvInfo($id)
 {
@@ -36,11 +37,33 @@ function getScreenInfo($id)
     return $res[0];
 }
 
+$tryMode = isset($_GET['try']) && (string) $_GET['try'] === '1';
+if ($tryMode) {
+	require_once __DIR__ . '/lib/try-draft.php';
+	if (choosology_try_visitor_is_logged_in()) {
+		echo "<p class='home-copy-card'>Try it yourself is only for visitors who are not signed in.</p>";
+		echo "<script>location.hash='#/home';</script>";
+		exit;
+	}
+	$draft = choosology_try_draft_get(true);
+	$adv = $draft['adv'];
+	$id = 'try';
+	$showExpMap = false;
+	$sid = isset($_GET['screen']) ? (string) $_GET['screen'] : (string) ($adv['begin'] ?? '1');
+	if (!isset($draft['screens'][$sid])) {
+		$sid = (string) ($adv['begin'] ?? '1');
+	}
+	$screen = $draft['screens'][$sid];
+} else {
 $id = $_GET['id'] ?? '';
 if ($id === '' || !is_numeric($id)) {
 	die("No adventure found!");
 }
 $adv = getAdvInfo($id);
+require_once __DIR__ . '/lib/adventure-review-helpers.php';
+if (!is_array($adv) || !choosology_adventure_can_view($adv, (string) ($_SESSION['user'] ?? ''))) {
+	die("No adventure found!");
+}
 
 /** "Map" opens the graph editor; only useful for the owner when there is more than one active screen. */
 $showExpMap = false;
@@ -61,6 +84,7 @@ if (!empty($_GET['screen'])) {
 }
 if (!$sid) die ("Can't find page information!");
 $screen = getScreenInfo($sid);
+}
 
 /* Count a play start once per adventure per PHP session (initial load / begin screen). */
 $isBeginLoad = empty($_GET['screen']) || (string) ($_GET['screen'] ?? '') === (string) ($adv['begin'] ?? '');
@@ -110,6 +134,9 @@ $playChoiceCssSafe = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F<>]/', '', $playC
 list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
 $choiceborder= "border: 2px solid rgb($r, $g, $b);border: 2px solid rgba($r, $g, $b, .5)";
 $choices = "";
+if (!empty($tryMode)) {
+	$choices = choosology_try_choice_markup($screen, (string) $sid);
+} else {
 for ($i=1; $i <= 8; $i++)
 {
     if($screen['choice'.$i])
@@ -126,6 +153,7 @@ if ($choices === '') {
 	$choices .= "<input type='hidden' name='advid' id='advid' value='" . (int) $id . "'>";
 	$choices .= "<input type='hidden' name='screenid' id='screenid' value='" . (int) $sid . "'>";
 }
+}
 
 $offset = "top: -".$adv['borderwidth']."px; left: -".$adv['borderwidth']."px";
 //$choices = "hey look choices";
@@ -140,7 +168,7 @@ $out = "
 
     <meta charset='utf-8' />
 
-        <link rel='stylesheet' href='style/view.css?v=choiceload1' /><link rel='stylesheet' href='style/choosology.css?v=myoffice1' />
+        <link rel='stylesheet' href='style/view.css?v=playauthor1' /><link rel='stylesheet' href='style/choosology.css?v=authorprof1' />
         <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css' />
       <style>
         .choice
@@ -163,10 +191,10 @@ $bg;'>
 <h2 class='view-sidebar-title'".($titlestyling !== '' ? " style='".$titlestyling."'" : "").">".
 htmlspecialchars_decode($adv['title']).
 "</h2>
-<p class='view-sidebar-byline'>by <span class='view-sidebar-author'>".htmlspecialchars((string) $adv['user'], ENT_QUOTES, 'UTF-8')."</span></p>
+<p class='view-sidebar-byline'>by ".choosology_author_byline_html((string) ($adv['user'] ?? ''), 'classic')."</p>
 </div>
 <div class='view-sidebar-nav' role='navigation' aria-label='Experiment navigation'>
-<div class='choice view-sidebar-action' id='firstscreen' onclick=\"goToScreen('".$adv['begin']."', $sid,1,this)\">
+<div class='choice view-sidebar-action".(choosology_play_show_start_over($sid, $adv['begin'] ?? '') ? '' : ' is-opening-screen')."' id='firstscreen' data-begin='".htmlspecialchars((string) ($adv['begin'] ?? ''), ENT_QUOTES, 'UTF-8')."' onclick=\"goToScreen('".$adv['begin']."', $sid,1,this)\">
     &larr; Start over
 </div>
 ".($showExpMap ? "<div class='choice view-sidebar-action' id='mapbutton' data-advid='".htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8')."'>
@@ -208,7 +236,7 @@ $text.
 
 <button type='button' class='theater-exit' id='theater_exit' hidden title='Return to normal view'>Exit theater</button>
 
-    <script src='scripts/view.js?v=choiceload1'></script>
+    <script src='scripts/view.js?v=playauthor1'></script>
 ";
 //<div style='$choicestyling;$box;$border' class='commentsholder'>See comments...</div>
 //    <script src='jquery.js'></script>

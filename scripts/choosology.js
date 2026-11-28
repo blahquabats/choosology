@@ -53,8 +53,12 @@ var decodeEntities = (function () {
 
 function nicedatetime(datetime)
 {
+    var when = datetime instanceof Date ? datetime : new Date(datetime);
+    if (!when || isNaN(when.getTime()) || when.getTime() < 86400000) {
+        return "";
+    }
     var datePat = (window.CHOOSOLOGY_DATE_FMT === "dmy") ? "dd/MM/yyyy" : "MM/dd/yyyy";
-    return $.format.date(datetime, "h:mma on " + datePat).toLowerCase();
+    return $.format.date(when, "h:mma on " + datePat).toLowerCase();
 }
 
 function degreesToRadians(degrees) 

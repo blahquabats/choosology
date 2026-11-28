@@ -38,6 +38,8 @@ describe("Admin hub wiring", () => {
     expect(src).toContain("award_scrip");
     expect(src).toContain("moderate_comment");
     expect(src).toContain("moderate_adventure");
+    expect(src).toContain("set_featured");
+    expect(src).toContain("restricted-adventure-feature");
     expect(src).toContain("set_probation");
     expect(src).toContain("restricted_preview_mascot");
     expect(src).toContain("scan_poses");
@@ -103,6 +105,7 @@ describe("Admin hub wiring", () => {
     expect(src).toContain("Admin access required.");
     expect(src).toContain("403");
     expect(src).toContain("moderate_adventure");
+    expect(src).toContain("set_featured");
     expect(src).toContain("set_probation");
     expect(src).toContain("choosology_adventure_review_pending");
   });
@@ -114,6 +117,8 @@ describe("Admin hub wiring", () => {
     expect(helpers).toContain("choosology_adventure_review_on_avail_change");
     expect(helpers).toContain("choosology_adventure_discovery_sql");
     expect(helpers).toContain("accept_restricted");
+    expect(helpers).toContain("choosology_adventure_review_set_featured");
+    expect(helpers).toContain("choosology_newly_featured_adventures");
     expect(read("ajax/saveadvmeta.php")).toContain("choosology_adventure_review_on_avail_change");
     expect(read("vised/advsettings.php")).toContain("as_flag_mature");
   });

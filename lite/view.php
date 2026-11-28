@@ -1,9 +1,29 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
 choosology_lite_bootstrap();
+require_once dirname(__DIR__) . '/lib/play-surface.php';
 
 global $db;
 
+$tryMode = isset($_GET['try']) && (string) $_GET['try'] === '1';
+if ($tryMode) {
+	require_once dirname(__DIR__) . '/lib/try-draft.php';
+	if (choosology_try_visitor_is_logged_in()) {
+		header('Location: ' . choosology_lite_url('index.php'));
+		exit;
+	}
+	$draft = choosology_try_draft_get(true);
+	$adv = $draft['adv'];
+	$id = 0;
+	$begin = (string) ($adv['begin'] ?? '1');
+	$sid = isset($_GET['screen']) ? (string) $_GET['screen'] : $begin;
+	if (!isset($draft['screens'][$sid])) {
+		$sid = $begin;
+	}
+	$screen = $draft['screens'][$sid];
+	$from = isset($_GET['from']) ? (string) $_GET['from'] : '';
+	$sessionUser = '';
+} else {
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($id < 1) {
 	http_response_code(404);
@@ -69,6 +89,7 @@ if ($isBeginLoad) {
 		}
 	}
 }
+}
 
 $title = trim(decode((string) ($adv['title'] ?? ''), 1));
 if ($title === '') {
@@ -120,12 +141,21 @@ if (!empty($adv['pic']) && function_exists('choosology_adv_pic_usable_for_displa
 	}
 }
 
+if (!empty($tryMode)) {
+	$structureUrl = '';
+	$classicEdit = '';
+	$startUrl = choosology_lite_url('view.php?try=1');
+	$returnUrl = ($from !== '' && $from !== '0')
+		? choosology_lite_url('view.php?try=1&screen=' . rawurlencode((string) $from))
+		: '';
+} else {
 $structureUrl = choosology_lite_url('structure.php?id=' . $id);
 $classicEdit = choosology_classic_url('edit/' . $id);
 $startUrl = choosology_lite_url('view.php?id=' . $id);
 $returnUrl = $from > 0
 	? choosology_lite_url('view.php?id=' . $id . '&screen=' . $from)
 	: '';
+}
 
 $guideNext = 'view.php?id=' . $id;
 if (isset($_GET['screen'])) {
@@ -144,10 +174,14 @@ choosology_lite_guide_panel('view', $guideNext);
 			<?php echo $iconHtml; ?>
 			<h1 class="lite-read-title"<?php echo $read['title'] !== '' ? ' style="' . htmlspecialchars($read['title'], ENT_QUOTES, 'UTF-8') . '"' : ''; ?>><?php echo $read['title_html']; ?></h1>
 			<p class="lite-read-meta">
-				Exp #<?php echo (int) $id; ?> · by <?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?>
+				<?php if (!empty($tryMode)) { ?>
+				Draft · not saved · by <?php echo choosology_author_byline_html($owner, 'lite'); ?>
+				<?php } else { ?>
+				Exp #<?php echo (int) $id; ?> · by <?php echo choosology_author_byline_html($owner, 'lite'); ?>
 				· <a href="<?php echo htmlspecialchars($structureUrl, ENT_QUOTES, 'UTF-8'); ?>">Structure (ASCII)</a>
 				<?php if ($sessionUser !== '' && $sessionUser === $owner) { ?>
 					· <a href="<?php echo htmlspecialchars($classicEdit, ENT_QUOTES, 'UTF-8'); ?>">Edit in Classic</a>
+				<?php } ?>
 				<?php } ?>
 			</p>
 		</header>
@@ -163,11 +197,19 @@ choosology_lite_guide_panel('view', $guideNext);
 			</summary>
 			<div class="lite-choices-body">
 				<?php if ($isTerminal) {
-					echo choosology_lite_ending_panel_html($db, $id, $sid);
+					if (!empty($tryMode)) {
+						echo choosology_try_ending_html('lite');
+					} else {
+						echo choosology_lite_ending_panel_html($db, $id, $sid);
+					}
 				} else { ?>
 					<div class="lite-read-choice-list" role="navigation" aria-label="Choices">
 						<?php foreach ($choices as $idx => $c) {
-							$href = choosology_lite_url('view.php?id=' . $id . '&screen=' . (int) $c['target'] . '&from=' . $sid);
+							if (!empty($tryMode)) {
+								$href = choosology_lite_url('view.php?try=1&screen=' . (int) $c['target'] . '&from=' . rawurlencode((string) $sid));
+							} else {
+								$href = choosology_lite_url('view.php?id=' . $id . '&screen=' . (int) $c['target'] . '&from=' . $sid);
+							}
 							?>
 							<a class="lite-read-choice" href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $read['choice'] !== '' ? ' style="' . htmlspecialchars($read['choice'], ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
 								<?php echo ($idx + 1) . '. ' . $c['label']; ?>
@@ -179,7 +221,9 @@ choosology_lite_guide_panel('view', $guideNext);
 		</details>
 
 		<p class="lite-btn-row lite-read-nav">
+			<?php if (choosology_play_show_start_over($sid, $begin)) { ?>
 			<a class="lite-btn" href="<?php echo htmlspecialchars($startUrl, ENT_QUOTES, 'UTF-8'); ?>">← Start over</a>
+			<?php } ?>
 			<?php if ($returnUrl !== '') { ?>
 				<a class="lite-btn" href="<?php echo htmlspecialchars($returnUrl, ENT_QUOTES, 'UTF-8'); ?>">← Return to previous screen</a>
 			<?php } ?>

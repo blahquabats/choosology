@@ -144,6 +144,14 @@ if ($action === 'moderate_comment') {
 	));
 }
 
+if ($action === 'set_featured') {
+	choosology_restricted_json(choosology_adventure_review_set_featured(
+		$db,
+		(int) ($data['adventure_id'] ?? 0),
+		!empty($data['featured'])
+	));
+}
+
 if ($action === 'moderate_adventure') {
 	choosology_restricted_json(choosology_adventure_review_moderate(
 		$db,

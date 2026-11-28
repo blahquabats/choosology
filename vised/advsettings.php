@@ -474,6 +474,7 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 			advPicLibraryResponse = res;
 			advPicLibraryAdvid = advid;
 			var allItems = res.items;
+			var libraryNotice = res.notice ? String(res.notice) : "";
 			var tagOpts = Array.isArray(res.tagOptions) ? res.tagOptions : [];
 			$(".adv-picbrowser").each(function () {
 				var $root = $(this);
@@ -498,11 +499,13 @@ $bgPreviewUrl = $bgpicVal > 0 ? getPicUrl($bgpicVal, true) : '';
 					var $grid = $root.find(".adv-picbrowser-grid");
 					var $st = $root.find(".adv-picbrowser-status");
 					$grid.empty();
+					var countLine = "";
 					if (list.length === 0) {
-						$st.text(allItems.length === 0 ? "No images in your library yet." : "No images match this search or filter.");
+						countLine = allItems.length === 0 ? "No images in your library yet." : "No images match this search or filter.";
 					} else {
-						$st.text(list.length + " of " + allItems.length + " shown");
+						countLine = list.length + " of " + allItems.length + " shown";
 					}
+					$st.text(libraryNotice ? (libraryNotice + " " + countLine) : countLine);
 					var bi;
 					for (bi = 0; bi < list.length; bi++) {
 						var it = list[bi];

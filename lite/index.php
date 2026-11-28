@@ -9,31 +9,7 @@ global $db;
 $recentFeed = choosology_build_recent_feed($db, CHOOSOLOGY_HOME_FEED_LIMIT);
 
 require_once dirname(__DIR__) . '/lib/adventure-review-helpers.php';
-$discoverySql = choosology_adventure_discovery_sql('a');
-$query = "
-	SELECT DISTINCT a.id AS aid, a.title AS adv_title, a.description AS adv_description, a.user AS adv_user
-	FROM advs a
-	INNER JOIN advscreens s ON s.id = a.`begin`
-	WHERE $discoverySql
-	  AND CHAR_LENGTH(TRIM(COALESCE(a.description, ''))) > 0
-	  AND (
-			NOT EXISTS (SELECT 1 FROM ratings r WHERE r.adv = a.id)
-		 OR (SELECT AVG(r.rating) FROM ratings r WHERE r.adv = a.id) > 2.5
-	  )
-	ORDER BY a.id DESC
-	LIMIT 40";
-$res = runquery_assoc($query);
-$featured = array();
-if (is_array($res) && count($res) > 0) {
-	$res = array_values(array_filter($res, static function ($row) {
-		$text = trim(decode($row['adv_description'] ?? '', 1));
-		return $text !== '';
-	}));
-	if (count($res) > 0) {
-		shuffle($res);
-		$featured = array_slice($res, 0, 8);
-	}
-}
+$featured = choosology_newly_featured_adventures($db, 10);
 
 choosology_lite_header(array('title' => 'Home', 'active' => 'home'));
 ?>
@@ -44,7 +20,9 @@ choosology_lite_header(array('title' => 'Home', 'active' => 'home'));
 	<p>
 		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('browse.php'), ENT_QUOTES, 'UTF-8'); ?>">Browse experiments</a>
 		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('news.php'), ENT_QUOTES, 'UTF-8'); ?>">Lab notes</a>
+		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('about.php'), ENT_QUOTES, 'UTF-8'); ?>">About</a>
 		<?php if (empty($_SESSION['user'])) { ?>
+		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('try.php'), ENT_QUOTES, 'UTF-8'); ?>">Try it yourself</a>
 		<a class="lite-btn" href="<?php echo htmlspecialchars(choosology_lite_url('login.php'), ENT_QUOTES, 'UTF-8'); ?>">Sign in</a>
 		<?php } ?>
 	</p>

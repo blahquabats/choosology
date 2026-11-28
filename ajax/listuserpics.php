@@ -48,7 +48,10 @@ $tagPick = isset($_GET['tag']) ? trim((string) $_GET['tag']) : '';
 
 require_once __DIR__ . '/../lib/pic-list-helpers.php';
 
+choosology_sync_on_disk_picture_catalog($db);
 $pics = getUserPics($user);
+$libraryRows = 0;
+$libraryOnDisk = 0;
 
 $tagOptionsMap = array();
 foreach ($pics as $pic) {
@@ -68,6 +71,17 @@ foreach ($pics as $pic) {
 	if ($pid < 1) {
 		continue;
 	}
+	$isCatalog = strncmp((string) ($pic['filename'] ?? ''), 'catalog:', 8) === 0;
+	if (!$isCatalog) {
+		$libraryRows++;
+	}
+	$onDisk = choosology_pic_filesystem_path($pic, true);
+	if ($onDisk === null || !is_file($onDisk)) {
+		continue;
+	}
+	if (!$isCatalog) {
+		$libraryOnDisk++;
+	}
 	if (!choosology_listuserpics_row_matches_tag($pic, $tagPick)) {
 		continue;
 	}
@@ -79,7 +93,7 @@ foreach ($pics as $pic) {
 	$tags = choosology_listuserpics_tags_from_cat($cat);
 	$width = 0;
 	$height = 0;
-	$path = choosology_pic_filesystem_path($pic, true);
+	$path = $onDisk;
 	if ($path !== '' && is_file($path)) {
 		$sz = @getimagesize($path);
 		if (is_array($sz) && isset($sz[0], $sz[1])) {
@@ -100,9 +114,14 @@ foreach ($pics as $pic) {
 	);
 }
 
+$notice = '';
+if ($libraryRows > 0 && $libraryOnDisk === 0) {
+	$notice = 'Picture files for this library were not copied onto this machine. Showing images that exist on disk.';
+}
 echo json_encode(array(
 	'ok' => 1,
 	'items' => $items,
 	'tagOptions' => $tagList,
+	'notice' => $notice,
 ), $jsonFlags);
 exit;

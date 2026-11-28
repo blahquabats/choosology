@@ -2,6 +2,7 @@
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'paths-config.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'font-options.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'choosology-core.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'pic-list-helpers.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'ending-helpers.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'clipboard-helpers.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'messagesfunc.php';
@@ -200,6 +201,79 @@ function getPicUrl($id, bool $useThumb = true): string
  *
  * @return list<array<string, mixed>>
  */
+/**
+ * Register image files that are actually on this machine so the picker can show them.
+ * Library rows whose files were never copied stay out of the list.
+ *
+ * @return int number of catalog rows inserted
+ */
+function choosology_sync_on_disk_picture_catalog($db): int
+{
+	if (!($db instanceof mysqli) || !function_exists('choosology_catalog_resolve_file')) {
+		return 0;
+	}
+	$files = array();
+	$rootReal = realpath(choosology_pics_root());
+	if ($rootReal && is_dir($rootReal)) {
+		$iter = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($rootReal, FilesystemIterator::SKIP_DOTS)
+		);
+		foreach ($iter as $file) {
+			if (!$file->isFile()) {
+				continue;
+			}
+			$ext = strtolower((string) $file->getExtension());
+			if (!in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'webp'), true)) {
+				continue;
+			}
+			$real = $file->getPathname();
+			$rel = substr(str_replace('\\', '/', $real), strlen(str_replace('\\', '/', $rootReal)) + 1);
+			if (preg_match('#(^|/)thumbs(/|$)#i', $rel)) {
+				continue;
+			}
+			$key = 'pics/' . $rel;
+			if (strlen('catalog:' . $key) > 75) {
+				continue;
+			}
+			$files[$key] = $real;
+		}
+	}
+	$story = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'about' . DIRECTORY_SEPARATOR . 'story-bg.jpg';
+	if (is_file($story)) {
+		$files['about/story-bg.jpg'] = (string) realpath($story);
+	}
+	$added = 0;
+	foreach ($files as $key => $abs) {
+		if (choosology_catalog_resolve_file('catalog:' . $key, choosology_pics_root(), __DIR__ . '/images/about') === null) {
+			continue;
+		}
+		$fn = mysqli_real_escape_string($db, 'catalog:' . $key);
+		$have = runquery_assoc("SELECT id FROM pics WHERE filename = '$fn' AND user = '&everyone' LIMIT 1");
+		if (is_array($have) && count($have) > 0) {
+			continue;
+		}
+		$name = mysqli_real_escape_string($db, substr((string) pathinfo($abs, PATHINFO_FILENAME), 0, 75));
+		$ext = strtolower((string) pathinfo($abs, PATHINFO_EXTENSION));
+		$mime = 'image/jpeg';
+		if ($ext === 'png') {
+			$mime = 'image/png';
+		} elseif ($ext === 'gif') {
+			$mime = 'image/gif';
+		} elseif ($ext === 'webp') {
+			$mime = 'image/webp';
+		}
+		$now = date('Y-m-d H:i:s');
+		$ok = mysqli_query(
+			$db,
+			"INSERT INTO pics (filename, imagename, cat, size, uploaded, user, type) VALUES ('$fn', '$name', 'on disk', 'static', '$now', '&everyone', '$mime')"
+		);
+		if ($ok) {
+			$added++;
+		}
+	}
+	return $added;
+}
+
 function getUserPics(string $username): array
 {
 	global $db;
@@ -301,6 +375,11 @@ function choosology_pic_filesystem_path(array $row, bool $wantThumb): ?string
 	$fn = (string) ($row['filename'] ?? '');
 	if ($fn === '') {
 		return null;
+	}
+	if (strncmp($fn, 'catalog:', 8) === 0 && function_exists('choosology_catalog_resolve_file')) {
+		$aboutDir = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'about';
+		$resolved = choosology_catalog_resolve_file($fn, choosology_pics_root(), $aboutDir);
+		return ($resolved !== null && is_file($resolved)) ? $resolved : null;
 	}
 	$user = (string) ($row['user'] ?? '');
 	$base = playerDir($user !== '' ? $user : '&everyone');

@@ -11,6 +11,8 @@ final class AdventureReviewIntegrationTest extends TestCase
 {
 	private mysqli $db;
 	private int $advId = 0;
+	/** @var list<int> */
+	private array $extraIds = array();
 
 	protected function setUp(): void
 	{
@@ -26,6 +28,10 @@ final class AdventureReviewIntegrationTest extends TestCase
 			choosology_adventure_review_delete($this->db, $this->advId);
 			$this->advId = 0;
 		}
+		foreach ($this->extraIds as $id) {
+			choosology_adventure_review_delete($this->db, (int) $id);
+		}
+		$this->extraIds = array();
 		@mysqli_query($this->db, "UPDATE users SET probation=0 WHERE name='testuser'");
 		$_SESSION = array();
 	}
@@ -119,5 +125,40 @@ final class AdventureReviewIntegrationTest extends TestCase
 			"SELECT COUNT(*) AS c FROM messages WHERE to_user='testuser'"
 		))['c'] ?? 0);
 		$this->assertGreaterThan($before, $after);
+	}
+
+	public function testNewlyFeaturedUsesOnlyTheTenMostRecent(): void
+	{
+		mysqli_query($this->db, 'UPDATE advs SET featured=0, featured_at=NULL');
+		$ids = array();
+		$unfeatured = $this->makeAdventure('Unfeatured Public');
+		choosology_adventure_review_on_avail_change($this->db, $unfeatured, 'testuser', 'public', 'none', '');
+		$ids[] = $unfeatured;
+		for ($i = 0; $i < 11; $i++) {
+			$id = $this->makeAdventure('Featured Pool ' . $i);
+			choosology_adventure_review_on_avail_change($this->db, $id, 'testuser', 'public', 'none', '');
+			$marked = choosology_adventure_review_set_featured($this->db, $id, true);
+			$this->assertTrue($marked['ok']);
+			$stamp = sprintf('2020-01-%02d 12:00:00', $i + 1);
+			mysqli_query($this->db, "UPDATE advs SET featured_at='$stamp' WHERE id=$id");
+			$ids[] = $id;
+		}
+		$this->extraIds = $ids;
+		$oldest = $ids[1];
+		$newest = $ids[11];
+		$rows = choosology_newly_featured_adventures($this->db, 10);
+		$got = array_map('intval', array_column($rows, 'aid'));
+		$this->assertCount(10, $got);
+		$this->assertNotContains($unfeatured, $got);
+		$this->assertNotContains($oldest, $got);
+		$this->assertContains($newest, $got);
+
+		$_SESSION['usertype'] = 0;
+		$denied = choosology_adventure_review_set_featured($this->db, $unfeatured, true);
+		$this->assertFalse($denied['ok']);
+		$_SESSION['usertype'] = 1;
+
+		$this->extraIds = $ids;
+		$this->advId = 0;
 	}
 }

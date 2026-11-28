@@ -43,7 +43,7 @@
     <meta charset="utf-8" />
     <title>Choosology</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.10.4/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" href="style/choosology.css?v=slidearrow1" />
+    <link rel="stylesheet" href="style/choosology.css?v=authorprof1" />
     <link rel="stylesheet" href="style/jquery.minicolors.css" />
     <script src="scripts/jquery.js"></script>
     <script>
@@ -68,18 +68,18 @@
     <script src="scripts/jquery-dateFormat.js"></script>
     <script src="scripts/jquery-minicolors/jquery.minicolors.min.js"></script>
     <script src="scripts/lib/choosology-utils.js?v=clic4"></script>
-    <script src="scripts/choosology.js"></script>
+    <script src="scripts/choosology.js?v=savestamp1"></script>
     <!-- Konva 10.3.0 UMD (official npm konva.min.js). jsDelivr mirrors npm; cdnjs /ajax/libs/konva/10.x/konva.min.js was 404 when checked — swap to cdnjs when they publish this version. -->
     <script src="https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.min.js" crossorigin="anonymous"></script>
     <script src="scripts/sammy.js"></script>
     
-    <script src='scripts/index.js?v=logoutspin1'></script>
+    <script src='scripts/index.js?v=author1'></script>
     <script src='scripts/messages.js?v=clic4'></script>
     <script src='scripts/clipboard.js?v=clip8'></script>
     <script src='scripts/office.js?v=admin1'></script>
     <script src='scripts/guide.js?v=guide1'></script>
-    <script src='scripts/restricted.js?v=advreview2'></script>
-    <script src='scripts/routes.js?v=admin1'></script>
+    <script src='scripts/restricted.js?v=advfeature1'></script>
+    <script src='scripts/routes.js?v=author1'></script>
     <script src='scripts/lite-suggest.js?v=2'></script>
 
 
@@ -151,8 +151,10 @@ $liteBtnDismissed = choosology_lite_btn_dismissed();
 	    {
 	        echo "<div id='loginbox-inner' class='loginbox-inner'>\n";
 	        echo "<p class='loginbox-eyebrow'>Lab access</p>\n";
+	        echo "<div class='loginbox-fields'>\n";
 	        echo "<label class='loginbox-field' for='loginuser'><span class='loginbox-label'>User name</span><input type='text' name='logname' id='loginuser' autocomplete='username' /></label>\n";
 	        echo "<label class='loginbox-field' for='loginpass'><span class='loginbox-label'>Password</span><input type='password' name='logpass' id='loginpass' autocomplete='current-password' /></label>\n";
+	        echo "</div>\n";
 	        echo "<div class='loginbox-actions'><div class='rememberme'><input type='checkbox' name='rememberlogin' id='rememberlogin'> <label for='rememberlogin'>Remember me</label></div>";
 	        echo "<button type='button' id='loginsubmit'>Sign in</button></div>\n";
 	        echo "<div class='login-signup-row'><button type='button' class='login-signup-link' id='opensignup'>Apply for lab access</button>";
@@ -204,6 +206,18 @@ $liteBtnDismissed = choosology_lite_btn_dismissed();
 </div>
 <?php } ?>
 <div class='genericwindow' id="homewindow">
+    <div class='ajaxloader'></div>
+</div>
+<div class='genericwindow' id="aboutwindow">
+    <div class='ajaxloader'></div>
+</div>
+<div class='genericwindow' id="termswindow">
+    <div class='ajaxloader'></div>
+</div>
+<div class='genericwindow' id="privacywindow">
+    <div class='ajaxloader'></div>
+</div>
+<div class='genericwindow' id="authorwindow">
     <div class='ajaxloader'></div>
 </div>
 <div class='genericwindow' id="newswindow">
@@ -319,6 +333,7 @@ $liteBtnDismissed = choosology_lite_btn_dismissed();
 
 <div class='footer' id='footer'>
     Copyright &copy; 2015&ndash;<?php echo date('Y'); ?> The Grasssmith &amp; Grasssmithery Worldwide
+    <span class="footer-legal"><a href="#/terms">Terms</a> · <a href="#/privacy">Privacy</a></span>
 </div>
 
 </body>

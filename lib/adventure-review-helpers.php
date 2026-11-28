@@ -45,6 +45,24 @@ function choosology_adventure_review_ensure_schema(mysqli $db): void
 				$db,
 				"ALTER TABLE advs ADD COLUMN content_flags varchar(255) NOT NULL DEFAULT '' AFTER review_hold"
 			);
+			$advsCols['content_flags'] = true;
+		}
+		if (empty($advsCols['featured'])) {
+			mysqli_query(
+				$db,
+				"ALTER TABLE advs ADD COLUMN featured tinyint(1) NOT NULL DEFAULT 0 AFTER content_flags"
+			);
+			$advsCols['featured'] = true;
+		}
+		if (empty($advsCols['featured_at'])) {
+			mysqli_query(
+				$db,
+				"ALTER TABLE advs ADD COLUMN featured_at datetime NULL DEFAULT NULL AFTER featured"
+			);
+		}
+		$idx = mysqli_query($db, "SHOW INDEX FROM advs WHERE Key_name='idx_advs_featured'");
+		if ($idx && mysqli_num_rows($idx) === 0) {
+			mysqli_query($db, 'ALTER TABLE advs ADD INDEX idx_advs_featured (featured, featured_at)');
 		}
 
 		$userCols = array();
@@ -287,6 +305,9 @@ function choosology_adventure_can_view(array $adv, string $viewer = ''): bool
 {
 	$owner = (string) ($adv['user'] ?? '');
 	$avail = (string) ($adv['avail'] ?? 'none');
+	if ($avail === 'removed') {
+		return false;
+	}
 	$hold = (int) ($adv['review_hold'] ?? 0) === 1;
 	$viewer = $viewer !== '' ? $viewer : (string) ($_SESSION['user'] ?? '');
 	$isOwner = ($viewer !== '' && $viewer === $owner);
@@ -318,7 +339,7 @@ function choosology_adventure_review_pending(mysqli $db, int $limit = 100): arra
 	$r = mysqli_query(
 		$db,
 		"SELECT a.id, a.title, a.user, a.avail, a.description, a.tags, a.content_flags,
-		        a.review_status, a.review_hold, a.published, a.edited, a.pic,
+		        a.review_status, a.review_hold, a.featured, a.featured_at, a.published, a.edited, a.pic,
 		        IFNULL(u.probation,0) AS author_probation
 		 FROM advs a
 		 LEFT JOIN users u ON u.name = a.user
@@ -358,6 +379,8 @@ function choosology_adventure_review_pending(mysqli $db, int $limit = 100): arra
 			'content_flags' => $flags,
 			'review_status' => (string) ($row['review_status'] ?? ''),
 			'review_hold' => $held,
+			'featured' => (int) ($row['featured'] ?? 0) === 1,
+			'featured_at' => (string) ($row['featured_at'] ?? ''),
 			'author_probation' => (int) ($row['author_probation'] ?? 0) === 1,
 			'hold_reasons' => $holdReasons,
 			'published' => (string) ($row['published'] ?? ''),
@@ -516,4 +539,95 @@ function choosology_adventure_review_moderate(
 		'id' => $advid,
 		'message_id' => $messageId,
 	);
+}
+
+/**
+ * Mark or clear the home-page feature flag. Admins only (usertype >= 1).
+ * Featuring is a review-queue action, so the experiment must still be pending.
+ *
+ * @return array{ok:bool,error?:string,id?:int,featured?:int}
+ */
+function choosology_adventure_review_set_featured(mysqli $db, int $advid, bool $featured): array
+{
+	choosology_adventure_review_ensure_schema($db);
+	if (!function_exists('choosology_restricted_is_admin')) {
+		require_once __DIR__ . '/restricted-helpers.php';
+	}
+	if (!choosology_restricted_is_admin()) {
+		return array('ok' => false, 'error' => 'Admin access required.');
+	}
+	if ($advid < 1) {
+		return array('ok' => false, 'error' => 'Invalid experiment id.');
+	}
+	$id = (int) $advid;
+	$r = mysqli_query(
+		$db,
+		"SELECT id, review_status FROM advs WHERE id=$id LIMIT 1"
+	);
+	$row = $r ? mysqli_fetch_assoc($r) : null;
+	if (!$row) {
+		return array('ok' => false, 'error' => 'Experiment not found.');
+	}
+	if ((string) ($row['review_status'] ?? '') !== 'pending') {
+		return array('ok' => false, 'error' => 'Feature an experiment from the review queue.');
+	}
+	if ($featured) {
+		$ok = mysqli_query(
+			$db,
+			"UPDATE advs
+			 SET featured=1, featured_at=NOW()
+			 WHERE id=$id AND review_status='pending'
+			 LIMIT 1"
+		);
+	} else {
+		$ok = mysqli_query(
+			$db,
+			"UPDATE advs
+			 SET featured=0, featured_at=NULL
+			 WHERE id=$id AND review_status='pending'
+			 LIMIT 1"
+		);
+	}
+	if (!$ok) {
+		return array('ok' => false, 'error' => 'Could not update the feature flag.');
+	}
+	return array(
+		'ok' => true,
+		'id' => $id,
+		'featured' => $featured ? 1 : 0,
+	);
+}
+
+/**
+ * Random draw of the most recently featured, publicly discoverable experiments.
+ * At most $limit (capped at 10). Unfeatured rows are never included.
+ *
+ * @return list<array<string,mixed>>
+ */
+function choosology_newly_featured_adventures(mysqli $db, int $limit = 10): array
+{
+	choosology_adventure_review_ensure_schema($db);
+	$limit = max(1, min(10, $limit));
+	$discovery = choosology_adventure_discovery_sql('a');
+	$sql = "
+		SELECT a.id AS aid, a.title AS adv_title, a.description AS adv_description, a.user AS adv_user
+		FROM advs a
+		INNER JOIN advscreens s ON s.id = a.`begin`
+		WHERE a.featured=1
+		  AND a.featured_at IS NOT NULL
+		  AND $discovery
+		ORDER BY a.featured_at DESC, a.id DESC
+		LIMIT $limit";
+	$r = mysqli_query($db, $sql);
+	if (!$r) {
+		return array();
+	}
+	$rows = array();
+	while ($row = mysqli_fetch_assoc($r)) {
+		$rows[] = $row;
+	}
+	if (count($rows) > 1) {
+		shuffle($rows);
+	}
+	return $rows;
 }

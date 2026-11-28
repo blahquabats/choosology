@@ -125,6 +125,18 @@
     opacity: 0.95;
 }
 
+a.view-sidebar-author
+{
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+#firstscreen.is-opening-screen
+{
+    display: none !important;
+}
+
 .view-sidebar-nav
 {
     display: flex;

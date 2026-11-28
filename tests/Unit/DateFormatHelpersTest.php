@@ -46,6 +46,17 @@ final class DateFormatHelpersTest extends TestCase
 		$this->assertSame('03/06/2020', nicedatetime($stamp, 'date'));
 	}
 
+	public function testMissingSaveTimeIsNotTheEpoch(): void
+	{
+		foreach (array(null, '', '0', 0, '0000-00-00 00:00:00', '1970-01-01 00:00:00') as $missing) {
+			$this->assertSame('', choosology_format_user_date($missing, 'datetime', 'mdy'));
+			$this->assertSame('Not saved yet', choosology_last_saved_label($missing));
+		}
+		$real = '2020-06-03 15:30:00';
+		$this->assertSame('Last Saved: 3:30pm on 06/03/2020', choosology_last_saved_label($real));
+		$this->assertSame('3:30pm on 03/06/2020', choosology_format_user_date($real, 'datetime', 'dmy'));
+	}
+
 	public function testCookieSaveRoundTrip(): void
 	{
 		choosology_date_format_cookie_set('dmy');

@@ -41,7 +41,70 @@
         $(document).off("keydown.advsettings");
     }
 
+    function choosologyTryAccountMessage()
+    {
+        return "This draft stays in this browser session and is not saved to the lab. Create an account (Apply for lab access) to keep an experiment.";
+    }
+
+    function adventureBoxPayload()
+    {
+        var temparray = {};
+        var cid = 0;
+        var clabel = 0;
+        temparray.advid = advid;
+        for (var i in boxgroups)
+        {
+            temparray[i] = {};
+            temparray[i].connections = {};
+            if (connto[i])
+            {
+                var c = 1;
+                for (var j in connto[i])
+                {
+                    cid = j.substr(4);
+                    clabel = connto[i][j][1];
+                    temparray[i].connections[c] = clabel + "|Q-D-|" + cid;
+                    c++;
+                }
+            }
+            temparray[i].name = boxgroups[i].name();
+            temparray[i].title = boxgroups[i].title;
+            temparray[i].x = boxgroups[i].x();
+            temparray[i].y = boxgroups[i].y();
+            if (boxgroups[i].deleted) temparray[i].deleted = boxgroups[i].deleted;
+        }
+        return temparray;
+    }
+
+    function postTryDraft(reload, done)
+    {
+        $.ajax({
+            type: "POST",
+            url: choosologyUrl("ajax/trydraft.php"),
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify({ op: "sync", boxes: adventureBoxPayload() })
+        }).done(function (response) {
+            if (response && response.account && typeof showAlert === "function") {
+                showAlert(response.error || choosologyTryAccountMessage(), "error");
+            }
+            if (reload) {
+                loadAdv("try");
+            } else {
+                $("#visedloader").hide();
+            }
+            if (typeof done === "function") done(response);
+        }).fail(function () {
+            $("#visedloader").hide();
+            if (typeof showAlert === "function") showAlert("Could not update the draft.", "error");
+        });
+    }
+
     function openAdvSettings() {
+        if (window.choosologyTryDraft) {
+            if (typeof showAlert === "function") showAlert(choosologyTryAccountMessage(), "error");
+            return;
+        }
         var w = $("#advsettingswindow");
         w.removeClass("advsettings-hidden").addClass("advsettings-open").attr("aria-hidden", "false");
         var url = choosologyUrl("vised/advsettings.php?advid=" + encodeURIComponent(String(typeof advid !== "undefined" ? advid : "")));
@@ -82,14 +145,24 @@
         stopmenuonce = 0;
         if (typeof refreshStatusPill === "function") refreshStatusPill();
         
-        $.ajax({
-            type: "POST",
-            url: choosologyUrl("ajax/loadadvstructure.php"),
-            dataType: "json",
-            data: {
-                    advid: advid
-                }
-        }).done(function(response) {
+        var loadUrl = window.choosologyTryDraft
+            ? choosologyUrl("ajax/trydraft.php")
+            : choosologyUrl("ajax/loadadvstructure.php");
+        var loadOptions = window.choosologyTryDraft
+            ? {
+                type: "POST",
+                url: loadUrl,
+                contentType: "application/json; charset=UTF-8",
+                dataType: "json",
+                data: JSON.stringify({ op: "load" })
+            }
+            : {
+                type: "POST",
+                url: loadUrl,
+                dataType: "json",
+                data: { advid: advid }
+            };
+        $.ajax(loadOptions).done(function(response) {
 
             if(response[0] == "0") 
             {
@@ -394,6 +467,16 @@
             showAlert("You cannot create more than eight children of one screen!", "error");
             return false;
         }
+        if (window.choosologyTryDraft) {
+            var draftScreens = 0;
+            for (var draftKey in boxgroups) {
+                if (boxgroups[draftKey] && !boxgroups[draftKey].deleted) draftScreens++;
+            }
+            if (draftScreens >= 8) {
+                showAlert("This draft holds eight screens, the same ceiling as one screen's outgoing choices. " + choosologyTryAccountMessage(), "error");
+                return false;
+            }
+        }
         var newtitle = prompt("Name the new screen:");
         var newname = "new"+existing+"_"+box1;
         var box2 = newname;
@@ -444,7 +527,9 @@
        // alert(es.parent().attr("class"));
         es.switchClass("editscreenclosed", "editscreenopen", 400, "linear", function(){
             ensureTinyMCE(function () {
-                es.load("vised/screeneditor.php?screenid="+idstuff[1]);
+                var screenUrl = "vised/screeneditor.php?screenid=" + encodeURIComponent(idstuff[1]);
+                if (window.choosologyTryDraft) screenUrl += "&try=1";
+                es.load(screenUrl);
                 resetView();
             });
         });
@@ -818,6 +903,7 @@
         lineOrPath(b1, b2);
         layers['lines'].draw();
         layers['boxes'].draw();
+        if (window.choosologyTryDraft) postTryDraft(false);
         return false;
         // add to connto/connfrom
         
@@ -846,6 +932,7 @@
         updateConnectionDots(b2);
         layers['lines'].draw();
         layers['boxes'].draw();
+        if (window.choosologyTryDraft) postTryDraft(false);
         return true;
         // add to connto/connfrom
         
@@ -986,7 +1073,7 @@
             for (var i in connto[boxid])
             {
                 toname = connto[boxid][i][0];
-                var tolink = decodeEntities(strip_tags(connto[boxid][i][1]));
+                var tolink = strip_tags(decodeEntities(connto[boxid][i][1]));
 
                 thisline = lines[boxid][toname];
                 thisline.stroke(config.to_color);
@@ -1028,7 +1115,7 @@
             for (var i in connfrom[boxid])
             {
                 fromname = connfrom[boxid][i][0];
-                var fromlink = decodeEntities(strip_tags(connfrom[boxid][i][1]));
+                var fromlink = strip_tags(decodeEntities(connfrom[boxid][i][1]));
 
                 thisline = lines[fromname][boxid];
                 thisline.stroke(config.from_color);
@@ -1359,35 +1446,13 @@ function drawPath(box1, box2)
     function saveAdventure()
     {
         $("#visedloader").show();
+        if (window.choosologyTryDraft) {
+            postTryDraft(true);
+            return;
+        }
        // return;
         // get positions
-        var temparray = {};
-        var cid = 0;
-        var clabel = 0;
-        temparray['advid'] = advid;
-        for(var i in boxgroups)
-        {    
-            temparray[i] = {};
-            temparray[i]['connections'] = {};
-            if(connto[i])
-            {
-                var c = 1;
-                for (var j in connto[i])
-                {
-                    cid = j.substr(4);
-                    clabel = connto[i][j][1];
-                    temparray[i]['connections'][c] = clabel+"|Q-D-|"+cid;
-                    c++;
-                }
-                
-            }
-            temparray[i]['name'] = boxgroups[i].name();
-            temparray[i]['title'] = boxgroups[i].title;
-            temparray[i]['x'] = boxgroups[i].x();
-            temparray[i]['y'] = boxgroups[i].y();
-            if(boxgroups[i].deleted) temparray[i]['deleted'] = boxgroups[i].deleted;
-            
-        }
+        var temparray = adventureBoxPayload();
         var jsonarray = JSON.stringify(temparray)
        // alert(jsonarray);
         $.ajax({
@@ -1447,6 +1512,16 @@ function drawPath(box1, box2)
 
     $(document).on("click", "#vised_opensettings", function () {
         openAdvSettings();
+    });
+    $(document).on("click", "#vised_try_save", function () {
+        if (typeof showAlert === "function") showAlert(choosologyTryAccountMessage(), "error");
+    });
+    $(document).on("click", "#vised_try_preview", function (e) {
+        e.preventDefault();
+        $("#visedloader").show();
+        postTryDraft(false, function () {
+            window.location.hash = "#/try/play";
+        });
     });
     if (window.sessionStorage) {
         try {

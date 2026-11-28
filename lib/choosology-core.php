@@ -2,6 +2,7 @@
 /**
  * Pure / mostly-pure Choosology helpers (safe to load without connect.php).
  */
+require_once __DIR__ . '/date-format-helpers.php';
 
 /**
  * Legacy password digest: md5("cYo" . password).

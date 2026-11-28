@@ -8,7 +8,11 @@ ALTER TABLE `advs`
   ADD COLUMN IF NOT EXISTS `review_hold` tinyint(1) NOT NULL DEFAULT 0
     COMMENT '1 = hidden from public discovery until reviewed' AFTER `review_status`,
   ADD COLUMN IF NOT EXISTS `content_flags` varchar(255) NOT NULL DEFAULT ''
-    COMMENT 'comma-separated flags that can force a hold (e.g. mature)' AFTER `review_hold`;
+    COMMENT 'comma-separated flags that can force a hold (e.g. mature)' AFTER `review_hold`,
+  ADD COLUMN IF NOT EXISTS `featured` tinyint(1) NOT NULL DEFAULT 0
+    COMMENT '1 = eligible for the home Newly Featured carousel' AFTER `content_flags`,
+  ADD COLUMN IF NOT EXISTS `featured_at` datetime NULL DEFAULT NULL
+    COMMENT 'when an admin last marked this adventure featured' AFTER `featured`;
 
 ALTER TABLE `users`
   ADD COLUMN IF NOT EXISTS `probation` tinyint(1) NOT NULL DEFAULT 0

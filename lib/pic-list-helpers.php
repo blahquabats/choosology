@@ -60,6 +60,44 @@ function choosology_listuserpics_row_matches_tag(array $pic, string $tagPick): b
 /**
  * @return list<string>
  */
+/**
+ * Resolve a catalog: filename to a file under the pics root or images/about.
+ * Returns null for anything that would leave those directories.
+ */
+function choosology_catalog_resolve_file(string $filename, string $picsRoot, string $aboutDir): ?string
+{
+	if (strncmp($filename, 'catalog:', 8) !== 0) {
+		return null;
+	}
+	$rel = str_replace('\\', '/', substr($filename, 8));
+	if ($rel === '' || strpos($rel, '..') !== false || strpos($rel, "\0") !== false) {
+		return null;
+	}
+	if (strncmp($rel, 'pics/', 5) === 0) {
+		$base = realpath($picsRoot);
+		$tail = substr($rel, 5);
+	} elseif (strncmp($rel, 'about/', 6) === 0) {
+		$base = realpath($aboutDir);
+		$tail = substr($rel, 6);
+	} else {
+		return null;
+	}
+	if ($base === false || $tail === '' || strpos($tail, '..') !== false) {
+		return null;
+	}
+	$full = $base . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $tail);
+	$real = realpath($full);
+	if ($real === false || !is_file($real)) {
+		return null;
+	}
+	$baseNorm = rtrim(str_replace('\\', '/', $base), '/');
+	$realNorm = str_replace('\\', '/', $real);
+	if ($realNorm !== $baseNorm && strpos($realNorm, $baseNorm . '/') !== 0) {
+		return null;
+	}
+	return $real;
+}
+
 function choosology_account_pic_tags(string $cat): array
 {
 	$cat = trim($cat);

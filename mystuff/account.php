@@ -123,6 +123,19 @@ $uiMode = choosology_ui_normalize((string) ($account['ui_mode'] ?? 'classic'));
 		</div>
 	</form>
 
+	<section class="ms-account-remove" aria-labelledby="ms-account-remove-heading">
+		<h3 id="ms-account-remove-heading">Remove profile and submitted content</h3>
+		<p class="ms-account-remove-warn">This cannot be undone. Your account, login, uploaded images, ratings, and experiments will be removed from browse, search, and play. A placeholder stays so other people&rsquo;s activity still has a target. Your comments stay visible as &ldquo;[deleted]&rdquo; by &ldquo;[deleted user]&rdquo;.</p>
+		<label class="ms-account-label" for="acct_remove_password">Type your current password</label>
+		<input type="password" id="acct_remove_password" autocomplete="current-password">
+		<label class="ms-account-check">
+			<input type="checkbox" id="acct_remove_confirm">
+			<span>I understand this cannot be undone.</span>
+		</label>
+		<button type="button" id="acct_remove">Remove my profile and content</button>
+		<p id="acct_remove_status" class="ms-account-remove-status" aria-live="polite"></p>
+	</section>
+
 	<div id="acct_picmodal" class="acct-picmodal acct-picmodal--hidden" aria-hidden="true">
 		<div class="acct-picmodal-backdrop" tabindex="-1"></div>
 		<div class="acct-picmodal-panel" role="dialog" aria-modal="true" aria-labelledby="acct_picmodal_title">
@@ -376,6 +389,41 @@ $uiMode = choosology_ui_normalize((string) ($account['ui_mode'] ?? 'classic'));
 	});
 	$("#ms-account-form").on("input change keyup", "input, textarea", function () {
 		accountTouched = true;
+	});
+
+	$("#acct_remove").on("click", function () {
+		var password = String($("#acct_remove_password").val() || "");
+		var $status = $("#acct_remove_status");
+		$status.removeClass("ms-account-status--error").text("");
+		if (!$("#acct_remove_confirm").is(":checked")) {
+			$status.addClass("ms-account-status--error").text("Check the box. This cannot be undone.");
+			return;
+		}
+		if (password === "") {
+			$status.addClass("ms-account-status--error").text("Type your current password.");
+			return;
+		}
+		if (!window.confirm("Remove your profile and submitted content? This cannot be undone.")) {
+			return;
+		}
+		$("#acct_remove").prop("disabled", true);
+		$.ajax({
+			type: "POST",
+			url: acctUrl("ajax/removeaccount.php"),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			data: JSON.stringify({ password: password, confirm: 1 })
+		}).done(function (res) {
+			if (res && res.ok) {
+				window.location.href = acctUrl("index.php?logout=1");
+				return;
+			}
+			$status.addClass("ms-account-status--error").text((res && res.error) ? res.error : "Nothing was removed.");
+			$("#acct_remove").prop("disabled", false);
+		}).fail(function () {
+			$status.addClass("ms-account-status--error").text("Nothing was removed.");
+			$("#acct_remove").prop("disabled", false);
+		});
 	});
 
 	$("#acct_save").on("click", function () {

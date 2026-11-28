@@ -587,6 +587,7 @@
 			var $body = $("<div>").addClass("restricted-adventure-body").appendTo($row);
 			$("<p>").addClass("restricted-comment-meta").text(
 				"#" + adv.id + " · " + (adv.user || "?") + " · " + (adv.avail || "") +
+				(adv.featured ? " · FEATURED" : "") +
 				(holdBits.length ? " · " + holdBits.join(", ") : "") +
 				(adv.published ? " · published " + adv.published : "")
 			).appendTo($body);
@@ -607,6 +608,12 @@
 			).appendTo($body);
 			$note.css({ display: "block", margin: "8px 0" });
 			var $actions = $("<div>").addClass("restricted-actions").appendTo($body);
+			$("<button>").attr({
+				type: "button",
+				"data-featured": adv.featured ? "1" : "0"
+			}).addClass("restricted-btn restricted-adventure-feature")
+				.text(adv.featured ? "Unfeature" : "Feature")
+				.appendTo($actions);
 			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--primary restricted-adventure-accept").text("Accept").appendTo($actions);
 			$("<button>").attr("type", "button").addClass("restricted-btn restricted-adventure-restricted").text("Accept as Restricted").appendTo($actions);
 			$("<button>").attr("type", "button").addClass("restricted-btn restricted-btn--danger restricted-adventure-reject").text("Reject & remove").appendTo($actions);
@@ -942,6 +949,15 @@
 			if (window.confirm("Approve every comment currently awaiting review?")) {
 				mutate("moderate_comment", { mode: "approve_all" }, "Review queue approved.");
 			}
+		});
+
+		root.on("click.restricted", ".restricted-adventure-feature", function () {
+			var $item = $(this).closest("[data-adventure-id]");
+			var turnOn = $(this).attr("data-featured") !== "1";
+			mutate("set_featured", {
+				adventure_id: parseInt($item.attr("data-adventure-id"), 10) || 0,
+				featured: turnOn ? 1 : 0
+			}, turnOn ? "Experiment featured." : "Experiment removed from Newly Featured.");
 		});
 
 		root.on("click.restricted", ".restricted-adventure-accept, .restricted-adventure-restricted, .restricted-adventure-reject", function () {

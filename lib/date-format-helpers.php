@@ -179,18 +179,53 @@ function choosology_date_format_label(?string $fmt = null): string
 }
 
 /**
- * Format a DB datetime / unix timestamp using the user preference.
- * @param 'date'|'datetime'|'time' $kind
+ * Unix time for a real save, or null when the value is missing or the epoch.
+ * A zero timestamp is stored as 1970-01-01 and must not be shown as a save.
  */
-function choosology_format_user_date($date, string $kind = 'date', ?string $fmt = null): string
+function choosology_real_save_unix($date): ?int
 {
-	if (is_int($date) || (is_string($date) && ctype_digit($date))) {
+	if ($date === null) {
+		return null;
+	}
+	if (is_string($date)) {
+		$date = trim($date);
+		if ($date === '' || $date === '0' || strncmp($date, '0000-00-00', 10) === 0 || strncmp($date, '1970-01-01', 10) === 0) {
+			return null;
+		}
+	}
+	if (is_int($date) || (is_string($date) && ctype_digit((string) $date))) {
 		$phptime = (int) $date;
 	} else {
 		$phptime = strtotime((string) $date);
 	}
-	if ($phptime === false || $phptime <= 0) {
+	if ($phptime === false || $phptime < 86400) {
+		return null;
+	}
+	return $phptime;
+}
+
+/**
+ * Format a DB datetime / unix timestamp using the user preference.
+ * Missing and epoch values format as an empty string, not 01/01/1970.
+ * @param 'date'|'datetime'|'time' $kind
+ */
+function choosology_format_user_date($date, string $kind = 'date', ?string $fmt = null): string
+{
+	$phptime = choosology_real_save_unix($date);
+	if ($phptime === null) {
 		return '';
 	}
 	return date(choosology_date_format_pattern($kind, $fmt), $phptime);
+}
+
+/**
+ * Screen-editor stamp. A real save uses the mdy/dmy preference. Nothing saved stays unstamped.
+ */
+function choosology_last_saved_label($date): string
+{
+	$formatted = choosology_format_user_date($date, 'datetime');
+	if ($formatted === '') {
+		return 'Not saved yet';
+	}
+	return 'Last Saved: ' . $formatted;
 }

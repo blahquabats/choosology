@@ -282,7 +282,7 @@ if (!choosology_restricted_is_admin()) {
 				<h3 id="restricted_adventures_heading">Adventure Review</h3>
 			</div>
 		</div>
-		<p class="restricted-note">Publishing stays frictionless. Every new public listing enters this queue. Held rows (probation or content flags) stay out of browse until you act.</p>
+		<p class="restricted-note">Publishing stays frictionless. Every new public listing enters this queue. Held rows (probation or content flags) stay out of browse until you act. Feature places a queued experiment in the home Newly Featured set.</p>
 		<div class="restricted-card restricted-card--compact restricted-form">
 			<p class="restricted-kicker">Probation</p>
 			<form id="restricted_probation_form" class="restricted-fields restricted-fields--two" onsubmit="return false;">

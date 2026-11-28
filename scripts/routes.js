@@ -15,6 +15,36 @@
         this.get('#/home', function(context) {
                 showMenuOption("home");
         });
+        this.get('#/about', function(context) {
+                showMenuOption("about");
+        });
+        this.get('#/terms', function(context) {
+                showMenuOption("terms");
+        });
+        this.get('#/privacy', function(context) {
+                showMenuOption("privacy");
+        });
+        this.get(/#\/author\/(.*)/, function() {
+                var raw = this.params['splat'];
+                raw = Array.isArray(raw) ? raw[0] : raw;
+                raw = String(raw || '');
+                try { raw = decodeURIComponent(raw); } catch (e) { /* keep the raw segment */ }
+                showMenuOption("author", "user=" + encodeURIComponent(raw));
+        });
+        this.get('#/try/play', function(context) {
+                if ($("body").attr("data-logged-in") === "1") {
+                    window.location.hash = "#/home";
+                    return;
+                }
+                showMenuOption("tryplay", "try=1");
+        });
+        this.get('#/try', function(context) {
+                if ($("body").attr("data-logged-in") === "1") {
+                    window.location.hash = "#/home";
+                    return;
+                }
+                showMenuOption("tryedit", "try=1");
+        });
       
         this.get(/\#\/news\/?(.*)/, function(context) {
                 var splat = this.params['splat'];

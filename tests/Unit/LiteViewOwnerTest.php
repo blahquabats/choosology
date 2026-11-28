@@ -10,7 +10,7 @@ final class LiteViewOwnerTest extends TestCase
 		$src = file_get_contents(CHOOSOLOGY_ROOT . '/lite/view.php');
 		$this->assertIsString($src);
 		$assign = strpos($src, "\$owner = (string) (\$adv['user'] ?? '');");
-		$byline = strpos($src, 'htmlspecialchars($owner, ENT_QUOTES, \'UTF-8\')');
+		$byline = strpos($src, "choosology_author_byline_html(\$owner, 'lite')");
 		$this->assertNotFalse($assign);
 		$this->assertNotFalse($byline);
 		$this->assertLessThan($byline, $assign);

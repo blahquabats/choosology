@@ -123,12 +123,27 @@ function paintLoadedScreen(response, screenid, fromscreen)
     $("#lastscreen").on("click", function () {
         goToScreen(fromscreen, screenid, 1, this);
     });
+    var beginId = $("#firstscreen").attr("data-begin");
+    if (beginId !== undefined) {
+        $("#firstscreen").toggleClass("is-opening-screen", String(screenid) === String(beginId));
+    }
     $("#innards div").html(response.text);
     silenceBrokenImages(".advcanvas");
     $(".advcanvas").prop("style", response.bg);
     $(".realinnards,.viewcol1,.choices").prop("style", response.box + ";" + response.border);
     $("#choicemeat").html(response.choices);
     resetChoiceReveal($(".choicecontainer"));
+}
+
+function screenAjaxData(screenid, fromscreen)
+{
+    var data = {
+        screen: screenid,
+        project_lazarus: "go"
+    };
+    if (fromscreen !== undefined && fromscreen !== null) data.from = fromscreen;
+    if ($("#try-draft").val() === "1") data.try = "1";
+    return data;
 }
 
 function goToScreen(screenid, fromscreen, reverse, selected)
@@ -141,9 +156,7 @@ function goToScreen(screenid, fromscreen, reverse, selected)
     var gen = ++screenNavGen;
     $.ajax({
        url: "ajax/screenajax.php",
-       data: {screen: screenid,
-       from: fromscreen,
-       project_lazarus:'go'}
+       data: screenAjaxData(screenid, fromscreen)
     })
     .done(function (text) {
         if (gen !== screenNavGen) {
@@ -178,8 +191,7 @@ function reloadScreen(screenid)
     var wasRevealed = $(".choicecontainer .choices").hasClass("is-revealed");
     $.ajax({
        url: "ajax/screenajax.php",
-       data: {screen: screenid,
-       project_lazarus:'go'}
+       data: screenAjaxData(screenid)
     })
     .done(function(text)
     {

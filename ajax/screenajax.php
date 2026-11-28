@@ -5,6 +5,19 @@ require_once("../auxfuncs.php");
 $response = array();
 $response["success"] = 0;
 $_POST=$_GET;
+if (isset($_GET['try']) && (string) $_GET['try'] === '1') {
+    require_once dirname(__DIR__) . '/lib/try-draft.php';
+    if (choosology_try_visitor_is_logged_in()) {
+        echo json_encode(array('success' => 0));
+        exit;
+    }
+    $draft = choosology_try_draft_get(true);
+    $payload = choosology_try_screen_payload($draft, (string) ($_GET['screen'] ?? ''));
+    /* Same as a saved screen: a raw JSON string. A JSON content type makes
+       jQuery parse it before $.parseJSON, and the choice click then does nothing. */
+    echo json_encode($payload);
+    exit;
+}
 if (isset($_POST['screen']))
 {
     $screenid = $_POST['screen'];
